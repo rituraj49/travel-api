@@ -1,0 +1,26 @@
+services:
+  postgres:
+    container_name: lucene-postgres
+    image: postgres:16
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: java
+      POSTGRES_DB: mydb
+    ports:
+      - "6433:5432"
+    volumes:
+      - ./docker/postgres-app/data:/var/lib/postgresql/data
+  lucene-spring:
+    container_name: lucene-backend
+#    build: .
+    image: rituraj49/lucene-demo:latest
+    restart: unless-stopped
+    depends_on:
+      - postgres
+    ports:
+      - 8080:8080
+    environment:
+      - SPRING_PROFILES_ACTIVE=docker
+      - AMADEUS_KEY=bM1c5H05exTfyAQs849FSP2raP0uWlA3
+      - AMADEUS_SECRET=jy4wEv6Bo3tQyyZP

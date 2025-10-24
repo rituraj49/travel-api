@@ -1,0 +1,114 @@
+{
+  "oneWay": false,
+  "seatsAvailable": 0,
+  "currencyCode": "INR",
+  "basePrice": "26760.00",
+  "totalPrice": "56488.00",
+  "fees": [
+    {
+      "amount": "0.00",
+      "type": "SUPPLIER"
+    },
+    {
+      "amount": "0.00",
+      "type": "TICKETING"
+    },
+    {
+      "amount": "0.00",
+      "type": "FORM_OF_PAYMENT"
+    }
+  ],
+  "totalTravelers": 1,
+  "trips": [
+    {
+      "tripNo": 1,
+      "tripType": "ONEWAY",
+      "from": "BLR",
+      "to": "JFK",
+      "stops": 1,
+      "totalFlightDuration": "19h 55m",
+      "totalLayoverDuration": "1h 20m",
+      "legs": [
+        {
+          "legNo": "7",
+          "flightNumber": "569",
+          "carrierCode": "EK",
+          "carrierName": "AIRLINE",
+          "operatingCarrierCode": "EK",
+          "operatingCarrierName": "AIRLINE",
+          "aircraftCode": "388",
+          "aircraft": "AIRCRAFT",
+          "departureAirport": "BLR",
+          "departureTerminal": "2",
+          "departureDateTime": "2025-12-31T04:30:00",
+          "arrivalAirport": "DXB",
+          "arrivalTerminal": "3",
+          "arrivalDateTime": "2025-12-31T07:10:00",
+          "duration": "4h 10m",
+          "layoverAfter": "1h 20m"
+        },
+        {
+          "legNo": "8",
+          "flightNumber": "201",
+          "carrierCode": "EK",
+          "carrierName": null,
+          "operatingCarrierCode": "EK",
+          "operatingCarrierName": null,
+          "aircraftCode": "388",
+          "aircraft": null,
+          "departureAirport": "DXB",
+          "departureTerminal": "3",
+          "departureDateTime": "2025-12-31T08:30:00",
+          "arrivalAirport": "JFK",
+          "arrivalTerminal": "4",
+          "arrivalDateTime": "2025-12-31T13:55:00",
+          "duration": null,
+          "layoverAfter": null
+        }
+      ]
+    }
+  ],
+  "creditCardFees": [
+    {
+      "brand": "VISA",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "AMERICAN_EXPRESS",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "MASTERCARD",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "VISA_ELECTRON",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "VISA_DEBIT",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "MASTERCARD_DEBIT",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "MAESTRO",
+      "amount": "0",
+      "currency": "EUR"
+    },
+    {
+      "brand": "DINERS",
+      "amount": "0",
+      "currency": "EUR"
+    }
+  ],
+  "bookingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"1\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-10-30\",\"numberOfBookableSeats\":0,\"itineraries\":[{\"segments\":[{\"departure\":{\"iataCode\":\"BLR\",\"terminal\":\"2\",\"at\":\"2025-12-31T04:30:00\"},\"arrival\":{\"iataCode\":\"DXB\",\"terminal\":\"3\",\"at\":\"2025-12-31T07:10:00\"},\"carrierCode\":\"EK\",\"number\":\"569\",\"aircraft\":{\"code\":\"388\"},\"operating\":{\"carrierCode\":\"EK\"},\"duration\":\"PT4H10M\",\"id\":\"7\",\"numberOfStops\":0,\"blacklistedInEU\":false,\"co2Emissions\":[{\"weight\":169,\"weightUnit\":\"KG\",\"cabin\":\"ECONOMY\"}]},{\"departure\":{\"iataCode\":\"DXB\",\"terminal\":\"3\",\"at\":\"2025-12-31T08:30:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"4\",\"at\":\"2025-12-31T13:55:00\"},\"carrierCode\":\"EK\",\"number\":\"201\",\"aircraft\":{\"code\":\"388\"},\"operating\":{\"carrierCode\":\"EK\"},\"duration\":\"PT14H25M\",\"id\":\"8\",\"numberOfStops\":0,\"blacklistedInEU\":false,\"co2Emissions\":[{\"weight\":628,\"weightUnit\":\"KG\",\"cabin\":\"ECONOMY\"}]}]}],\"price\":{\"currency\":\"INR\",\"total\":\"56488.00\",\"base\":\"26760.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"},{\"amount\":\"0.00\",\"type\":\"FORM_OF_PAYMENT\"}],\"grandTotal\":\"56488.00\",\"billingCurrency\":\"INR\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"EK\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"INR\",\"total\":\"56488\",\"base\":\"26760\",\"taxes\":[{\"amount\":\"1074.00\",\"code\":\"F6\"},{\"amount\":\"614.00\",\"code\":\"XY\"},{\"amount\":\"1241.00\",\"code\":\"P2\"},{\"amount\":\"1770.00\",\"code\":\"IN\"},{\"amount\":\"19626.00\",\"code\":\"YQ\"},{\"amount\":\"2320.00\",\"code\":\"K3\"},{\"amount\":\"120.00\",\"code\":\"ZR\"},{\"amount\":\"325.00\",\"code\":\"XA\"},{\"amount\":\"631.00\",\"code\":\"YC\"},{\"amount\":\"2007.00\",\"code\":\"US\"}],\"refundableTaxes\":\"9120\"},\"fareDetailsBySegment\":[{\"segmentId\":\"7\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"LHAOPIN1\",\"brandedFare\":\"ECOSAVER\",\"class\":\"L\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"8\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"LHAOPIN1\",\"brandedFare\":\"ECOSAVER\",\"class\":\"L\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}}]}]}"
+}

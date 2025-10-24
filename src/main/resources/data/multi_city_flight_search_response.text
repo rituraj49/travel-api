@@ -1,0 +1,523 @@
+[
+    {
+        "oneWay": false,
+        "seatsAvailable": 7,
+        "currencyCode": "USD",
+        "basePrice": "779.00",
+        "totalPrice": "906.17",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "RETURN",
+                "from": "DEL",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "21h 25m",
+                "totalLayoverDuration": "3h 10m",
+                "legs": [
+                    {
+                        "legNo": "1",
+                        "flightNumber": "579",
+                        "carrierCode": "QR",
+                        "carrierName": "QATAR AIRWAYS",
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": "QATAR AIRWAYS",
+                        "aircraftCode": "359",
+                        "aircraft": "AIRBUS A350-900",
+                        "departureAirport": "DEL",
+                        "departureTerminal": "3",
+                        "departureDateTime": "2025-10-05T03:25:00",
+                        "arrivalAirport": "DOH",
+                        "arrivalTerminal": null,
+                        "arrivalDateTime": "2025-10-05T04:55:00",
+                        "duration": "4h 0m",
+                        "layoverAfter": "3h 10m"
+                    },
+                    {
+                        "legNo": "2",
+                        "flightNumber": "6640",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "777",
+                        "aircraft": null,
+                        "departureAirport": "DOH",
+                        "departureTerminal": null,
+                        "departureDateTime": "2025-10-05T08:05:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2025-10-05T15:20:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            },
+            {
+                "tripNo": 2,
+                "tripType": "RETURN",
+                "from": "JFK",
+                "to": "LHR",
+                "stops": 0,
+                "totalFlightDuration": "7h 24m",
+                "totalLayoverDuration": "0h 0m",
+                "legs": [
+                    {
+                        "legNo": "9",
+                        "flightNumber": "1107",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "32Q",
+                        "aircraft": null,
+                        "departureAirport": "JFK",
+                        "departureTerminal": "5",
+                        "departureDateTime": "2025-10-20T08:21:00",
+                        "arrivalAirport": "LHR",
+                        "arrivalTerminal": "2",
+                        "arrivalDateTime": "2025-10-20T20:45:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"1\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-09-08\",\"numberOfBookableSeats\":7,\"itineraries\":[{\"duration\":\"PT21H25M\",\"segments\":[{\"departure\":{\"iataCode\":\"DEL\",\"terminal\":\"3\",\"at\":\"2025-10-05T03:25:00\"},\"arrival\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T04:55:00\"},\"carrierCode\":\"QR\",\"number\":\"579\",\"aircraft\":{\"code\":\"359\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT4H\",\"id\":\"1\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T08:05:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2025-10-05T15:20:00\"},\"carrierCode\":\"B6\",\"number\":\"6640\",\"aircraft\":{\"code\":\"777\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT14H15M\",\"id\":\"2\",\"numberOfStops\":0,\"blacklistedInEU\":false}]},{\"duration\":\"PT7H24M\",\"segments\":[{\"departure\":{\"iataCode\":\"JFK\",\"terminal\":\"5\",\"at\":\"2025-10-20T08:21:00\"},\"arrival\":{\"iataCode\":\"LHR\",\"terminal\":\"2\",\"at\":\"2025-10-20T20:45:00\"},\"carrierCode\":\"B6\",\"number\":\"1107\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT7H24M\",\"id\":\"9\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"USD\",\"total\":\"906.17\",\"base\":\"779.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"906.17\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"B6\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"USD\",\"total\":\"906.17\",\"base\":\"779.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"1\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"2\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"R\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"9\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"PL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"P\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 7,
+        "currencyCode": "USD",
+        "basePrice": "779.00",
+        "totalPrice": "906.17",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "RETURN",
+                "from": "DEL",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "21h 35m",
+                "totalLayoverDuration": "3h 20m",
+                "legs": [
+                    {
+                        "legNo": "3",
+                        "flightNumber": "571",
+                        "carrierCode": "QR",
+                        "carrierName": "QATAR AIRWAYS",
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": "QATAR AIRWAYS",
+                        "aircraftCode": "788",
+                        "aircraft": "BOEING 787-8",
+                        "departureAirport": "DEL",
+                        "departureTerminal": "3",
+                        "departureDateTime": "2025-10-05T10:25:00",
+                        "arrivalAirport": "DOH",
+                        "arrivalTerminal": null,
+                        "arrivalDateTime": "2025-10-05T11:55:00",
+                        "duration": "4h 0m",
+                        "layoverAfter": "3h 20m"
+                    },
+                    {
+                        "legNo": "4",
+                        "flightNumber": "5552",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "350",
+                        "aircraft": null,
+                        "departureAirport": "DOH",
+                        "departureTerminal": null,
+                        "departureDateTime": "2025-10-05T15:15:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2025-10-05T22:30:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            },
+            {
+                "tripNo": 2,
+                "tripType": "RETURN",
+                "from": "JFK",
+                "to": "LHR",
+                "stops": 0,
+                "totalFlightDuration": "7h 24m",
+                "totalLayoverDuration": "0h 0m",
+                "legs": [
+                    {
+                        "legNo": "9",
+                        "flightNumber": "1107",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "32Q",
+                        "aircraft": null,
+                        "departureAirport": "JFK",
+                        "departureTerminal": "5",
+                        "departureDateTime": "2025-10-20T08:21:00",
+                        "arrivalAirport": "LHR",
+                        "arrivalTerminal": "2",
+                        "arrivalDateTime": "2025-10-20T20:45:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"2\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-09-08\",\"numberOfBookableSeats\":7,\"itineraries\":[{\"duration\":\"PT21H35M\",\"segments\":[{\"departure\":{\"iataCode\":\"DEL\",\"terminal\":\"3\",\"at\":\"2025-10-05T10:25:00\"},\"arrival\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T11:55:00\"},\"carrierCode\":\"QR\",\"number\":\"571\",\"aircraft\":{\"code\":\"788\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT4H\",\"id\":\"3\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T15:15:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2025-10-05T22:30:00\"},\"carrierCode\":\"B6\",\"number\":\"5552\",\"aircraft\":{\"code\":\"350\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT14H15M\",\"id\":\"4\",\"numberOfStops\":0,\"blacklistedInEU\":false}]},{\"duration\":\"PT7H24M\",\"segments\":[{\"departure\":{\"iataCode\":\"JFK\",\"terminal\":\"5\",\"at\":\"2025-10-20T08:21:00\"},\"arrival\":{\"iataCode\":\"LHR\",\"terminal\":\"2\",\"at\":\"2025-10-20T20:45:00\"},\"carrierCode\":\"B6\",\"number\":\"1107\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT7H24M\",\"id\":\"9\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"USD\",\"total\":\"906.17\",\"base\":\"779.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"906.17\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"B6\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"USD\",\"total\":\"906.17\",\"base\":\"779.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"3\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"4\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"R\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"9\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"PL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"P\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 7,
+        "currencyCode": "USD",
+        "basePrice": "779.00",
+        "totalPrice": "906.17",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "RETURN",
+                "from": "DEL",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "28h 35m",
+                "totalLayoverDuration": "10h 20m",
+                "legs": [
+                    {
+                        "legNo": "5",
+                        "flightNumber": "579",
+                        "carrierCode": "QR",
+                        "carrierName": "QATAR AIRWAYS",
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": "QATAR AIRWAYS",
+                        "aircraftCode": "359",
+                        "aircraft": "AIRBUS A350-900",
+                        "departureAirport": "DEL",
+                        "departureTerminal": "3",
+                        "departureDateTime": "2025-10-05T03:25:00",
+                        "arrivalAirport": "DOH",
+                        "arrivalTerminal": null,
+                        "arrivalDateTime": "2025-10-05T04:55:00",
+                        "duration": "4h 0m",
+                        "layoverAfter": "10h 20m"
+                    },
+                    {
+                        "legNo": "6",
+                        "flightNumber": "5552",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "350",
+                        "aircraft": null,
+                        "departureAirport": "DOH",
+                        "departureTerminal": null,
+                        "departureDateTime": "2025-10-05T15:15:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2025-10-05T22:30:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            },
+            {
+                "tripNo": 2,
+                "tripType": "RETURN",
+                "from": "JFK",
+                "to": "LHR",
+                "stops": 0,
+                "totalFlightDuration": "7h 24m",
+                "totalLayoverDuration": "0h 0m",
+                "legs": [
+                    {
+                        "legNo": "9",
+                        "flightNumber": "1107",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "32Q",
+                        "aircraft": null,
+                        "departureAirport": "JFK",
+                        "departureTerminal": "5",
+                        "departureDateTime": "2025-10-20T08:21:00",
+                        "arrivalAirport": "LHR",
+                        "arrivalTerminal": "2",
+                        "arrivalDateTime": "2025-10-20T20:45:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"3\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-09-08\",\"numberOfBookableSeats\":7,\"itineraries\":[{\"duration\":\"PT28H35M\",\"segments\":[{\"departure\":{\"iataCode\":\"DEL\",\"terminal\":\"3\",\"at\":\"2025-10-05T03:25:00\"},\"arrival\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T04:55:00\"},\"carrierCode\":\"QR\",\"number\":\"579\",\"aircraft\":{\"code\":\"359\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT4H\",\"id\":\"5\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T15:15:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2025-10-05T22:30:00\"},\"carrierCode\":\"B6\",\"number\":\"5552\",\"aircraft\":{\"code\":\"350\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT14H15M\",\"id\":\"6\",\"numberOfStops\":0,\"blacklistedInEU\":false}]},{\"duration\":\"PT7H24M\",\"segments\":[{\"departure\":{\"iataCode\":\"JFK\",\"terminal\":\"5\",\"at\":\"2025-10-20T08:21:00\"},\"arrival\":{\"iataCode\":\"LHR\",\"terminal\":\"2\",\"at\":\"2025-10-20T20:45:00\"},\"carrierCode\":\"B6\",\"number\":\"1107\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT7H24M\",\"id\":\"9\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"USD\",\"total\":\"906.17\",\"base\":\"779.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"906.17\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"B6\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"USD\",\"total\":\"906.17\",\"base\":\"779.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"5\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"6\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"R\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"9\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"PL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"P\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 5,
+        "currencyCode": "USD",
+        "basePrice": "828.00",
+        "totalPrice": "957.57",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "RETURN",
+                "from": "DEL",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "21h 25m",
+                "totalLayoverDuration": "3h 10m",
+                "legs": [
+                    {
+                        "legNo": "1",
+                        "flightNumber": "579",
+                        "carrierCode": "QR",
+                        "carrierName": "QATAR AIRWAYS",
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": "QATAR AIRWAYS",
+                        "aircraftCode": "359",
+                        "aircraft": "AIRBUS A350-900",
+                        "departureAirport": "DEL",
+                        "departureTerminal": "3",
+                        "departureDateTime": "2025-10-05T03:25:00",
+                        "arrivalAirport": "DOH",
+                        "arrivalTerminal": null,
+                        "arrivalDateTime": "2025-10-05T04:55:00",
+                        "duration": "4h 0m",
+                        "layoverAfter": "3h 10m"
+                    },
+                    {
+                        "legNo": "2",
+                        "flightNumber": "6640",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "777",
+                        "aircraft": null,
+                        "departureAirport": "DOH",
+                        "departureTerminal": null,
+                        "departureDateTime": "2025-10-05T08:05:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2025-10-05T15:20:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            },
+            {
+                "tripNo": 2,
+                "tripType": "RETURN",
+                "from": "JFK",
+                "to": "LHR",
+                "stops": 1,
+                "totalFlightDuration": "11h 40m",
+                "totalLayoverDuration": "3h 19m",
+                "legs": [
+                    {
+                        "legNo": "10",
+                        "flightNumber": "1118",
+                        "carrierCode": "B6",
+                        "carrierName": "JETBLUE AIRWAYS",
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": "JETBLUE AIRWAYS",
+                        "aircraftCode": "223",
+                        "aircraft": "AIRBUS  A220-300",
+                        "departureAirport": "JFK",
+                        "departureTerminal": "5",
+                        "departureDateTime": "2025-10-20T13:50:00",
+                        "arrivalAirport": "BOS",
+                        "arrivalTerminal": "C",
+                        "arrivalDateTime": "2025-10-20T15:21:00",
+                        "duration": "1h 31m",
+                        "layoverAfter": "3h 19m"
+                    },
+                    {
+                        "legNo": "11",
+                        "flightNumber": "1620",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "32Q",
+                        "aircraft": null,
+                        "departureAirport": "BOS",
+                        "departureTerminal": "C",
+                        "departureDateTime": "2025-10-20T18:40:00",
+                        "arrivalAirport": "LHR",
+                        "arrivalTerminal": "2",
+                        "arrivalDateTime": "2025-10-21T06:30:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"4\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-09-08\",\"numberOfBookableSeats\":5,\"itineraries\":[{\"duration\":\"PT21H25M\",\"segments\":[{\"departure\":{\"iataCode\":\"DEL\",\"terminal\":\"3\",\"at\":\"2025-10-05T03:25:00\"},\"arrival\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T04:55:00\"},\"carrierCode\":\"QR\",\"number\":\"579\",\"aircraft\":{\"code\":\"359\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT4H\",\"id\":\"1\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T08:05:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2025-10-05T15:20:00\"},\"carrierCode\":\"B6\",\"number\":\"6640\",\"aircraft\":{\"code\":\"777\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT14H15M\",\"id\":\"2\",\"numberOfStops\":0,\"blacklistedInEU\":false}]},{\"duration\":\"PT11H40M\",\"segments\":[{\"departure\":{\"iataCode\":\"JFK\",\"terminal\":\"5\",\"at\":\"2025-10-20T13:50:00\"},\"arrival\":{\"iataCode\":\"BOS\",\"terminal\":\"C\",\"at\":\"2025-10-20T15:21:00\"},\"carrierCode\":\"B6\",\"number\":\"1118\",\"aircraft\":{\"code\":\"223\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT1H31M\",\"id\":\"10\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"BOS\",\"terminal\":\"C\",\"at\":\"2025-10-20T18:40:00\"},\"arrival\":{\"iataCode\":\"LHR\",\"terminal\":\"2\",\"at\":\"2025-10-21T06:30:00\"},\"carrierCode\":\"B6\",\"number\":\"1620\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT6H50M\",\"id\":\"11\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"USD\",\"total\":\"957.57\",\"base\":\"828.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"957.57\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"B6\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"USD\",\"total\":\"957.57\",\"base\":\"828.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"1\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"2\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"R\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"10\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"OL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"O\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]},{\"segmentId\":\"11\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"OL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"O\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 5,
+        "currencyCode": "USD",
+        "basePrice": "828.00",
+        "totalPrice": "957.57",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "RETURN",
+                "from": "DEL",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "21h 25m",
+                "totalLayoverDuration": "3h 10m",
+                "legs": [
+                    {
+                        "legNo": "1",
+                        "flightNumber": "579",
+                        "carrierCode": "QR",
+                        "carrierName": "QATAR AIRWAYS",
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": "QATAR AIRWAYS",
+                        "aircraftCode": "359",
+                        "aircraft": "AIRBUS A350-900",
+                        "departureAirport": "DEL",
+                        "departureTerminal": "3",
+                        "departureDateTime": "2025-10-05T03:25:00",
+                        "arrivalAirport": "DOH",
+                        "arrivalTerminal": null,
+                        "arrivalDateTime": "2025-10-05T04:55:00",
+                        "duration": "4h 0m",
+                        "layoverAfter": "3h 10m"
+                    },
+                    {
+                        "legNo": "2",
+                        "flightNumber": "6640",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "QR",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "777",
+                        "aircraft": null,
+                        "departureAirport": "DOH",
+                        "departureTerminal": null,
+                        "departureDateTime": "2025-10-05T08:05:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2025-10-05T15:20:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            },
+            {
+                "tripNo": 2,
+                "tripType": "RETURN",
+                "from": "JFK",
+                "to": "LHR",
+                "stops": 1,
+                "totalFlightDuration": "17h 20m",
+                "totalLayoverDuration": "9h 13m",
+                "legs": [
+                    {
+                        "legNo": "7",
+                        "flightNumber": "418",
+                        "carrierCode": "B6",
+                        "carrierName": "JETBLUE AIRWAYS",
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": "JETBLUE AIRWAYS",
+                        "aircraftCode": "320",
+                        "aircraft": "AIRBUS A320",
+                        "departureAirport": "JFK",
+                        "departureTerminal": "5",
+                        "departureDateTime": "2025-10-20T08:10:00",
+                        "arrivalAirport": "BOS",
+                        "arrivalTerminal": "C",
+                        "arrivalDateTime": "2025-10-20T09:27:00",
+                        "duration": "1h 17m",
+                        "layoverAfter": "9h 13m"
+                    },
+                    {
+                        "legNo": "8",
+                        "flightNumber": "1620",
+                        "carrierCode": "B6",
+                        "carrierName": null,
+                        "operatingCarrierCode": "B6",
+                        "operatingCarrierName": null,
+                        "aircraftCode": "32Q",
+                        "aircraft": null,
+                        "departureAirport": "BOS",
+                        "departureTerminal": "C",
+                        "departureDateTime": "2025-10-20T18:40:00",
+                        "arrivalAirport": "LHR",
+                        "arrivalTerminal": "2",
+                        "arrivalDateTime": "2025-10-21T06:30:00",
+                        "duration": null,
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"5\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-09-08\",\"numberOfBookableSeats\":5,\"itineraries\":[{\"duration\":\"PT21H25M\",\"segments\":[{\"departure\":{\"iataCode\":\"DEL\",\"terminal\":\"3\",\"at\":\"2025-10-05T03:25:00\"},\"arrival\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T04:55:00\"},\"carrierCode\":\"QR\",\"number\":\"579\",\"aircraft\":{\"code\":\"359\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT4H\",\"id\":\"1\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"DOH\",\"at\":\"2025-10-05T08:05:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2025-10-05T15:20:00\"},\"carrierCode\":\"B6\",\"number\":\"6640\",\"aircraft\":{\"code\":\"777\"},\"operating\":{\"carrierCode\":\"QR\"},\"duration\":\"PT14H15M\",\"id\":\"2\",\"numberOfStops\":0,\"blacklistedInEU\":false}]},{\"duration\":\"PT17H20M\",\"segments\":[{\"departure\":{\"iataCode\":\"JFK\",\"terminal\":\"5\",\"at\":\"2025-10-20T08:10:00\"},\"arrival\":{\"iataCode\":\"BOS\",\"terminal\":\"C\",\"at\":\"2025-10-20T09:27:00\"},\"carrierCode\":\"B6\",\"number\":\"418\",\"aircraft\":{\"code\":\"320\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT1H17M\",\"id\":\"7\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"BOS\",\"terminal\":\"C\",\"at\":\"2025-10-20T18:40:00\"},\"arrival\":{\"iataCode\":\"LHR\",\"terminal\":\"2\",\"at\":\"2025-10-21T06:30:00\"},\"carrierCode\":\"B6\",\"number\":\"1620\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"B6\"},\"duration\":\"PT6H50M\",\"id\":\"8\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"USD\",\"total\":\"957.57\",\"base\":\"828.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"957.57\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"B6\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"USD\",\"total\":\"957.57\",\"base\":\"828.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"1\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"2\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"RJR4I1SE\",\"class\":\"R\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"7\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"OL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"O\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]},{\"segmentId\":\"8\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"OL02BZY5\",\"brandedFare\":\"AN\",\"class\":\"O\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0},\"amenities\":[{\"description\":\"CHECKED BAG SECOND\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"EXTRA LEGROOM\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"ADVANCE SEAT SELECTION\",\"isChargeable\":false,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"NON ALCOHOLIC DRINK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL\",\"isChargeable\":false,\"amenityType\":\"MEAL\"}]}]}]}"
+    }
+]

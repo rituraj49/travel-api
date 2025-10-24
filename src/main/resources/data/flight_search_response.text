@@ -1,0 +1,378 @@
+[
+    {
+        "oneWay": false,
+        "seatsAvailable": 1,
+        "currencyCode": "INR",
+        "basePrice": "69765.00",
+        "totalPrice": "80394.00",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "ONEWAY",
+                "from": "SYD",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "30h 0m",
+                "totalLayoverDuration": "10h 45m",
+                "legs": [
+                    {
+                        "legNo": "1",
+                        "flightNumber": "3",
+                        "carrierCode": "JQ",
+                        "carrierName": "JETSTAR",
+                        "operatingCarrierCode": "JQ",
+                        "operatingCarrierName": "JETSTAR",
+                        "aircraftCode": "788",
+                        "aircraft": "BOEING 787-8",
+                        "departureAirport": "SYD",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T17:25:00",
+                        "arrivalAirport": "HNL",
+                        "arrivalTerminal": "M",
+                        "arrivalDateTime": "2025-12-31T06:00:00",
+                        "duration": "9h 35m",
+                        "layoverAfter": "10h 45m"
+                    },
+                    {
+                        "legNo": "2",
+                        "flightNumber": "830",
+                        "carrierCode": "HA",
+                        "carrierName": "HAWAIIAN AIRLINES",
+                        "operatingCarrierCode": "HA",
+                        "operatingCarrierName": "HAWAIIAN AIRLINES",
+                        "aircraftCode": "332",
+                        "aircraft": "AIRBUS A330-200",
+                        "departureAirport": "HNL",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T16:45:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2026-01-01T07:25:00",
+                        "duration": "9h 40m",
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"1\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-09-26\",\"numberOfBookableSeats\":1,\"itineraries\":[{\"duration\":\"PT30H\",\"segments\":[{\"departure\":{\"iataCode\":\"SYD\",\"terminal\":\"1\",\"at\":\"2025-12-31T17:25:00\"},\"arrival\":{\"iataCode\":\"HNL\",\"terminal\":\"M\",\"at\":\"2025-12-31T06:00:00\"},\"carrierCode\":\"JQ\",\"number\":\"3\",\"aircraft\":{\"code\":\"788\"},\"operating\":{\"carrierCode\":\"JQ\"},\"duration\":\"PT9H35M\",\"id\":\"1\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"HNL\",\"terminal\":\"1\",\"at\":\"2025-12-31T16:45:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2026-01-01T07:25:00\"},\"carrierCode\":\"HA\",\"number\":\"830\",\"aircraft\":{\"code\":\"332\"},\"operating\":{\"carrierCode\":\"HA\"},\"duration\":\"PT9H40M\",\"id\":\"2\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"INR\",\"total\":\"80394.00\",\"base\":\"69765.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"80394.00\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"HA\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"INR\",\"total\":\"80394.00\",\"base\":\"69765.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"1\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"HLOW2\",\"brandedFare\":\"MN\",\"class\":\"H\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":0,\"weight\":20,\"weightUnit\":\"KG\"},\"amenities\":[{\"description\":\"UPTO50LB 23KG AND62LI 158LCM\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":true,\"amenityType\":\"MEAL\"},{\"description\":\"BEVERAGE\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL 1\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"USB POWER\",\"isChargeable\":false,\"amenityType\":\"ENTERTAINMENT\"},{\"description\":\"PRERESERVED SEAT\",\"isChargeable\":false,\"amenityType\":\"BRANDED_FARES\"}]},{\"segmentId\":\"2\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"KH5OASMN\",\"brandedFare\":\"MN\",\"class\":\"K\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":0,\"weight\":20,\"weightUnit\":\"KG\"},\"amenities\":[{\"description\":\"UPTO50LB 23KG AND62LI 158LCM\",\"isChargeable\":true,\"amenityType\":\"BAGGAGE\"},{\"description\":\"SNACK\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"ALCOHOLIC DRINK\",\"isChargeable\":true,\"amenityType\":\"MEAL\"},{\"description\":\"BEVERAGE\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"MEAL 1\",\"isChargeable\":false,\"amenityType\":\"MEAL\"},{\"description\":\"USB POWER\",\"isChargeable\":false,\"amenityType\":\"ENTERTAINMENT\"},{\"description\":\"PRERESERVED SEAT\",\"isChargeable\":false,\"amenityType\":\"BRANDED_FARES\"}]}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 6,
+        "currencyCode": "INR",
+        "basePrice": "85480.00",
+        "totalPrice": "101260.00",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "ONEWAY",
+                "from": "SYD",
+                "to": "JFK",
+                "stops": 2,
+                "totalFlightDuration": "42h 15m",
+                "totalLayoverDuration": "18h 50m",
+                "legs": [
+                    {
+                        "legNo": "3",
+                        "flightNumber": "112",
+                        "carrierCode": "NZ",
+                        "carrierName": "AIR NEW ZEALAND",
+                        "operatingCarrierCode": "NZ",
+                        "operatingCarrierName": "AIR NEW ZEALAND",
+                        "aircraftCode": "32Q",
+                        "aircraft": "AIRBUS A321NEO",
+                        "departureAirport": "SYD",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T19:15:00",
+                        "arrivalAirport": "AKL",
+                        "arrivalTerminal": "I",
+                        "arrivalDateTime": "2026-01-01T00:30:00",
+                        "duration": "3h 15m",
+                        "layoverAfter": "15h 35m"
+                    },
+                    {
+                        "legNo": "4",
+                        "flightNumber": "102",
+                        "carrierCode": "TN",
+                        "carrierName": "AIR TAHITI NUI",
+                        "operatingCarrierCode": "TN",
+                        "operatingCarrierName": "AIR TAHITI NUI",
+                        "aircraftCode": "789",
+                        "aircraft": "BOEING 787-9",
+                        "departureAirport": "AKL",
+                        "departureTerminal": "I",
+                        "departureDateTime": "2026-01-01T16:05:00",
+                        "arrivalAirport": "LAX",
+                        "arrivalTerminal": "B",
+                        "arrivalDateTime": "2026-01-01T09:45:00",
+                        "duration": "14h 40m",
+                        "layoverAfter": "3h 15m"
+                    },
+                    {
+                        "legNo": "5",
+                        "flightNumber": "1110",
+                        "carrierCode": "TN",
+                        "carrierName": "AIR TAHITI NUI",
+                        "operatingCarrierCode": "AA",
+                        "operatingCarrierName": "AMERICAN AIRLINES",
+                        "aircraftCode": "32B",
+                        "aircraft": "AIRBUS A321 (SHARKLETS)",
+                        "departureAirport": "LAX",
+                        "departureTerminal": "0",
+                        "departureDateTime": "2026-01-01T13:00:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2026-01-01T21:30:00",
+                        "duration": "5h 30m",
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"2\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-10-16\",\"numberOfBookableSeats\":6,\"itineraries\":[{\"duration\":\"PT42H15M\",\"segments\":[{\"departure\":{\"iataCode\":\"SYD\",\"terminal\":\"1\",\"at\":\"2025-12-31T19:15:00\"},\"arrival\":{\"iataCode\":\"AKL\",\"terminal\":\"I\",\"at\":\"2026-01-01T00:30:00\"},\"carrierCode\":\"NZ\",\"number\":\"112\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"NZ\"},\"duration\":\"PT3H15M\",\"id\":\"3\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"AKL\",\"terminal\":\"I\",\"at\":\"2026-01-01T16:05:00\"},\"arrival\":{\"iataCode\":\"LAX\",\"terminal\":\"B\",\"at\":\"2026-01-01T09:45:00\"},\"carrierCode\":\"TN\",\"number\":\"102\",\"aircraft\":{\"code\":\"789\"},\"operating\":{\"carrierCode\":\"TN\"},\"duration\":\"PT14H40M\",\"stops\":[{\"iataCode\":\"PPT\",\"duration\":\"PT1H59M\",\"arrivalAt\":\"2025-12-31T22:00:00\",\"departureAt\":\"2025-12-31T23:59:00\"}],\"id\":\"4\",\"numberOfStops\":1,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"LAX\",\"terminal\":\"0\",\"at\":\"2026-01-01T13:00:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2026-01-01T21:30:00\"},\"carrierCode\":\"TN\",\"number\":\"1110\",\"aircraft\":{\"code\":\"32B\"},\"operating\":{\"carrierCode\":\"AA\"},\"duration\":\"PT5H30M\",\"id\":\"5\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"INR\",\"total\":\"101260.00\",\"base\":\"85480.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"101260.00\",\"additionalServices\":[{\"amount\":\"7012\",\"type\":\"CHECKED_BAGS\"}]},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"TN\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"INR\",\"total\":\"101260.00\",\"base\":\"85480.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"3\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"SLOWAU\",\"class\":\"L\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0}},{\"segmentId\":\"4\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"SLOWAU\",\"class\":\"S\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0}},{\"segmentId\":\"5\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"SLOWAU\",\"class\":\"S\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0}}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 6,
+        "currencyCode": "INR",
+        "basePrice": "85480.00",
+        "totalPrice": "101260.00",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "ONEWAY",
+                "from": "SYD",
+                "to": "JFK",
+                "stops": 2,
+                "totalFlightDuration": "44h 44m",
+                "totalLayoverDuration": "21h 18m",
+                "legs": [
+                    {
+                        "legNo": "10",
+                        "flightNumber": "112",
+                        "carrierCode": "NZ",
+                        "carrierName": "AIR NEW ZEALAND",
+                        "operatingCarrierCode": "NZ",
+                        "operatingCarrierName": "AIR NEW ZEALAND",
+                        "aircraftCode": "32Q",
+                        "aircraft": "AIRBUS A321NEO",
+                        "departureAirport": "SYD",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T19:15:00",
+                        "arrivalAirport": "AKL",
+                        "arrivalTerminal": "I",
+                        "arrivalDateTime": "2026-01-01T00:30:00",
+                        "duration": "3h 15m",
+                        "layoverAfter": "15h 35m"
+                    },
+                    {
+                        "legNo": "11",
+                        "flightNumber": "102",
+                        "carrierCode": "TN",
+                        "carrierName": "AIR TAHITI NUI",
+                        "operatingCarrierCode": "TN",
+                        "operatingCarrierName": "AIR TAHITI NUI",
+                        "aircraftCode": "789",
+                        "aircraft": "BOEING 787-9",
+                        "departureAirport": "AKL",
+                        "departureTerminal": "I",
+                        "departureDateTime": "2026-01-01T16:05:00",
+                        "arrivalAirport": "LAX",
+                        "arrivalTerminal": "B",
+                        "arrivalDateTime": "2026-01-01T09:45:00",
+                        "duration": "14h 40m",
+                        "layoverAfter": "5h 43m"
+                    },
+                    {
+                        "legNo": "12",
+                        "flightNumber": "1104",
+                        "carrierCode": "TN",
+                        "carrierName": "AIR TAHITI NUI",
+                        "operatingCarrierCode": "AA",
+                        "operatingCarrierName": "AMERICAN AIRLINES",
+                        "aircraftCode": "32B",
+                        "aircraft": "AIRBUS A321 (SHARKLETS)",
+                        "departureAirport": "LAX",
+                        "departureTerminal": "0",
+                        "departureDateTime": "2026-01-01T15:28:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2026-01-01T23:59:00",
+                        "duration": "5h 31m",
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"3\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-10-16\",\"numberOfBookableSeats\":6,\"itineraries\":[{\"duration\":\"PT44H44M\",\"segments\":[{\"departure\":{\"iataCode\":\"SYD\",\"terminal\":\"1\",\"at\":\"2025-12-31T19:15:00\"},\"arrival\":{\"iataCode\":\"AKL\",\"terminal\":\"I\",\"at\":\"2026-01-01T00:30:00\"},\"carrierCode\":\"NZ\",\"number\":\"112\",\"aircraft\":{\"code\":\"32Q\"},\"operating\":{\"carrierCode\":\"NZ\"},\"duration\":\"PT3H15M\",\"id\":\"10\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"AKL\",\"terminal\":\"I\",\"at\":\"2026-01-01T16:05:00\"},\"arrival\":{\"iataCode\":\"LAX\",\"terminal\":\"B\",\"at\":\"2026-01-01T09:45:00\"},\"carrierCode\":\"TN\",\"number\":\"102\",\"aircraft\":{\"code\":\"789\"},\"operating\":{\"carrierCode\":\"TN\"},\"duration\":\"PT14H40M\",\"stops\":[{\"iataCode\":\"PPT\",\"duration\":\"PT1H59M\",\"arrivalAt\":\"2025-12-31T22:00:00\",\"departureAt\":\"2025-12-31T23:59:00\"}],\"id\":\"11\",\"numberOfStops\":1,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"LAX\",\"terminal\":\"0\",\"at\":\"2026-01-01T15:28:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2026-01-01T23:59:00\"},\"carrierCode\":\"TN\",\"number\":\"1104\",\"aircraft\":{\"code\":\"32B\"},\"operating\":{\"carrierCode\":\"AA\"},\"duration\":\"PT5H31M\",\"id\":\"12\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"INR\",\"total\":\"101260.00\",\"base\":\"85480.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"101260.00\",\"additionalServices\":[{\"amount\":\"7012\",\"type\":\"CHECKED_BAGS\"}]},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"TN\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"INR\",\"total\":\"101260.00\",\"base\":\"85480.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"10\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"SLOWAU\",\"class\":\"L\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0}},{\"segmentId\":\"11\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"SLOWAU\",\"class\":\"S\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0}},{\"segmentId\":\"12\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"SLOWAU\",\"class\":\"S\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0}}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 9,
+        "currencyCode": "INR",
+        "basePrice": "106340.00",
+        "totalPrice": "126449.00",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "ONEWAY",
+                "from": "SYD",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "30h 25m",
+                "totalLayoverDuration": "6h 10m",
+                "legs": [
+                    {
+                        "legNo": "6",
+                        "flightNumber": "212",
+                        "carrierCode": "PR",
+                        "carrierName": "PHILIPPINE AIRLINES",
+                        "operatingCarrierCode": "PR",
+                        "operatingCarrierName": "PHILIPPINE AIRLINES",
+                        "aircraftCode": "333",
+                        "aircraft": "AIRBUS A330-300",
+                        "departureAirport": "SYD",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T11:35:00",
+                        "arrivalAirport": "MNL",
+                        "arrivalTerminal": "1",
+                        "arrivalDateTime": "2025-12-31T16:50:00",
+                        "duration": "8h 15m",
+                        "layoverAfter": "6h 10m"
+                    },
+                    {
+                        "legNo": "7",
+                        "flightNumber": "4031",
+                        "carrierCode": "PR",
+                        "carrierName": "PHILIPPINE AIRLINES",
+                        "operatingCarrierCode": "PR",
+                        "operatingCarrierName": "PHILIPPINE AIRLINES",
+                        "aircraftCode": "350",
+                        "aircraft": "AIRBUS INDUSTRIE A350",
+                        "departureAirport": "MNL",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T23:00:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "1",
+                        "arrivalDateTime": "2026-01-01T03:00:00",
+                        "duration": "16h 0m",
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"4\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-12-31\",\"numberOfBookableSeats\":9,\"itineraries\":[{\"duration\":\"PT30H25M\",\"segments\":[{\"departure\":{\"iataCode\":\"SYD\",\"terminal\":\"1\",\"at\":\"2025-12-31T11:35:00\"},\"arrival\":{\"iataCode\":\"MNL\",\"terminal\":\"1\",\"at\":\"2025-12-31T16:50:00\"},\"carrierCode\":\"PR\",\"number\":\"212\",\"aircraft\":{\"code\":\"333\"},\"operating\":{\"carrierCode\":\"PR\"},\"duration\":\"PT8H15M\",\"id\":\"6\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"MNL\",\"terminal\":\"1\",\"at\":\"2025-12-31T23:00:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"1\",\"at\":\"2026-01-01T03:00:00\"},\"carrierCode\":\"PR\",\"number\":\"4031\",\"aircraft\":{\"code\":\"350\"},\"operating\":{\"carrierCode\":\"PR\"},\"duration\":\"PT16H\",\"id\":\"7\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"INR\",\"total\":\"126449.00\",\"base\":\"106340.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"126449.00\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"PR\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"INR\",\"total\":\"126449.00\",\"base\":\"106340.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"6\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"MOBAU\",\"class\":\"M\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}},{\"segmentId\":\"7\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"MOBAU\",\"class\":\"M\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":2,\"weight\":0}}]}]}"
+    },
+    {
+        "oneWay": false,
+        "seatsAvailable": 9,
+        "currencyCode": "INR",
+        "basePrice": "101255.00",
+        "totalPrice": "126922.00",
+        "fees": [
+            {
+                "amount": "0.00",
+                "type": "SUPPLIER"
+            },
+            {
+                "amount": "0.00",
+                "type": "TICKETING"
+            }
+        ],
+        "totalTravelers": 1,
+        "trips": [
+            {
+                "tripNo": 1,
+                "tripType": "ONEWAY",
+                "from": "SYD",
+                "to": "JFK",
+                "stops": 1,
+                "totalFlightDuration": "30h 30m",
+                "totalLayoverDuration": "5h 50m",
+                "legs": [
+                    {
+                        "legNo": "8",
+                        "flightNumber": "100",
+                        "carrierCode": "CX",
+                        "carrierName": "CATHAY PACIFIC",
+                        "operatingCarrierCode": "CX",
+                        "operatingCarrierName": "CATHAY PACIFIC",
+                        "aircraftCode": "359",
+                        "aircraft": "AIRBUS A350-900",
+                        "departureAirport": "SYD",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2025-12-31T15:15:00",
+                        "arrivalAirport": "HKG",
+                        "arrivalTerminal": "1",
+                        "arrivalDateTime": "2025-12-31T21:30:00",
+                        "duration": "9h 15m",
+                        "layoverAfter": "5h 50m"
+                    },
+                    {
+                        "legNo": "9",
+                        "flightNumber": "844",
+                        "carrierCode": "CX",
+                        "carrierName": "CATHAY PACIFIC",
+                        "operatingCarrierCode": "CX",
+                        "operatingCarrierName": "CATHAY PACIFIC",
+                        "aircraftCode": "359",
+                        "aircraft": "AIRBUS A350-900",
+                        "departureAirport": "HKG",
+                        "departureTerminal": "1",
+                        "departureDateTime": "2026-01-01T03:20:00",
+                        "arrivalAirport": "JFK",
+                        "arrivalTerminal": "8",
+                        "arrivalDateTime": "2026-01-01T05:45:00",
+                        "duration": "15h 25m",
+                        "layoverAfter": null
+                    }
+                ]
+            }
+        ],
+        "pricingAdditionalInfo": "{\"type\":\"flight-offer\",\"id\":\"5\",\"source\":\"GDS\",\"instantTicketingRequired\":false,\"disablePricing\":false,\"nonHomogeneous\":false,\"oneWay\":false,\"paymentCardRequired\":false,\"lastTicketingDate\":\"2025-12-31\",\"numberOfBookableSeats\":9,\"itineraries\":[{\"duration\":\"PT30H30M\",\"segments\":[{\"departure\":{\"iataCode\":\"SYD\",\"terminal\":\"1\",\"at\":\"2025-12-31T15:15:00\"},\"arrival\":{\"iataCode\":\"HKG\",\"terminal\":\"1\",\"at\":\"2025-12-31T21:30:00\"},\"carrierCode\":\"CX\",\"number\":\"100\",\"aircraft\":{\"code\":\"359\"},\"operating\":{\"carrierCode\":\"CX\"},\"duration\":\"PT9H15M\",\"id\":\"8\",\"numberOfStops\":0,\"blacklistedInEU\":false},{\"departure\":{\"iataCode\":\"HKG\",\"terminal\":\"1\",\"at\":\"2026-01-01T03:20:00\"},\"arrival\":{\"iataCode\":\"JFK\",\"terminal\":\"8\",\"at\":\"2026-01-01T05:45:00\"},\"carrierCode\":\"CX\",\"number\":\"844\",\"aircraft\":{\"code\":\"359\"},\"operating\":{\"carrierCode\":\"CX\"},\"duration\":\"PT15H25M\",\"id\":\"9\",\"numberOfStops\":0,\"blacklistedInEU\":false}]}],\"price\":{\"currency\":\"INR\",\"total\":\"126922.00\",\"base\":\"101255.00\",\"fees\":[{\"amount\":\"0.00\",\"type\":\"SUPPLIER\"},{\"amount\":\"0.00\",\"type\":\"TICKETING\"}],\"grandTotal\":\"126922.00\"},\"pricingOptions\":{\"includedCheckedBagsOnly\":true,\"fareType\":[\"PUBLISHED\"],\"refundableFare\":false,\"noRestrictionFare\":false,\"noPenaltyFare\":false},\"validatingAirlineCodes\":[\"CX\"],\"travelerPricings\":[{\"travelerId\":\"1\",\"fareOption\":\"STANDARD\",\"travelerType\":\"ADULT\",\"price\":{\"currency\":\"INR\",\"total\":\"126922.00\",\"base\":\"101255.00\"},\"fareDetailsBySegment\":[{\"segmentId\":\"8\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"VR21AUUO\",\"brandedFare\":\"ECONLIGHT\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0},\"amenities\":[{\"description\":\"1PC MAX 23KG 158LCM EACH\",\"isChargeable\":false,\"amenityType\":\"BAGGAGE\"},{\"description\":\"1PC MAX 15LB 7KG 115LCM\",\"isChargeable\":false,\"amenityType\":\"BAGGAGE\"},{\"description\":\"SEAT ASSIGNMENT\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"REFUNDABLE TICKET\",\"isChargeable\":true,\"amenityType\":\"BRANDED_FARES\"},{\"description\":\"MILEAGE ACCRUAL\",\"isChargeable\":false,\"amenityType\":\"BRANDED_FARES\"},{\"description\":\"CHANGEABLE TICKET\",\"isChargeable\":true,\"amenityType\":\"BRANDED_FARES\"}]},{\"segmentId\":\"9\",\"cabin\":\"ECONOMY\",\"fareBasis\":\"VR21AUUO\",\"brandedFare\":\"ECONLIGHT\",\"class\":\"V\",\"isAllotment\":false,\"includedCheckedBags\":{\"quantity\":1,\"weight\":0},\"amenities\":[{\"description\":\"1PC MAX 23KG 158LCM EACH\",\"isChargeable\":false,\"amenityType\":\"BAGGAGE\"},{\"description\":\"1PC MAX 15LB 7KG 115LCM\",\"isChargeable\":false,\"amenityType\":\"BAGGAGE\"},{\"description\":\"SEAT ASSIGNMENT\",\"isChargeable\":true,\"amenityType\":\"PRE_RESERVED_SEAT\"},{\"description\":\"REFUNDABLE TICKET\",\"isChargeable\":true,\"amenityType\":\"BRANDED_FARES\"},{\"description\":\"MILEAGE ACCRUAL\",\"isChargeable\":false,\"amenityType\":\"BRANDED_FARES\"},{\"description\":\"CHANGEABLE TICKET\",\"isChargeable\":true,\"amenityType\":\"BRANDED_FARES\"}]}]}]}"
+    }
+]

@@ -1,0 +1,1 @@
+flight offer response all second and consecutive legs duration, carrierName coming as null.

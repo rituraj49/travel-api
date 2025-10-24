@@ -1,0 +1,102 @@
+{
+  "orderId": "eJzTd9c3d4p09nYFAArNAks%3D",
+  "travelers": [
+    {
+      "id": "1",
+      "dateOfBirth": "1992-02-09",
+      "gender": "MALE",
+      "firstName": "Rahul",
+      "lastName": "Sharma",
+      "email": null,
+      "phones": [
+        {
+          "deviceType": "MOBILE",
+          "countryCallingCode": "91",
+          "number": "9999999999"
+        }
+      ],
+      "documents": [
+        {
+          "number": "M1234567",
+          "expiryDate": "2026-03-10",
+          "issuanceCountry": "IN",
+          "nationality": "IN",
+          "documentType": "PASSPORT",
+          "holder": true
+        }
+      ]
+    }
+  ],
+  "flightOffer": {
+    "oneWay": false,
+    "seatsAvailable": 0,
+    "currencyCode": "INR",
+    "basePrice": "26760.00",
+    "totalPrice": "56488.00",
+    "fees": [
+      {
+        "amount": "0.00",
+        "type": "TICKETING"
+      },
+      {
+        "amount": "0.00",
+        "type": "SUPPLIER"
+      },
+      {
+        "amount": "0.00",
+        "type": "FORM_OF_PAYMENT"
+      }
+    ],
+    "totalTravelers": 1,
+    "trips": [
+      {
+        "tripNo": 1,
+        "tripType": "ONEWAY",
+        "from": "BLR",
+        "to": "JFK",
+        "stops": 1,
+        "totalFlightDuration": "19h 55m",
+        "totalLayoverDuration": "1h 20m",
+        "legs": [
+          {
+            "legNo": "7",
+            "flightNumber": "569",
+            "carrierCode": "EK",
+            "carrierName": null,
+            "operatingCarrierCode": null,
+            "operatingCarrierName": null,
+            "aircraftCode": "388",
+            "aircraft": null,
+            "departureAirport": "BLR",
+            "departureTerminal": "2",
+            "departureDateTime": "2025-12-31T04:30:00",
+            "arrivalAirport": "DXB",
+            "arrivalTerminal": "3",
+            "arrivalDateTime": "2025-12-31T07:10:00",
+            "duration": null,
+            "layoverAfter": null
+          },
+          {
+            "legNo": "8",
+            "flightNumber": "201",
+            "carrierCode": "EK",
+            "carrierName": null,
+            "operatingCarrierCode": null,
+            "operatingCarrierName": null,
+            "aircraftCode": "388",
+            "aircraft": null,
+            "departureAirport": "DXB",
+            "departureTerminal": "3",
+            "departureDateTime": "2025-12-31T08:30:00",
+            "arrivalAirport": "JFK",
+            "arrivalTerminal": "4",
+            "arrivalDateTime": "2025-12-31T13:55:00",
+            "duration": null,
+            "layoverAfter": null
+          }
+        ]
+      }
+    ],
+    "pricingAdditionalInfo": null
+  }
+}
