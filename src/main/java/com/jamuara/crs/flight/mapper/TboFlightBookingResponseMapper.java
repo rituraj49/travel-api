@@ -20,7 +20,7 @@ public interface TboFlightBookingResponseMapper {
 
     @Mapping(source = "pnr", target = "pnr")
     @Mapping(source = "bookingId", target = "bookingId")
-    @Mapping(expression = "java(com.jamuara.crs.flight.dto.tbo.book.FlightBookingResponseNonLcc.BookingStatus.values()[source.getStatus() - 1])", target = "bookingStatus")
+    @Mapping(expression = "java(com.jamuara.crs.flight.dto.tbo.book.FlightBookingResponseNonLcc.BookingStatus.values()[source.getStatus()])", target = "bookingStatus")
     @Mapping(source = "priceChanged", target = "priceChanged")
     @Mapping(source = "timeChanged", target = "timeChanged")
     @Mapping(source = "flightItinerary", target = "flightDetails")

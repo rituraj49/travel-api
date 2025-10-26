@@ -47,13 +47,13 @@ public class CacheConfiguration {
                 }
 
                 return Caffeine.newBuilder()
-                        .expireAfterAccess(10, TimeUnit.MINUTES)
+                        .expireAfterAccess(30, TimeUnit.MINUTES)
                         .maximumSize(1000)
                         .build();
             }
         };
 
-        caffeineCacheManager.setCacheNames(List.of("locations", "flightOffers", "activities"));
+        caffeineCacheManager.setCacheNames(List.of("locations", "flightOffers", "activities", "fareQuote"));
 
         return caffeineCacheManager;
     }

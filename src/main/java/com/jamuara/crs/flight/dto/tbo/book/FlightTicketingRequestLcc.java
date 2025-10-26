@@ -1,14 +1,11 @@
 package com.jamuara.crs.flight.dto.tbo.book;
 
-import com.jamuara.crs.enums.Gender;
-import com.jamuara.crs.enums.TravelerType;
-import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class FlightBookingRequestNonLcc {
+public class FlightTicketingRequestLcc {
     private String traceId;
 
     private String resultIndex;

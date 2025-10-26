@@ -30,7 +30,6 @@ public interface TboFlightFareQuoteResponseMapper {
 
     @Mapping(target = "legNo", source = "segmentIndicator")
     @Mapping(target = "tripType", expression = "java(com.jamuara.crs.enums.TripType.values()[segment.getTripIndicator() - 1])")
-//    @Mapping(target = "seatsAvailable", source = "noOfSeatAvailable")
     @Mapping(target = "baggage", source = "baggage")
     @Mapping(target = "cabinBaggage", source = "cabinBaggage")
     @Mapping(target = "cabinClass", expression = "java(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass() - 1])")
@@ -174,6 +173,7 @@ public interface TboFlightFareQuoteResponseMapper {
                             })
                     .collect(Collectors.toList())
             );
+
         } else {
             flight.setFlightLegs(List.of());
         }
@@ -199,10 +199,8 @@ public interface TboFlightFareQuoteResponseMapper {
         for(List<TboApiFareQuoteResponseDto.Segment> segmentList: result.getSegments()) {
             for(int i = 0; i < segmentList.size(); i++) {
                 TboApiFareQuoteResponseDto.Segment segment = segmentList.get(i);
-                //FlightFareQuoteResponse.FlightLeg currentLeg = flightDetailsResponse.getFlightLegs().get(globalIndex);
                 FlightFareQuoteDetailsResponse.FlightLeg currentLeg = flightDetailsResponse.getFlightLegs().get(globalIndex);
-                System.out.println("seg: " + segment.getAirline());
-                System.out.println("leg: " + currentLeg.getCarrierName());
+
                 if(fareRules != null) {
                     String fareBasisCode = fareRules.get(globalIndex).getFareBasisCode();
                     currentLeg.setFareBasisCode(fareBasisCode);

@@ -1,10 +1,15 @@
 package com.jamuara.crs.flight.mapper;
 
 import com.jamuara.crs.common.service.TboAuthService;
+import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteDetailsResponse;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingRequestNonLcc;
 import com.jamuara.crs.flight.dto.tbo.book.TravelerDto;
+import com.jamuara.crs.flight.dto.tbo.book.TravelerRequestDto;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.cache.Cache;
+import org.springframework.cache.CacheManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -56,13 +61,29 @@ public class TboFlightRequestMapper {
         return map;
     }
 
-    public static Map<String, Object> mapToBookingRequest(FlightBookingRequestNonLcc req) {
+    public static Map<String, Object> mapToBookingRequest(FlightBookingRequestNonLcc req, CacheManager cacheManager) {
         Map<String, Object> map = new HashMap<>();
 
-        List<Map<String, Object>> passengers = new ArrayList<>(req.getTravelers().size());
+        int totalTravelers = req.getTravelers().size();
 
-        for(int i = 0; i < req.getTravelers().size(); i++) {
-            TravelerDto traveler = req.getTravelers().get(i);
+        Cache cache = cacheManager.getCache("fareQuote");
+        Cache.ValueWrapper wrapper = cache.get(req.getTraceId());
+
+//                (FlightFareQuoteDetailsResponse) cacheManager.getCache("fareQuote").get(req.getTraceId());
+        Map<String, Object> fare = new HashMap<>();
+        if(wrapper != null) {
+            FlightFareQuoteDetailsResponse fareDetails = (FlightFareQuoteDetailsResponse) wrapper.get();
+            fare.put("Currency", fareDetails.getCurrency());
+            fare.put("BaseFare", (Double.parseDouble(fareDetails.getTotalBaseFareAmount())/totalTravelers));
+            fare.put("Tax", (Double.parseDouble(fareDetails.getTotalTaxAmount())/totalTravelers));
+            fare.put("YqTax", fareDetails.getYqTax());
+            fare.put("pgCharge", fareDetails.getPgCharge());
+        }
+        List<Map<String, Object>> passengers = new ArrayList<>(req.getTravelers().size());
+//        System.out.println("fare details: " + fareDetails.getTotalBaseFareAmount());
+
+        for(int i = 0; i < totalTravelers; i++) {
+            TravelerRequestDto traveler = req.getTravelers().get(i);
             Map<String, Object> pass = new HashMap<>();
             pass.put("Title", traveler.getTitle());
             pass.put("FirstName", traveler.getFirstName());
@@ -90,6 +111,8 @@ public class TboFlightRequestMapper {
             pass.put("Email", traveler.getEmail());
 
             pass.put("IsLeadPax", traveler.isLead());
+
+            pass.put("Fare", fare);
 
             passengers.add(pass);
 
