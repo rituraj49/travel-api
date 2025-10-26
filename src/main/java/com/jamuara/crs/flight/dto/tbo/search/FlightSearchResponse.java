@@ -1,5 +1,6 @@
-package com.jamuara.crs.flight.dto.tbo;
+package com.jamuara.crs.flight.dto.tbo.search;
 
+import com.jamuara.crs.flight.dto.tbo.FlightDetailsResponse;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

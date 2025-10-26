@@ -2,7 +2,7 @@ package com.jamuara.crs.service;
 
 import cl.lcd.dto.booking.FlightBookingRequest;
 import cl.lcd.dto.booking.FlightBookingResponse;
-import cl.lcd.dto.booking.TravelerRequestDto;
+//import cl.lcd.dto.booking.TravelerRequestDto;
 import cl.lcd.mappers.booking.FlightBookingResponseMapper;
 import cl.lcd.service.booking.AmadeusBookingService;
 import com.amadeus.Amadeus;
@@ -10,6 +10,7 @@ import com.amadeus.Booking;
 import com.amadeus.booking.FlightOrders;
 import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.FlightOrder;
+import com.jamuara.crs.flight.dto.TravelerRequestDto;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;

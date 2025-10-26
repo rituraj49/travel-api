@@ -1,7 +1,5 @@
-package com.jamuara.crs.flight.dto.tbo;
+package com.jamuara.crs.flight.dto.tbo.search;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.jamuara.crs.enums.TripType;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 

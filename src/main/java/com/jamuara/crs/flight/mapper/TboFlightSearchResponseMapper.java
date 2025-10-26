@@ -2,10 +2,9 @@ package com.jamuara.crs.flight.mapper;
 
 import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.config.CentralMapperConfig;
-import com.jamuara.crs.enums.TripType;
 import com.jamuara.crs.flight.dto.tbo.FlightDetailsResponse;
-import com.jamuara.crs.flight.dto.tbo.FlightSearchResponse;
-import com.jamuara.crs.flight.dto.tbo.TboApiFlightResponseDto;
+import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
+import com.jamuara.crs.flight.dto.tbo.search.TboApiFlightResponseDto;
 import org.mapstruct.AfterMapping;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
@@ -65,6 +64,7 @@ public interface TboFlightSearchResponseMapper {
     @Mapping(source = "fare.otherCharges", target = "otherCharges")
     @Mapping(source = "fare.chargeBU", target = "chargesBreakup")
     @Mapping(source = "fare.publishedFare", target = "publishedFare")
+    @Mapping(source = "fare.serviceFee", target = "serviceFee")
 //    @Mapping(expression = "java(result.getSegments().stream().flatMap(List::stream).map(this::mapFlightLeg).toList())", target = "flightLegs")
     @Mapping(expression = "java(mapFlattenedSegments(result.getSegments()))", target = "flightLegs")
     @Mapping(source = "fareBreakdown", target = "travelerDetails")
@@ -77,7 +77,7 @@ public interface TboFlightSearchResponseMapper {
                 .toList();
     }
 
-    @Mapping(target = "travelerType", expression = "java(FlightDetailsResponse.TravelerType.values()[fareBreakdown.getPassengerType() - 1])")
+    @Mapping(target = "travelerType", expression = "java(com.jamuara.crs.enums.TravelerType.values()[fareBreakdown.getPassengerType() - 1])")
     @Mapping(target = "travelersCount", source = "passengerCount")
     @Mapping(target = "baseFare", source = "baseFare")
     @Mapping(target = "tax", source = "tax")
@@ -112,6 +112,7 @@ public interface TboFlightSearchResponseMapper {
     @Mapping(target = "duration", expression = "java(formatDuration(segment.getDuration()))")
     @Mapping(target = "layoverDuration", ignore = true)
     @Mapping(target = "fareBasisCode", ignore = true)
+    @Mapping(target = "flightStatus", source = "flightStatus")
     FlightDetailsResponse.FlightLeg mapFlightLegs(TboApiFlightResponseDto.Response.Segment segment);
 
     default String formatDuration(int durationInMinutes) {

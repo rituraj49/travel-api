@@ -1,4 +1,4 @@
-package com.jamuara.crs.flight.dto.tbo;
+package com.jamuara.crs.flight.dto.tbo.search;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
