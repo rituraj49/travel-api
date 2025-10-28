@@ -1,11 +1,9 @@
 package com.jamuara.crs.flight.mapper;
 
 import com.jamuara.crs.config.CentralMapperConfig;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingRequestNonLcc;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingResponseNonLcc;
 import com.jamuara.crs.flight.dto.tbo.book.TboApiFlightBookingResponseDto;
 import com.jamuara.crs.flight.dto.tbo.book.TravelerDto;
-import com.jamuara.crs.model.Reservation;
 import org.mapstruct.Mapper;
 import org.mapstruct.Mapping;
 

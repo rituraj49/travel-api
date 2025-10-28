@@ -9,8 +9,9 @@
 ### two fare fields in booking response
 ### how to divide fare between passengers for booking
 ### price and tax fields to be included for each passenger fare in booking and whether yqTax and pgCharge would be divided among the travelers or added to each traveler.
-
-
+### Id and journeyWayType in ticket response passenger barcode section
+### Why is there an invoice details array and invoice outside the array also
+### what is invoice status 3
 
 ## Booking Flow - 
 ### booking request traveler fare details would be taken from the fare quote response.

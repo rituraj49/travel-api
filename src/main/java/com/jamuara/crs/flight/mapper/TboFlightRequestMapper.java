@@ -1,13 +1,13 @@
 package com.jamuara.crs.flight.mapper;
 
 import com.jamuara.crs.common.service.TboAuthService;
+import com.jamuara.crs.flight.dto.tbo.FareQuoteCacheEntry;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteDetailsResponse;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingRequestNonLcc;
-import com.jamuara.crs.flight.dto.tbo.book.TravelerDto;
+import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
+import com.jamuara.crs.flight.dto.tbo.book.FlightTicketRequestLcc;
 import com.jamuara.crs.flight.dto.tbo.book.TravelerRequestDto;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -52,80 +52,201 @@ public class TboFlightRequestMapper {
     }
 
     public static Map<String, Object> mapToFareQuoteRequest(FlightFareQuoteRequest req) {
-        Map<String, Object> map = new HashMap<>();
-        map.put("EndUserIp", "192.168.97.1");
-        map.put("TokenId", token);
-        map.put("TraceId", req.getTraceId());
-        map.put("ResultIndex", req.getResultIndex());
+        Map<String, Object> reqBody = new HashMap<>();
 
-        return map;
+        Map<String, Object> outboundReq = new HashMap<>();
+        outboundReq.put("EndUserIp", "192.168.97.1");
+        outboundReq.put("TokenId", token);
+        outboundReq.put("TraceId", req.getTraceId());
+        outboundReq.put("ResultIndex", req.getResultIndexOutbound());
+
+        reqBody.put("outbound", outboundReq);
+
+        if(req.getResultIndexInbound() != null) {
+            Map<String, Object> inboundReq = new HashMap<>();
+            inboundReq.put("EndUserIp", "192.168.97.1");
+            inboundReq.put("TokenId", token);
+            inboundReq.put("TraceId", req.getTraceId());
+            inboundReq.put("ResultIndex", req.getResultIndexInbound());
+
+            reqBody.put("inbound", inboundReq);
+        }
+
+        return reqBody;
     }
 
-    public static Map<String, Object> mapToBookingRequest(FlightBookingRequestNonLcc req, CacheManager cacheManager) {
-        Map<String, Object> map = new HashMap<>();
+    public static Map<String, Object> mapToBookingTicketingRequest(FlightBookingTicketingRequest req, CacheManager cacheManager) {
+        Map<String, Object> combinedReq = new HashMap<>();
+
+        Map<String, Object> outboundReq = new HashMap<>();
+        Map<String, Object> inboundReq = new HashMap<>();
 
         int totalTravelers = req.getTravelers().size();
 
         Cache cache = cacheManager.getCache("fareQuote");
+        assert cache != null;
         Cache.ValueWrapper wrapper = cache.get(req.getTraceId());
 
 //                (FlightFareQuoteDetailsResponse) cacheManager.getCache("fareQuote").get(req.getTraceId());
-        Map<String, Object> fare = new HashMap<>();
+        Map<String, Object> fareOutbound = new HashMap<>();
+        Map<String, Object> fareInbound = new HashMap<>();
         if(wrapper != null) {
-            FlightFareQuoteDetailsResponse fareDetails = (FlightFareQuoteDetailsResponse) wrapper.get();
-            fare.put("Currency", fareDetails.getCurrency());
-            fare.put("BaseFare", (Double.parseDouble(fareDetails.getTotalBaseFareAmount())/totalTravelers));
-            fare.put("Tax", (Double.parseDouble(fareDetails.getTotalTaxAmount())/totalTravelers));
-            fare.put("YqTax", fareDetails.getYqTax());
-            fare.put("pgCharge", fareDetails.getPgCharge());
-        }
-        List<Map<String, Object>> passengers = new ArrayList<>(req.getTravelers().size());
-//        System.out.println("fare details: " + fareDetails.getTotalBaseFareAmount());
+            FareQuoteCacheEntry cacheEntry = (FareQuoteCacheEntry) wrapper.get();
 
-        for(int i = 0; i < totalTravelers; i++) {
-            TravelerRequestDto traveler = req.getTravelers().get(i);
-            Map<String, Object> pass = new HashMap<>();
-            pass.put("Title", traveler.getTitle());
-            pass.put("FirstName", traveler.getFirstName());
-            pass.put("LastName", traveler.getLastName());
-            pass.put("PaxType", traveler.getTravelerType() != null ? traveler.getTravelerType().ordinal() + 1 : null);
-            pass.put("DateOfBirth", traveler.getDateOfBirth());
-            pass.put("Gender", traveler.getGender() != null ? traveler.getGender().ordinal() + 1 : null);
+            if(cacheEntry != null) {
+                FlightFareQuoteDetailsResponse fareDetails = (FlightFareQuoteDetailsResponse) cacheEntry.getOutboundFlight();
 
-            if (traveler.getPassportDetails() != null) {
-                pass.put("PassportNo", traveler.getPassportDetails().getNumber());
-                pass.put("PassportExpiry", traveler.getPassportDetails().getExpiryDate());
-//                pass.put("Nationality", traveler.getPassportDetails().getNationality());
-                pass.put("Nationality", traveler.getAddress().getCountryCode());
+                fareOutbound.put("Currency", fareDetails.getCurrency());
+                fareOutbound.put("BaseFare", (Double.parseDouble(fareDetails.getTotalBaseFareAmount())/totalTravelers));
+                fareOutbound.put("Tax", (Double.parseDouble(fareDetails.getTotalTaxAmount())/totalTravelers));
+                fareOutbound.put("YqTax", fareDetails.getYqTax());
+                fareOutbound.put("pgCharge", fareDetails.getPgCharge());
+
+                if(cacheEntry.getInboundFlight() != null) {
+                    FlightFareQuoteDetailsResponse fareDetailsInbound = (FlightFareQuoteDetailsResponse) cacheEntry.getInboundFlight();
+
+                    fareInbound.put("Currency", fareDetailsInbound.getCurrency());
+                    fareInbound.put("BaseFare", (Double.parseDouble(fareDetailsInbound.getTotalBaseFareAmount())/totalTravelers));
+                    fareInbound.put("Tax", (Double.parseDouble(fareDetailsInbound.getTotalTaxAmount())/totalTravelers));
+                    fareInbound.put("YqTax", fareDetailsInbound.getYqTax());
+                    fareInbound.put("pgCharge", fareDetailsInbound.getPgCharge());
+                }
             }
+        }
+        List<Map<String, Object>> passengersOutbound = new ArrayList<>(req.getTravelers().size());
+        List<Map<String, Object>> passengersInbound = new ArrayList<>(req.getTravelers().size());
 
-            if (traveler.getAddress() != null) {
-                pass.put("AddressLine1", traveler.getAddress().getLine1());
-                pass.put("AddressLine2", traveler.getAddress().getLine2());
-                pass.put("City", traveler.getAddress().getCity());
-                pass.put("CountryCode", traveler.getAddress().getCountryCode());
-            }
+        passengersOutbound = req.getTravelers().stream()
+                .map(t -> createPassengerMap(t, fareOutbound))
+                .toList();
 
-            pass.put("CellCountryCode", traveler.getPhoneCountryCode());
-            pass.put("ContactNo", traveler.getPhone());
-            pass.put("Email", traveler.getEmail());
+        passengersInbound = req.getTravelers().stream()
+                        .map(t -> createPassengerMap(t, fareInbound))
+                        .toList();
 
-            pass.put("IsLeadPax", traveler.isLead());
+        outboundReq.put("EndUserIp", "192.168.97.1");
+        outboundReq.put("TokenId", token);
+        outboundReq.put("TraceId", req.getTraceId());
+        outboundReq.put("ResultIndex", req.getResultIndexOutbound());
+        outboundReq.put("Passengers", passengersOutbound);
 
-            pass.put("Fare", fare);
+        if(!fareInbound.isEmpty()) {
+            inboundReq.put("EndUserIp", "192.168.97.1");
+            inboundReq.put("TokenId", token);
+            inboundReq.put("TraceId", req.getTraceId());
+            inboundReq.put("ResultIndex", req.getResultIndexInbound());
+            inboundReq.put("Passengers", passengersInbound);
 
-            passengers.add(pass);
-
+            combinedReq.put("inbound", inboundReq);
         }
 
-        map.put("EndUserIp", "192.168.97.1");
-        map.put("TokenId", token);
-        map.put("TraceId", req.getTraceId());
-        map.put("ResultIndex", req.getResultIndex());
-        map.put("Passengers", passengers);
+        combinedReq.put("outbound", outboundReq);
 
-        return map;
+        return combinedReq;
     }
 
+    public static Map<String, Object> mapToTicketingRequest(FlightTicketRequestLcc req, CacheManager cacheManager) {
+        Map<String, Object> combinedReq = new HashMap<>();
 
+        Map<String, Object> outboundReq = new HashMap<>();
+        Map<String, Object> inboundReq = new HashMap<>();
+
+        int totalTravelers = req.getTravelers().size();
+
+        Cache cache = cacheManager.getCache("fareQuote");
+        assert cache != null;
+        Cache.ValueWrapper wrapper = cache.get(req.getTraceId());
+
+//                (FlightFareQuoteDetailsResponse) cacheManager.getCache("fareQuote").get(req.getTraceId());
+        Map<String, Object> fareOutbound = new HashMap<>();
+        Map<String, Object> fareInbound = new HashMap<>();
+        if(wrapper != null) {
+            FareQuoteCacheEntry cacheEntry = (FareQuoteCacheEntry) wrapper.get();
+
+            if(cacheEntry != null) {
+                FlightFareQuoteDetailsResponse fareDetails = (FlightFareQuoteDetailsResponse) cacheEntry.getOutboundFlight();
+
+                fareOutbound.put("Currency", fareDetails.getCurrency());
+                fareOutbound.put("BaseFare", (Double.parseDouble(fareDetails.getTotalBaseFareAmount())/totalTravelers));
+                fareOutbound.put("Tax", (Double.parseDouble(fareDetails.getTotalTaxAmount())/totalTravelers));
+                fareOutbound.put("YqTax", fareDetails.getYqTax());
+                fareOutbound.put("pgCharge", fareDetails.getPgCharge());
+
+                if(cacheEntry.getInboundFlight() != null) {
+                    FlightFareQuoteDetailsResponse fareDetailsInbound = (FlightFareQuoteDetailsResponse) cacheEntry.getInboundFlight();
+
+                    fareInbound.put("Currency", fareDetailsInbound.getCurrency());
+                    fareInbound.put("BaseFare", (Double.parseDouble(fareDetailsInbound.getTotalBaseFareAmount())/totalTravelers));
+                    fareInbound.put("Tax", (Double.parseDouble(fareDetailsInbound.getTotalTaxAmount())/totalTravelers));
+                    fareInbound.put("YqTax", fareDetailsInbound.getYqTax());
+                    fareInbound.put("pgCharge", fareDetailsInbound.getPgCharge());
+                }
+            }
+        }
+        List<Map<String, Object>> passengersOutbound = new ArrayList<>(req.getTravelers().size());
+        List<Map<String, Object>> passengersInbound = new ArrayList<>(req.getTravelers().size());
+
+        passengersOutbound = req.getTravelers().stream()
+                .map(t -> createPassengerMap(t, fareOutbound))
+                .toList();
+
+        passengersInbound = req.getTravelers().stream()
+                .map(t -> createPassengerMap(t, fareInbound))
+                .toList();
+
+        outboundReq.put("EndUserIp", "192.168.97.1");
+        outboundReq.put("TokenId", token);
+        outboundReq.put("TraceId", req.getTraceId());
+        outboundReq.put("ResultIndex", req.getResultIndexOutbound());
+        outboundReq.put("Passengers", passengersOutbound);
+
+        if(!fareInbound.isEmpty()) {
+            inboundReq.put("EndUserIp", "192.168.97.1");
+            inboundReq.put("TokenId", token);
+            inboundReq.put("TraceId", req.getTraceId());
+            inboundReq.put("ResultIndex", req.getResultIndexInbound());
+            inboundReq.put("Passengers", passengersInbound);
+
+            combinedReq.put("inbound", inboundReq);
+        }
+
+        combinedReq.put("outbound", outboundReq);
+
+        return combinedReq;
+    }
+
+    private static Map<String, Object> createPassengerMap(TravelerRequestDto traveler, Map<String, Object> fare) {
+        Map<String, Object> pass = new HashMap<>();
+        pass.put("Title", traveler.getTitle());
+        pass.put("FirstName", traveler.getFirstName());
+        pass.put("LastName", traveler.getLastName());
+        pass.put("PaxType", traveler.getTravelerType() != null ? traveler.getTravelerType().ordinal() + 1 : null);
+        pass.put("DateOfBirth", traveler.getDateOfBirth());
+        pass.put("Gender", traveler.getGender() != null ? traveler.getGender().ordinal() + 1 : null);
+
+        if (traveler.getPassportDetails() != null) {
+            pass.put("PassportNo", traveler.getPassportDetails().getNumber());
+            pass.put("PassportExpiry", traveler.getPassportDetails().getExpiryDate());
+//                pass.put("Nationality", traveler.getPassportDetails().getNationality());
+            pass.put("Nationality", traveler.getAddress().getCountryCode());
+        }
+
+        if (traveler.getAddress() != null) {
+            pass.put("AddressLine1", traveler.getAddress().getLine1());
+            pass.put("AddressLine2", traveler.getAddress().getLine2());
+            pass.put("City", traveler.getAddress().getCity());
+            pass.put("CountryCode", traveler.getAddress().getCountryCode());
+        }
+
+        pass.put("CellCountryCode", traveler.getPhoneCountryCode());
+        pass.put("ContactNo", traveler.getPhone());
+        pass.put("Title", traveler.getTitle());
+        pass.put("FirstName", traveler.getFirstName());
+        pass.put("Email", traveler.getEmail());
+
+        pass.put("IsLeadPax", traveler.isLead());
+
+        pass.put("Fare", fare);
+        return pass;
+    }
 }

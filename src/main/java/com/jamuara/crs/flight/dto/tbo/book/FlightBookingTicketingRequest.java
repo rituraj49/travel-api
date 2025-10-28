@@ -5,10 +5,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class FlightTicketingRequestLcc {
+public class FlightBookingTicketingRequest {
     private String traceId;
 
-    private String resultIndex;
+    private String resultIndexOutbound;
+
+    private String resultIndexInbound;
 
     private List<TravelerRequestDto> travelers;
 }

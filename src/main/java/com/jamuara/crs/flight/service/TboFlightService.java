@@ -1,21 +1,14 @@
 package com.jamuara.crs.flight.service;
 
 import com.jamuara.crs.common.service.RestService;
-import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
-import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteResponse;
-import com.jamuara.crs.flight.dto.tbo.TboApiFareQuoteResponseDto;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingRequestNonLcc;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingResponseNonLcc;
-import com.jamuara.crs.flight.dto.tbo.book.TboApiFlightBookingResponseDto;
+import com.jamuara.crs.common.service.TboAuthService;
+import com.jamuara.crs.flight.dto.tbo.*;
+import com.jamuara.crs.flight.dto.tbo.book.*;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.dto.tbo.search.TboApiFlightResponseDto;
-import com.jamuara.crs.flight.mapper.TboFlightBookingResponseMapper;
-import com.jamuara.crs.flight.mapper.TboFlightFareQuoteResponseMapper;
-import com.jamuara.crs.flight.mapper.TboFlightRequestMapper;
-import com.jamuara.crs.flight.mapper.TboFlightSearchResponseMapper;
+import com.jamuara.crs.flight.mapper.*;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.core.ParameterizedTypeReference;
@@ -23,9 +16,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
+import java.util.*;
 
 @Service
 @Slf4j
@@ -38,6 +29,8 @@ public class TboFlightService {
 
     TboFlightFareQuoteResponseMapper tboFlightFareQuoteResponseMapper;
 
+    TboFlightTicketMapper tboFlightTicketMapper;
+
     CacheManager cacheManager;
 
     private final String TBO_FLIGHT_URL = "http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest";
@@ -47,12 +40,14 @@ public class TboFlightService {
             TboFlightSearchResponseMapper tboFlightSearchResponseMapper,
             TboFlightBookingResponseMapper tboFlightBookingResponseMapper,
             TboFlightFareQuoteResponseMapper tboFlightFareQuoteResponseMapper,
+            TboFlightTicketMapper tboFlightTicketMapper,
             CacheManager cacheManager
     ) {
         this.restService = restService;
         this.tboFlightSearchResponseMapper = tboFlightSearchResponseMapper;
         this.tboFlightBookingResponseMapper = tboFlightBookingResponseMapper;
         this.tboFlightFareQuoteResponseMapper = tboFlightFareQuoteResponseMapper;
+        this.tboFlightTicketMapper = tboFlightTicketMapper;
         this.cacheManager = cacheManager;
     }
 
@@ -73,42 +68,186 @@ public class TboFlightService {
         return tboFlightSearchResponseMapper.mapToFlightSearchResponse(response.getBody().getResponse());
     }
 
-    public FlightFareQuoteResponse flightFareQuote(FlightFareQuoteRequest request) throws Exception {
+    public List<Map<String, FlightFareQuoteResponse>> flightFareQuote(FlightFareQuoteRequest request) throws Exception {
 
         log.info("flight fare quote request received");
         Map<String, Object> requestBody = TboFlightRequestMapper.mapToFareQuoteRequest(request);
 
-        ResponseEntity<TboApiFareQuoteResponseDto> responseBody = restService.sendRequest(
+        ResponseEntity<TboApiFareQuoteResponseDto> outboundResponse = restService.sendRequest(
                 TBO_FLIGHT_URL + "/FareQuote",
                 HttpMethod.POST,
                 new HashMap<>(),
-                requestBody,
+                requestBody.get("outbound"),
                 new ParameterizedTypeReference<TboApiFareQuoteResponseDto>() {}
         );
 
-        if(!Objects.equals(responseBody.getBody().getResponse().getError().getErrorMessage(), "")) {
-            throw new Exception(responseBody.getBody().getResponse().getError().getErrorMessage());
+        if(!Objects.equals(outboundResponse.getBody().getResponse().getError().getErrorMessage(), "")) {
+            throw new Exception(outboundResponse.getBody().getResponse().getError().getErrorMessage());
         }
 
-//        FlightFareQuoteResponse response = tboFlightFareQuoteResponseMapper.mapToFlightFareQuoteResponse(responseBody.getBody().getResponse());
-        //FlightFareQuoteResponse response = tboFareQuoteResponseMapper.mapToFareQuoteResponse(responseBody);
-        FlightFareQuoteResponse response =  tboFlightFareQuoteResponseMapper.mapToFlightFareQuoteResponse(responseBody.getBody().getResponse());
-        String traceId = response.getTraceId();
-        var flightDetails = response.getFlightsAvailable()
-                    .get("flight")
-                    .get(0);
+        FlightFareQuoteResponse outboundFareQuote =  tboFlightFareQuoteResponseMapper.mapToFlightFareQuoteResponse(outboundResponse.getBody().getResponse());
+        String traceId = outboundFareQuote.getTraceId();
+        var outboundFlightDetails = outboundFareQuote.getFlightsAvailable()
+                .get("flight")
+                .get(0);
 
-        cacheManager.getCache("fareQuote").put(traceId, flightDetails);
+        ResponseEntity<TboApiFareQuoteResponseDto> inboundResponse = null;
+        if(requestBody.containsKey("inbound")) {
+            inboundResponse = restService.sendRequest(
+                    TBO_FLIGHT_URL + "/FareQuote",
+                    HttpMethod.POST,
+                    new HashMap<>(),
+                    requestBody.get("inbound"),
+                    new ParameterizedTypeReference<TboApiFareQuoteResponseDto>() {}
+            );
 
-        return response;
+            if(!Objects.equals(inboundResponse.getBody().getResponse().getError().getErrorMessage(), "")) {
+                throw new Exception(outboundResponse.getBody().getResponse().getError().getErrorMessage());
+            }
+        }
+
+        Object inboundFlightDetails = null;
+        FlightFareQuoteResponse inboundFareQuote = null;
+
+        if(inboundResponse != null) {
+            inboundFareQuote = tboFlightFareQuoteResponseMapper.mapToFlightFareQuoteResponse(inboundResponse.getBody().getResponse());
+            inboundFlightDetails = inboundFareQuote.getFlightsAvailable()
+                .get("flight")
+                .get(0);
+        }
+
+        cacheManager.getCache("fareQuote").put(traceId, new FareQuoteCacheEntry(outboundFlightDetails, inboundFlightDetails));
+
+//        List<FlightFareQuoteResponse> result = new ArrayList<>();
+        List<Map<String, FlightFareQuoteResponse>> result = new ArrayList<>();
+
+        Map<String, FlightFareQuoteResponse> outboundResult = Map.of("outboundFareQuote", outboundFareQuote);
+        result.add(outboundResult);
+//        result.add(outboundFareQuote);
+        if(inboundFareQuote != null) {
+            Map<String, FlightFareQuoteResponse> inboundResult = Map.of("inboundFareQuote", inboundFareQuote);
+            result.add(inboundResult);
+        }
+
+        return result;
     }
 
-    public FlightBookingResponseNonLcc flightBook(FlightBookingRequestNonLcc request) throws Exception {
-//        Cache cache = cacheManager.getCache("fareQuote");
-//        Cache.ValueWrapper wrapper = cache.get(request.getTraceId());
+    public List<FlightTicketResponse> flightBookAndTicket(FlightBookingTicketingRequest request) throws Exception {
+        Cache cache = cacheManager.getCache("fareQuote");
+        Cache.ValueWrapper wrapper = cache.get(request.getTraceId());
 
-        Map<String, Object> requestBody = TboFlightRequestMapper.mapToBookingRequest(request, cacheManager);
-        log.info("flight book request body: {}", requestBody.toString());
+        FlightFareQuoteDetailsResponse obFlight = null;
+        FlightFareQuoteDetailsResponse ibFlight = null;
+
+        Map<String, Object> obReq = TboFlightRequestMapper.mapToBookingTicketingRequest(request, cacheManager);
+        Map<String, Object> ibReq = TboFlightRequestMapper.mapToBookingTicketingRequest(request, cacheManager);
+
+
+        FlightBookingResponseNonLcc obBooking = null;
+        FlightBookingResponseNonLcc ibBooking = null;
+
+        FlightTicketResponse obTicket = null;
+        FlightTicketResponse ibTicket = null;
+
+        if(wrapper != null) {
+            FareQuoteCacheEntry entry = (FareQuoteCacheEntry) wrapper.get();
+            obFlight = (FlightFareQuoteDetailsResponse) (entry != null ? entry.getOutboundFlight() : null);
+            ibFlight = (FlightFareQuoteDetailsResponse) (entry != null ? entry.getInboundFlight() : null);
+        }
+
+        if(obFlight.isLCC()) {
+            obTicket = getFlightTicket(obReq.get("outbound"));
+        }
+
+        if (!obFlight.isLCC()) {
+            obBooking = getFlightBooking(obReq.get("outbound"));
+
+            Map<String, Object> reqBody = new HashMap<>();
+            reqBody.put("EndUserIp", "192.168.97.1");
+            reqBody.put("TokenId", TboAuthService.getToken());
+            reqBody.put("TraceId", obBooking.getTraceId());
+            reqBody.put("PNR", obBooking.getBookingDetails().getPnr());
+            reqBody.put("BookingId", obBooking.getBookingDetails().getBookingId());
+
+            obTicket = getFlightTicket(reqBody);
+        }
+
+        if(ibFlight != null) {
+            if(ibFlight.isLCC()) {
+                ibTicket = getFlightTicket(ibReq.get("inbound"));
+            }
+
+            if(!ibFlight.isLCC()) {
+                ibBooking = getFlightBooking(ibReq);
+
+                Map<String, Object> reqBody = new HashMap<>();
+                reqBody.put("EndUserIp", "192.168.97.1");
+                reqBody.put("TokenId", TboAuthService.getToken());
+                reqBody.put("TraceId", ibBooking.getTraceId());
+                reqBody.put("PNR", ibBooking.getBookingDetails().getPnr());
+                reqBody.put("BookingId", ibBooking.getBookingDetails().getBookingId());
+
+                ibTicket = getFlightTicket(reqBody);
+            }
+        }
+
+//        Map<String, Object> requestBody = TboFlightRequestMapper.mapToBookingTicketingRequest(request, cacheManager);
+//
+//        log.info("flight book request body: {}", requestBody.toString());
+//        ResponseEntity<TboApiFlightBookingResponseDto> response = restService.sendRequest(
+//                TBO_FLIGHT_URL + "/Book",
+//                HttpMethod.POST,
+//                new HashMap<>(),
+//                requestBody.get("outbound"),
+//                new ParameterizedTypeReference<TboApiFlightBookingResponseDto>() {}
+//        );
+//
+//        if(!Objects.equals(response.getBody().getError().getErrorMessage(), "")) {
+//            throw new Exception(response.getBody().getError().getErrorMessage());
+//        }
+//
+//        FlightBookingResponseNonLcc outboundBooking = tboFlightBookingResponseMapper.mapToBookingResponse(response.getBody());
+//
+//        FlightBookingResponseNonLcc inboundBooking = null;
+//        if(requestBody.containsKey("inbound")) {
+//            ResponseEntity<TboApiFlightBookingResponseDto> responseInbound = restService.sendRequest(
+//                    TBO_FLIGHT_URL + "/Book",
+//                    HttpMethod.POST,
+//                    new HashMap<>(),
+//                    requestBody.get("inbound"),
+//                    new ParameterizedTypeReference<TboApiFlightBookingResponseDto>() {}
+//            );
+//
+//            if(!Objects.equals(response.getBody().getError().getErrorMessage(), "")) {
+//                throw new Exception(response.getBody().getError().getErrorMessage());
+//            }
+//            inboundBooking = tboFlightBookingResponseMapper.mapToBookingResponse(response.getBody());
+//        }
+//
+        List<FlightTicketResponse> result = new ArrayList<>();
+        result.add(obTicket);
+
+        if(ibTicket != null) result.add(ibTicket);
+
+        return result;
+    }
+
+    public FlightTicketResponse getFlightTicket(Object requestBody) throws Exception {
+        ResponseEntity<TboApiFlightTicketResponseDto> response = restService.sendRequest(
+                TBO_FLIGHT_URL + "/Ticket",
+                HttpMethod.POST,
+                new HashMap<>(),
+                requestBody,
+                new ParameterizedTypeReference<TboApiFlightTicketResponseDto>() {}
+        );
+        if(!Objects.equals(response.getBody().getResponse().getError().getErrorMessage(), "")) {
+            throw new Exception(response.getBody().getResponse().getError().getErrorMessage());
+        }
+
+        return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
+    }
+
+    public FlightBookingResponseNonLcc getFlightBooking(Object requestBody) throws Exception {
         ResponseEntity<TboApiFlightBookingResponseDto> response = restService.sendRequest(
                 TBO_FLIGHT_URL + "/Book",
                 HttpMethod.POST,
@@ -120,8 +259,6 @@ public class TboFlightService {
         if(!Objects.equals(response.getBody().getError().getErrorMessage(), "")) {
             throw new Exception(response.getBody().getError().getErrorMessage());
         }
-
-        System.out.println("response status: " + response.getBody().getResponse().getStatus() + " : book response:");
 
         return tboFlightBookingResponseMapper.mapToBookingResponse(response.getBody());
     }

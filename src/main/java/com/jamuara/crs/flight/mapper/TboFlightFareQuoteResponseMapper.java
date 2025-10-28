@@ -14,6 +14,7 @@ import org.mapstruct.MappingTarget;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -173,7 +174,51 @@ public interface TboFlightFareQuoteResponseMapper {
                             })
                     .collect(Collectors.toList())
             );
+            List<FlightFareQuoteDetailsResponse.FlightLeg> allLegs = new ArrayList<>();
+            Duration totalLayover = Duration.ZERO;
 
+            for (List<TboApiFareQuoteResponseDto.Segment> segmentList : results.getSegments()) {
+                for (int i = 0; i < segmentList.size(); i++) {
+                    var segment = segmentList.get(i);
+                    var leg = new FlightFareQuoteDetailsResponse.FlightLeg();
+
+                    leg.setTripType(TripType.values()[segment.getTripIndicator() - 1]);
+                    leg.setBaggage(segment.getBaggage());
+                    leg.setCabinBaggage(segment.getCabinBaggage());
+                    leg.setCabinClass(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass() - 1]);
+                    leg.setCarrierCode(segment.getAirline().getAirlineCode());
+                    leg.setCarrierName(segment.getAirline().getAirlineName());
+                    leg.setOperatingCarrier(segment.getAirline().getOperatingCarrier());
+                    leg.setFlightNumber(segment.getAirline().getFlightNumber());
+                    leg.setAircraftCode(segment.getCraft());
+                    leg.setDepartureAirport(segment.getOrigin().getAirport().getAirportCode());
+                    leg.setDepartureAirportName(segment.getOrigin().getAirport().getAirportName());
+                    leg.setDepartureTerminal(segment.getOrigin().getAirport().getTerminal());
+                    leg.setDepartureCityName(segment.getOrigin().getAirport().getCityName());
+                    leg.setDepartureCountryName(segment.getOrigin().getAirport().getCountryName());
+                    leg.setDepartureDateTime(segment.getOrigin().getDepTime());
+                    leg.setArrivalAirport(segment.getDestination().getAirport().getAirportCode());
+                    leg.setArrivalAirportName(segment.getDestination().getAirport().getAirportName());
+                    leg.setArrivalTerminal(segment.getDestination().getAirport().getTerminal());
+                    leg.setArrivalCityName(segment.getDestination().getAirport().getCityName());
+                    leg.setArrivalCountryName(segment.getDestination().getAirport().getCountryName());
+                    leg.setArrivalDateTime(segment.getDestination().getArrTime());
+                    leg.setDuration(formatDuration(segment.getDuration()));
+
+                    if (i < segmentList.size() - 1) {
+                        LocalDateTime arr = LocalDateTime.parse(segment.getDestination().getArrTime());
+                        LocalDateTime nextDep = LocalDateTime.parse(segmentList.get(i + 1).getOrigin().getDepTime());
+                        Duration layover = Duration.between(arr, nextDep);
+                        leg.setLayoverDuration(Helper.getDurationString(layover.toString()));
+                        totalLayover = totalLayover.plus(layover);
+                    }
+
+                    allLegs.add(leg);
+                }
+            }
+
+            flight.setFlightLegs(allLegs);
+            flight.setTotalLayover(Helper.getDurationString(totalLayover.toString()));
         } else {
             flight.setFlightLegs(List.of());
         }

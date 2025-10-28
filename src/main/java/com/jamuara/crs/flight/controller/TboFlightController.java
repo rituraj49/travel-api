@@ -2,8 +2,9 @@ package com.jamuara.crs.flight.controller;
 
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteResponse;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingRequestNonLcc;
+import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingResponseNonLcc;
+import com.jamuara.crs.flight.dto.tbo.book.FlightTicketResponse;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.service.TboFlightService;
@@ -12,6 +13,9 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("tbo/flights")
@@ -39,7 +43,7 @@ public class TboFlightController {
     @PostMapping("/fare-quote")
     public ResponseEntity<?> fareQuote(@RequestBody FlightFareQuoteRequest request) {
         try {
-            FlightFareQuoteResponse response = tboFlightService.flightFareQuote(request);
+            List<Map<String, FlightFareQuoteResponse>> response = tboFlightService.flightFareQuote(request);
 //            log.info("{} flight offers found", flightResponseList.size());
 
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
@@ -50,9 +54,9 @@ public class TboFlightController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<?> flightBooking(@RequestBody FlightBookingRequestNonLcc request) {
+    public ResponseEntity<?> flightBooking(@RequestBody FlightBookingTicketingRequest request) {
         try {
-            FlightBookingResponseNonLcc response = tboFlightService.flightBook(request);
+            List<FlightTicketResponse> response = tboFlightService.flightBookAndTicket(request);
 //            log.info("{} flight offers found", flightResponseList.size());
 
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
