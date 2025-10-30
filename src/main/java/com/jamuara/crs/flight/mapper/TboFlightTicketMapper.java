@@ -18,7 +18,7 @@ import java.util.List;
 public interface TboFlightTicketMapper {
     // === Root Mapping ===
     @Mapping(source = "response.traceId", target = "traceId")
-    @Mapping(source = "response", target = "ticketBookingDetails")
+    @Mapping(source = "response.response", target = "ticketBookingDetails")
     FlightTicketResponse toFlightTicketResponse(TboApiFlightTicketResponseDto source);
 
     // === TicketBookingDetails ===

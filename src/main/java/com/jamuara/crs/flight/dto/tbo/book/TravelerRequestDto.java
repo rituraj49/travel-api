@@ -33,9 +33,9 @@ public class TravelerRequestDto {
 
     private String phone;
 
-    private TravelerDto.IdentityDocument passportDetails;
+    private IdentityDocument passportDetails;
 
-    private TravelerDto.AddressDto address;
+    private AddressDto address;
 
     @Data
     public static class AddressDto {

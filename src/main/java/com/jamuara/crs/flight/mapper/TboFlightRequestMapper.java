@@ -23,6 +23,8 @@ public class TboFlightRequestMapper {
 
         Map<String, Object> req = new HashMap<>();
 
+        List<Map<String, Object>> segments = new ArrayList<>();
+
         Map<String, Object> segDep = new HashMap<>();
             segDep.put("Origin", dto.getOriginLocationCode());
             segDep.put("Destination", dto.getDestinationLocationCode());
@@ -37,6 +39,9 @@ public class TboFlightRequestMapper {
             segRet.put("PreferredDepartureTime", dto.getReturnDate() + "T00:00:00");
         }
 
+        segments.add(segDep);
+        if(segRet.containsKey("Origin") && segRet.get("Origin") != null) segments.add(segRet);
+
         req.put("EndUserIp", "192.168.97.1");
         req.put("TokenId", token);
         req.put("AdultCount", dto.getAdults());
@@ -46,7 +51,7 @@ public class TboFlightRequestMapper {
         req.put("OneStopFlight", dto.isOneStop());
         req.put("JourneyType", dto.getReturnDate() != null ? 2 : 1);
         req.put("PreferredAirlines", null);
-        req.put("Segments", List.of(segDep, segRet));
+        req.put("Segments", segments);
 
         return req;
     }
@@ -75,7 +80,7 @@ public class TboFlightRequestMapper {
         return reqBody;
     }
 
-    public static Map<String, Object> mapToBookingTicketingRequest(FlightBookingTicketingRequest req, CacheManager cacheManager) {
+    public static Map<String, Object> mapToBookingTicketingRequest(FlightBookingTicketingRequest req, Cache.ValueWrapper wrapper) {
         Map<String, Object> combinedReq = new HashMap<>();
 
         Map<String, Object> outboundReq = new HashMap<>();
@@ -83,9 +88,9 @@ public class TboFlightRequestMapper {
 
         int totalTravelers = req.getTravelers().size();
 
-        Cache cache = cacheManager.getCache("fareQuote");
-        assert cache != null;
-        Cache.ValueWrapper wrapper = cache.get(req.getTraceId());
+//        Cache cache = cacheManager.getCache("fareQuote");
+//        assert cache != null;
+//        Cache.ValueWrapper wrapper = cache.get(req.getTraceId());
 
 //                (FlightFareQuoteDetailsResponse) cacheManager.getCache("fareQuote").get(req.getTraceId());
         Map<String, Object> fareOutbound = new HashMap<>();

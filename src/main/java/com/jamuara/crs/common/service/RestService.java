@@ -52,7 +52,6 @@ public class RestService {
 
         try {
             var res = restTemplate.exchange(url, method, entity, responseType);
-            System.out.println();
             log.info("rest request completed successfully with status: {}", res.getStatusCode());
             return res;
         } catch (RestClientException e) {
