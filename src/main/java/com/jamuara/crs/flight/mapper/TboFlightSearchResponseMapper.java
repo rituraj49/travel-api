@@ -91,7 +91,7 @@ public interface TboFlightSearchResponseMapper {
     @Mapping(target = "seatsAvailable", source = "noOfSeatAvailable")
     @Mapping(target = "baggage", source = "baggage")
     @Mapping(target = "cabinBaggage", source = "cabinBaggage")
-    @Mapping(target = "cabinClass", expression = "java(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass() - 1])")
+    @Mapping(target = "cabinClass", expression = "java(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass()])")
     @Mapping(target = "carrierCode", source = "airline.airlineCode")
     @Mapping(target = "carrierName", source = "airline.airlineName")
     @Mapping(target = "flightNumber", source = "airline.flightNumber")

@@ -2,6 +2,7 @@ package com.jamuara.crs.flight.service;
 
 import com.jamuara.crs.common.service.RestService;
 import com.jamuara.crs.common.service.TboAuthService;
+import com.jamuara.crs.enums.BookingStatusDb;
 import com.jamuara.crs.flight.dto.FlightBookingRequest;
 import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.*;
@@ -10,9 +11,13 @@ import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.dto.tbo.search.TboApiFlightResponseDto;
 import com.jamuara.crs.flight.mapper.*;
+import com.jamuara.crs.flight.repopsitory.FlightBookingRepository;
+import com.jamuara.crs.model.FlightBooking;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
@@ -32,6 +37,9 @@ public class TboFlightService {
     TboFlightFareQuoteResponseMapper tboFlightFareQuoteResponseMapper;
 
     TboFlightTicketMapper tboFlightTicketMapper;
+
+    @Autowired(required = false)
+    FlightBookingRepository flightBookingRepository;
 
     CacheManager cacheManager;
 
@@ -170,6 +178,8 @@ public class TboFlightService {
             obBooking = getFlightBooking(obReq.get("outbound"));
 
             bookings.add(obBooking);
+
+//            saveBookingToDb(obBooking);
 //            Map<String, Object> reqBody = new HashMap<>();
 //            reqBody.put("EndUserIp", "192.168.97.1");
 //            reqBody.put("TokenId", TboAuthService.getToken());
@@ -191,6 +201,8 @@ public class TboFlightService {
                 ibBooking = getFlightBooking(ibReq);
 
                 bookings.add(ibBooking);
+
+//                saveBookingToDb(ibBooking);
 //                Map<String, Object> reqBody = new HashMap<>();
 //                reqBody.put("EndUserIp", "192.168.97.1");
 //                reqBody.put("TokenId", TboAuthService.getToken());
@@ -242,5 +254,16 @@ public class TboFlightService {
         }
 
         return tboFlightBookingResponseMapper.mapToBookingResponse(response.getBody());
+    }
+
+    public void saveBookingToDb(FlightBookingResponseNonLcc booking) {
+        FlightBooking flightBooking = new FlightBooking();
+        flightBooking.setBookingId(booking.getBookingDetails().getBookingId());
+        flightBooking.setBookingStatus(BookingStatusDb.PENDING);
+        flightBooking.setPnr(booking.getBookingDetails().getPnr());
+        flightBooking.setLcc(booking.getBookingDetails().getFlightDetails().isLCC());
+        flightBooking.setDomestic(booking.getBookingDetails().getFlightDetails().isDomestic());
+
+        flightBookingRepository.save(flightBooking);
     }
 }

@@ -1,5 +1,6 @@
 package com.jamuara.crs.security;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
@@ -14,13 +15,15 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Configuration
 public class SecurityConfig {
+
+    @Value("${app.keycloak.admin.clientId}")
+    private String keycloakClientId;
+
     @Bean
     SecurityFilterChain resourceSecurityFilterChain(
             HttpSecurity http,
@@ -72,19 +75,39 @@ public class SecurityConfig {
     @Bean
     AuthoritiesConverter realmRolesConverter() {
         return (claims) -> {
-            var realmAccess = Optional.ofNullable(
-                    (Map<String, Object>) claims.get("realm_access"));
-            var resourceAccess = Optional.ofNullable(
-                    (Map<String, Object>) claims.get("resource_access"));
+//            var realmAccess = Optional.ofNullable(
+//                    (Map<String, Object>) claims.get("realm_access"));
+//            var resourceAccess = Optional.ofNullable(
+//                    (Map<String, Object>) claims.get("resource_access"));
+//
+//            var roles = resourceAccess.flatMap(map -> Optional.ofNullable(
+//                    (List<String>) map.get("roles")));
+////            roles.map(List::stream)
+////                    .orElse(Stream.empty())
+//            return roles.stream().flatMap(Collection::stream)
+//                    .map(SimpleGrantedAuthority::new)
+//                    .map(GrantedAuthority.class::cast)
+//                    .toList();
 
-            var roles = resourceAccess.flatMap(map -> Optional.ofNullable(
-                    (List<String>) map.get("roles")));
-//            roles.map(List::stream)
-//                    .orElse(Stream.empty())
-            return roles.stream().flatMap(Collection::stream)
+            List<String> roles = new ArrayList<>();
+
+            Map<String, Object> realmAccess = (Map<String, Object>) claims.get("realm_access");
+            if (realmAccess != null && realmAccess.containsKey("roles")) {
+                roles.addAll((Collection<String>) realmAccess.get("roles"));
+            }
+
+            Map<String, Object> resourceAccess = (Map<String, Object>) claims.get("resource_access");
+            if (resourceAccess != null) {
+                Map<String, Object> clientAccess = (Map<String, Object>) resourceAccess.get(keycloakClientId);
+                if (clientAccess != null && clientAccess.containsKey("roles")) {
+                    roles.addAll((Collection<String>) clientAccess.get("roles"));
+                }
+            }
+
+            return roles.stream()
+                    .map(role -> "ROLE_" + role.toUpperCase())
                     .map(SimpleGrantedAuthority::new)
-                    .map(GrantedAuthority.class::cast)
-                    .toList();
+                    .collect(Collectors.toList());
         };
     }
 }

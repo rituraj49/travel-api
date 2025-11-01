@@ -8,6 +8,7 @@ import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightTicketRequestLcc;
 import com.jamuara.crs.flight.dto.tbo.book.TravelerRequestDto;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 
@@ -20,7 +21,7 @@ public class TboFlightRequestMapper {
     private static String token = TboAuthService.getToken();
 
     public static Map<String, Object> mapDtoToFlightRequest(FlightSearchRequest dto) {
-
+        boolean isReturn = StringUtils.isNotBlank(dto.getReturnDate());
         Map<String, Object> req = new HashMap<>();
 
         List<Map<String, Object>> segments = new ArrayList<>();
@@ -32,7 +33,7 @@ public class TboFlightRequestMapper {
             segDep.put("PreferredDepartureTime", dto.getDepartureDate() + "T00:00:00");
 
         Map<String, Object> segRet = new HashMap<>();
-        if(dto.getReturnDate() != null) {
+        if(isReturn) {
             segRet.put("Origin", dto.getDestinationLocationCode());
             segRet.put("Destination", dto.getOriginLocationCode());
             segRet.put("FlightCabinClass", dto.getTravelClass().ordinal() + 1);
@@ -49,7 +50,7 @@ public class TboFlightRequestMapper {
         req.put("InfantCount", dto.getInfants());
         req.put("DirectFlight", dto.isDirect());
         req.put("OneStopFlight", dto.isOneStop());
-        req.put("JourneyType", dto.getReturnDate() != null ? 2 : 1);
+        req.put("JourneyType", isReturn ? 2 : 1);
         req.put("PreferredAirlines", null);
         req.put("Segments", segments);
 
