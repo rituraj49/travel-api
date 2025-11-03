@@ -2,10 +2,7 @@ package com.jamuara.crs.flight.controller;
 
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteResponse;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingCombinedResponse;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingResponseNonLcc;
-import com.jamuara.crs.flight.dto.tbo.book.FlightTicketResponse;
+import com.jamuara.crs.flight.dto.tbo.book.*;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.service.TboFlightService;
@@ -154,4 +151,49 @@ public class TboFlightController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
     }
+
+
+
+
+    @Operation(
+            summary = "Fetch booking details for a given PNR and Booking ID",
+            description = "Retrieves detailed flight booking information (itinerary, passengers, fare, etc.) from the TBO API using the provided PNR and Booking ID."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Booking details retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PostMapping("/getBookingDetails")
+    public ResponseEntity<?> getBookingDetails(
+            @io.swagger.v3.oas.annotations.parameters.RequestBody(
+                    required = true,
+                    description = "Booking details request containing PNR and Booking ID",
+                    content = @Content(
+                            schema = @Schema(implementation = TBOGetBookingDetailsRequest.class),
+                            examples = @ExampleObject(
+                                    name = "Sample Request",
+                                    value = """
+                                        {
+                                          "PNR": "ABC123",
+                                          "BookingId": "987654321"
+                                        }
+                                        """
+                            )
+                    )
+            )
+            @RequestBody TBOGetBookingDetailsRequest request
+    ) {
+        try {
+            var response = tboFlightService.getBookingDetails(request);
+            return ResponseEntity.ok()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .body(response);
+        } catch (Exception e) {
+            log.error("Error while fetching booking details: {}", e.getMessage(), e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Error: " + e.getMessage());
+        }
+    }
+
+
 }
