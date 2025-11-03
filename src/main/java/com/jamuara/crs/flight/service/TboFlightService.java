@@ -233,11 +233,27 @@ public class TboFlightService {
                 new ParameterizedTypeReference<TboApiFlightTicketResponseDto>() {}
         );
 
+        TboApiFlightTicketResponseDto body = response.getBody();
+        TboApiFlightTicketResponseDto.BookingResponseWrapper wrapper = body.getResponse();
+//        var errorMessage = wrapper != null && wrapper.getError() != null ? wrapper.getError() : "No error field present";
 
-        if(!Objects.equals(response.getBody().getResponse().getError().getErrorMessage(), "")) {
-            throw new Exception(response.getBody().getResponse().getError().getErrorMessage());
+        String errorMessage = Optional.ofNullable(wrapper)
+                        .map(TboApiFlightTicketResponseDto.BookingResponseWrapper::getError)
+                                .map(TboApiFlightTicketResponseDto.ErrorResponse::getErrorMessage)
+                                        .orElse("invalid error from tbo");
+
+        log.info("ticketing response: {}", wrapper != null && wrapper.getError() != null ? wrapper.getError() : "No error field present");
+
+        if(!errorMessage.isBlank()) {
+            throw new Exception(errorMessage);
         }
-        return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
+
+        FlightTicketResponse ticket = tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
+
+        if(ticket.getTicketBookingDetails().getPnr() == null || ticket.getTicketBookingDetails().getPnr().isEmpty()) {
+
+        }
+        return ticket;
     }
 
     public FlightBookingResponseNonLcc getFlightBooking(Object requestBody) throws Exception {
@@ -248,9 +264,18 @@ public class TboFlightService {
                 requestBody,
                 new ParameterizedTypeReference<TboApiFlightBookingResponseDto>() {}
         );
+        TboApiFlightBookingResponseDto body = response.getBody();
+//        var errorMessage = body != null && body.getError() != null ? body.getError() : "No error field present";
 
-        if(!Objects.equals(response.getBody().getError().getErrorMessage(), "")) {
-            throw new Exception(response.getBody().getError().getErrorMessage());
+        String errorMessage = Optional.ofNullable(body)
+                        .map(TboApiFlightBookingResponseDto::getError)
+                                .map(TboApiFlightBookingResponseDto.ErrorDetail::getErrorMessage)
+                                        .orElse("invalid error from tbo");
+
+        log.info("booking response: {}", body != null && body.getError() != null ? body.getError() : "No error field present");
+
+        if(!errorMessage.isBlank()) {
+            throw new Exception(errorMessage);
         }
 
         return tboFlightBookingResponseMapper.mapToBookingResponse(response.getBody());
