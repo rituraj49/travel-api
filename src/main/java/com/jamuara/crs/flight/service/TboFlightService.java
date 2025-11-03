@@ -19,8 +19,7 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.context.annotation.Profile;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -266,4 +265,21 @@ public class TboFlightService {
 
         flightBookingRepository.save(flightBooking);
     }
+
+
+    public TBOGetBookingDetailsResponse getBookingDetails(TBOGetBookingDetailsRequest request){
+        log.info("Fetching booking details for PNR: {} and BookingId: {}", request.getPnr(), request.getBookingId());
+        Map<String, Object> requestBody = TboFlightRequestMapper.mapToBookingDetailsRequest(request);
+
+        ResponseEntity<TBOGetBookingDetailsResponse> response = restService.sendRequest(
+                TBO_FLIGHT_URL + "/GetBookingDetails",
+                HttpMethod.POST,
+                new HashMap<>(),                // headers
+                requestBody,                        // body
+                new ParameterizedTypeReference<TBOGetBookingDetailsResponse>() {} // expected response type
+        );
+
+        return response.getBody();
+    }
+
 }

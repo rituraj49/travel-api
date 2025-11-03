@@ -6,6 +6,7 @@ import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteDetailsResponse;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightTicketRequestLcc;
+import com.jamuara.crs.flight.dto.tbo.book.TBOGetBookingDetailsRequest;
 import com.jamuara.crs.flight.dto.tbo.book.TravelerRequestDto;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import org.apache.commons.lang3.StringUtils;
@@ -255,4 +256,21 @@ public class TboFlightRequestMapper {
         pass.put("Fare", fare);
         return pass;
     }
+
+
+
+
+    public static Map<String, Object> mapToBookingDetailsRequest(TBOGetBookingDetailsRequest req) {
+
+
+        Map<String, Object> getBookingReq = new HashMap<>();
+        getBookingReq.put("EndUserIp", "192.168.97.1");
+        getBookingReq.put("TokenId", token);
+        getBookingReq.put("PNR", req.getPnr());
+        getBookingReq.put("BookingId", req.getBookingId());
+
+        return getBookingReq;
+    }
+
+
 }
