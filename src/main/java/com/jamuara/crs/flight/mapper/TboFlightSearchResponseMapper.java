@@ -2,6 +2,7 @@ package com.jamuara.crs.flight.mapper;
 
 import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.config.CentralMapperConfig;
+import com.jamuara.crs.enums.TripType;
 import com.jamuara.crs.flight.dto.tbo.FlightDetailsResponse;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.dto.tbo.search.TboApiFlightResponseDto;
@@ -21,6 +22,7 @@ public interface TboFlightSearchResponseMapper {
     @Mapping(source = "traceId", target = "traceId")
     @Mapping(source = "origin", target = "from")
     @Mapping(source = "destination", target = "to")
+//    @Mapping(target = "tripType", ignore = true)
     @Mapping(expression = "java(mapFlights(tboDto.getResults()))", target = "flightsAvailable")
     FlightSearchResponse mapToFlightSearchResponse(TboApiFlightResponseDto.Response tboDto);
 
@@ -32,17 +34,27 @@ public interface TboFlightSearchResponseMapper {
         for(int i = 0; i < results.size(); i++) {
             List<TboApiFlightResponseDto.Response.Result> flightResults = results.get(i);
             String key = "";
+            TripType tripType = null;
 
             if(results.size() == 1) {
                 key = "outboundFlights";
+                int segSize = flightResults.get(0).getSegments().size();
+
+                if(segSize == 1) tripType = TripType.OUTBOUND;
+                if(segSize == 2) tripType = TripType.RETURN;
+                if(segSize > 2) tripType = TripType.MULTICITY;
             } else if(results.size() == 2) {
                 key = i == 0 ? "outboundFlights" : "inboundFlights";
-            } else if(results.size() > 2) {
-                key = "trip " + i + 1;
+                tripType = i == 0 ? TripType.OUTBOUND : TripType.RETURN;
             }
 
+            TripType finalTripType = tripType;
             List<FlightDetailsResponse> flightDetailsResponses = flightResults.stream()
-                    .map(this::mapResultsToFlightDetailsResponse)
+                    .map(f -> {
+                        FlightDetailsResponse fd = this.mapResultsToFlightDetailsResponse(f);
+                        fd.setTripType(finalTripType);
+                        return fd;
+                    })
                     .toList();
 
             map.put(key, flightDetailsResponses);
@@ -66,6 +78,7 @@ public interface TboFlightSearchResponseMapper {
     @Mapping(source = "fare.publishedFare", target = "publishedFare")
     @Mapping(source = "fare.serviceFee", target = "serviceFee")
 //    @Mapping(expression = "java(result.getSegments().stream().flatMap(List::stream).map(this::mapFlightLeg).toList())", target = "flightLegs")
+//    @Mapping(target = "tripType", expression = "java(com.jamuara.crs.enums.TripType.values()[segment.getTripIndicator() - 1])")
     @Mapping(expression = "java(mapFlattenedSegments(result.getSegments()))", target = "flightLegs")
     @Mapping(source = "fareBreakdown", target = "travelerDetails")
     FlightDetailsResponse mapResultsToFlightDetailsResponse(TboApiFlightResponseDto.Response.Result result);
@@ -87,7 +100,9 @@ public interface TboFlightSearchResponseMapper {
     FlightDetailsResponse.FareDetails mapFareDetails(TboApiFlightResponseDto.Response.FareBreakdown fareBreakdown);
 
     @Mapping(target = "legNo", source = "segmentIndicator")
-    @Mapping(target = "tripType", expression = "java(com.jamuara.crs.enums.TripType.values()[segment.getTripIndicator() - 1])")
+    @Mapping(target = "tripNo", source = "tripIndicator")
+//    @Mapping(target = "tripType", expression = "java(com.jamuara.crs.enums.TripType.values()[segment.getTripIndicator() - 1])")
+//    @Mapping(target = "tripType", ignore = true)
     @Mapping(target = "seatsAvailable", source = "noOfSeatAvailable")
     @Mapping(target = "baggage", source = "baggage")
     @Mapping(target = "cabinBaggage", source = "cabinBaggage")
@@ -132,6 +147,8 @@ public interface TboFlightSearchResponseMapper {
             for(int i = 0; i < segmentList.size(); i++) {
                 TboApiFlightResponseDto.Response.Segment segment = segmentList.get(i);
                 FlightDetailsResponse.FlightLeg currentLeg = flightDetailsResponse.getFlightLegs().get(globalIndex);
+
+//                segment.getSegmentIndicator();
                 if(fareRules != null) {
                     String fareBasisCode = fareRules.get(globalIndex).getFareBasisCode();
                     currentLeg.setFareBasisCode(fareBasisCode);

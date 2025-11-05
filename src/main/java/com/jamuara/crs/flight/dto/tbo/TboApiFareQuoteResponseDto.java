@@ -221,7 +221,6 @@ public class TboApiFareQuoteResponseDto {
         @JsonProperty("StopPointDepartureTime")
         private String stopPointDepartureTime;
 
-
         @JsonProperty("Craft")
         private String craft;
 
@@ -240,7 +239,6 @@ public class TboApiFareQuoteResponseDto {
         @JsonProperty("FareClassification")
         private String fareClassification;
     }
-
 
     @Data
     public static class Airline {

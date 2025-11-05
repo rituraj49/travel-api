@@ -3,6 +3,7 @@ package com.jamuara.crs.flight.controller;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteResponse;
 import com.jamuara.crs.flight.dto.tbo.book.*;
+import com.jamuara.crs.flight.dto.tbo.search.FlightSearchMulticityRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.service.TboFlightService;
@@ -39,6 +40,20 @@ public class TboFlightController {
 
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
         } catch (Exception e) {
+            log.error("An internal error occurred while processing flight offer search API: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/search")
+    public ResponseEntity<?> searchFlightsMulticity(@RequestBody FlightSearchMulticityRequest request) {
+        try {
+            FlightSearchResponse response = tboFlightService.flightMulticitySearch(request);
+//            log.info("{} flight offers found", flightResponseList.size());
+
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
+        } catch (Exception e) {
+            e.printStackTrace();
             log.error("An internal error occurred while processing flight offer search API: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
         }
@@ -142,7 +157,7 @@ public class TboFlightController {
             @RequestBody FlightBookingTicketingRequest request
     ) {
         try {
-            FlightBookingTicketingCombinedResponse response = tboFlightService.flightBookAndTicket(request);
+            List<FetchFlightBookingResponse> response = tboFlightService.flightBookAndTicket(request);
 //            log.info("{} flight offers found", flightResponseList.size());
 
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
@@ -152,9 +167,6 @@ public class TboFlightController {
         }
     }
 
-
-
-
     @Operation(
             summary = "Fetch booking details for a given PNR and Booking ID",
             description = "Retrieves detailed flight booking information (itinerary, passengers, fare, etc.) from the TBO API using the provided PNR and Booking ID."
@@ -163,28 +175,28 @@ public class TboFlightController {
             @ApiResponse(responseCode = "200", description = "Booking details retrieved successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @PostMapping("/getBookingDetails")
+    @PostMapping("/fetch-booking")
     public ResponseEntity<?> getBookingDetails(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
                     description = "Booking details request containing PNR and Booking ID",
                     content = @Content(
-                            schema = @Schema(implementation = TBOGetBookingDetailsRequest.class),
+                            schema = @Schema(implementation = FetchBookingRequest.class),
                             examples = @ExampleObject(
                                     name = "Sample Request",
                                     value = """
                                         {
-                                          "PNR": "ABC123",
-                                          "BookingId": "987654321"
+                                          "pnr": "ABC123",
+                                          "bookingId": "987654321"
                                         }
                                         """
                             )
                     )
             )
-            @RequestBody TBOGetBookingDetailsRequest request
+            @RequestBody FetchBookingRequest request
     ) {
         try {
-            var response = tboFlightService.getBookingDetails(request);
+            FetchFlightBookingResponse response = tboFlightService.fetchBookingDetails(request);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(response);

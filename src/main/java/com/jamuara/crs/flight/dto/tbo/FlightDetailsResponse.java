@@ -41,6 +41,8 @@ public class FlightDetailsResponse {
 
     private List<FareDetails> travelerDetails;
 
+    private TripType tripType;
+
     private List<FlightLeg> flightLegs;
 
     private String totalLayover;
@@ -73,6 +75,8 @@ public class FlightDetailsResponse {
         private int legNo;
 
         private TripType tripType;
+
+        private int tripNo;
 
         private int seatsAvailable;
 

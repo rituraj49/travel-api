@@ -6,8 +6,9 @@ import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteDetailsResponse;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FlightTicketRequestLcc;
-import com.jamuara.crs.flight.dto.tbo.book.TBOGetBookingDetailsRequest;
+import com.jamuara.crs.flight.dto.tbo.book.FetchBookingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.TravelerRequestDto;
+import com.jamuara.crs.flight.dto.tbo.search.FlightSearchMulticityRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
@@ -56,6 +57,34 @@ public class TboFlightRequestMapper {
         req.put("Segments", segments);
 
         return req;
+    }
+
+    public static Map<String, Object> mapDtoToMulticityRequest(FlightSearchMulticityRequest dto) {
+        Map<String, Object> req = new HashMap<>();
+        List<Map<String, Object>> trips = new ArrayList<>();
+
+        dto.getTripDetails().forEach(t -> {
+            String depTime = !t.getDepartureTime().isEmpty() ? t.getDepartureTime() : "00:00:00";
+            Map<String, Object> trip = new HashMap<>();
+            trip.put("Origin", t.getFrom());
+            trip.put("Destination", t.getTo());
+            trip.put("FlightCabinClass", t.getCabin().ordinal() + 1);
+            trip.put("PreferredDepartureTime", t.getDepartureDate() + "T" + depTime);
+            trips.add(trip);
+        });
+
+        req.put("EndUserIp", "192.168.97.1");
+        req.put("TokenId", token);
+        req.put("AdultCount", dto.getAdults());
+        req.put("ChildCount", dto.getChildren());
+        req.put("InfantCount", dto.getInfants());
+        req.put("DirectFlight", dto.isDirect());
+        req.put("OneStopFlight", dto.isOneStop());
+        req.put("JourneyType", 3);
+        req.put("PreferredAirlines", null);
+        req.put("Segments", trips);
+
+        return  req;
     }
 
     public static Map<String, Object> mapToFareQuoteRequest(FlightFareQuoteRequest req) {
@@ -257,19 +286,17 @@ public class TboFlightRequestMapper {
         return pass;
     }
 
+    public static Map<String, Object> mapToBookingDetailsRequest(FetchBookingRequest req) {
+        Map<String, Object> reqBody = new HashMap<>();
+        reqBody.put("EndUserIp", "192.168.97.1");
+        reqBody.put("TokenId", token);
+        if(req.getTraceId() != null) reqBody.put("TraceId", req.getTraceId());
+        if(req.getPnr() != null) reqBody.put("PNR", req.getPnr());
+        if(req.getBookingId() != null) reqBody.put("BookingId", req.getBookingId());
+        if(req.getFirstName() != null) reqBody.put("FirstName", req.getFirstName());
+        if(req.getLastName() != null) reqBody.put("FirstName", req.getLastName());
 
-
-
-    public static Map<String, Object> mapToBookingDetailsRequest(TBOGetBookingDetailsRequest req) {
-
-
-        Map<String, Object> getBookingReq = new HashMap<>();
-        getBookingReq.put("EndUserIp", "192.168.97.1");
-        getBookingReq.put("TokenId", token);
-        getBookingReq.put("PNR", req.getPnr());
-        getBookingReq.put("BookingId", req.getBookingId());
-
-        return getBookingReq;
+        return reqBody;
     }
 
 

@@ -30,7 +30,8 @@ public interface TboFlightFareQuoteResponseMapper {
     FlightFareQuoteResponse mapToFlightFareQuoteResponse(TboApiFareQuoteResponseDto.Response tboDto);
 
     @Mapping(target = "legNo", source = "segmentIndicator")
-    @Mapping(target = "tripType", expression = "java(com.jamuara.crs.enums.TripType.values()[segment.getTripIndicator() - 1])")
+    @Mapping(target = "tripNo", source = "tripIndicator")
+//    @Mapping(target = "tripType", expression = "java(com.jamuara.crs.enums.TripType.values()[segment.getTripIndicator() - 1])")
     @Mapping(target = "baggage", source = "baggage")
     @Mapping(target = "cabinBaggage", source = "cabinBaggage")
     @Mapping(target = "cabinClass", expression = "java(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass() - 1])")
@@ -69,6 +70,14 @@ public interface TboFlightFareQuoteResponseMapper {
         flight.setFareType(results.getFareClassification() != null ? results.getFareClassification().getType() : null);
         flight.setFareColor(results.getFareClassification() != null ? results.getFareClassification().getColor() : null);
 
+        TripType tripType = null;
+
+        int segSize = results.getSegments().get(0).size();
+        if(segSize == 1) tripType = TripType.OUTBOUND;
+        if(segSize == 2) tripType = TripType.RETURN;
+        if(segSize > 2) tripType = TripType.MULTICITY;
+
+        flight.setTripType(tripType);
 
         if (results.getFare() != null) {
             var fare = results.getFare();
@@ -148,7 +157,7 @@ public interface TboFlightFareQuoteResponseMapper {
                             .map(segment -> {
                                 var leg = new FlightFareQuoteDetailsResponse.FlightLeg();
 //                                leg.setTripType(com.jamuara.crs.enums.TripType.RETURN);
-                                leg.setTripType(TripType.values()[segment.getTripIndicator() - 1]);
+//                                leg.setTripType(TripType.values()[segment.getTripIndicator() - 1]);
                                 leg.setBaggage(segment.getBaggage());
                                 leg.setCabinBaggage(segment.getCabinBaggage());
                                 leg.setCabinClass(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass() - 1]);
@@ -182,7 +191,7 @@ public interface TboFlightFareQuoteResponseMapper {
                     var segment = segmentList.get(i);
                     var leg = new FlightFareQuoteDetailsResponse.FlightLeg();
 
-                    leg.setTripType(TripType.values()[segment.getTripIndicator() - 1]);
+//                    leg.setTripType(TripType.values()[segment.getTripIndicator() - 1]);
                     leg.setBaggage(segment.getBaggage());
                     leg.setCabinBaggage(segment.getCabinBaggage());
                     leg.setCabinClass(com.jamuara.crs.enums.TravelClass.values()[segment.getCabinClass() - 1]);

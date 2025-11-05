@@ -41,8 +41,6 @@ public class TboApiFlightResponseDto {
 
             @JsonProperty("ErrorMessage")
             private String errorMessage;
-
-            // getters and setters
         }
 
         @Data

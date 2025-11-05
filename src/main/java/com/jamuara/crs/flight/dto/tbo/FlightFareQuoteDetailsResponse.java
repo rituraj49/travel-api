@@ -54,6 +54,8 @@ public class FlightFareQuoteDetailsResponse {
 
     private List<FareDetails> travelerDetails;
 
+    private TripType tripType;
+
     private List<FlightLeg> flightLegs;
 
     private String validatingAirline;
@@ -86,7 +88,8 @@ public class FlightFareQuoteDetailsResponse {
     @Data
     public static class FlightLeg {
         private int legNo;
-        private TripType tripType;
+        private int tripNo;
+//        private TripType tripType;
         private String baggage;
         private String cabinBaggage;
         private TravelClass cabinClass;
