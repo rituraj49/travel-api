@@ -12,6 +12,8 @@ import com.jamuara.crs.flight.mapper.*;
 import com.jamuara.crs.flight.repopsitory.FlightBookingRepository;
 import com.jamuara.crs.model.FlightBooking;
 import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
@@ -21,9 +23,12 @@ import org.springframework.stereotype.Service;
 
 import java.util.*;
 
+import static com.jamuara.crs.enums.TicketStatus.Successful;
+
 @Service
 @Slf4j
 public class TboFlightService {
+    private static final Logger log = LoggerFactory.getLogger(TboFlightService.class);
     RestService restService;
 
     TboFlightSearchResponseMapper tboFlightSearchResponseMapper;
@@ -386,4 +391,34 @@ public class TboFlightService {
         return fetchedFlight;
     }
 
+    public  List<FlightBooking> getAllBooking(){
+        log.info("number of booking is {}" ,flightBookingRepository.findAll().size());
+        return flightBookingRepository.findAll();
+    }
+
+    public void saveBookingDetails(FetchFlightBookingResponse response) {
+        if (response == null || response.getTicketBookingDetails() == null) {
+            throw new IllegalArgumentException("Invalid booking response");
+        }
+
+        FetchFlightBookingResponse.TicketBookingDetails bookingDetails = response.getTicketBookingDetails();
+        FetchFlightBookingResponse.TicketBookFlightDetails flightDetails = bookingDetails.getFlightDetails();
+
+        FlightBooking booking = new FlightBooking();
+        booking.setPnr(bookingDetails.getPnr());
+        booking.setBookingId(bookingDetails.getBookingId());
+        booking.setLcc(flightDetails.isLCC());
+        booking.setDomestic(flightDetails.isDomestic());
+
+
+        if (bookingDetails.getTicketStatus() != null) {
+            booking.setBookingStatus(BookingStatusDb.CONFIRMED);
+        } else {
+            booking.setBookingStatus(BookingStatusDb.PENDING);
+        }
+
+         flightBookingRepository.save(booking);
+
+        log.info("Booking save !!!!!!!!");
+    }
 }

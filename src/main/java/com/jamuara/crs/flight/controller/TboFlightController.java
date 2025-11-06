@@ -160,6 +160,11 @@ public class TboFlightController {
             List<FetchFlightBookingResponse> response = tboFlightService.flightBookAndTicket(request);
 //            log.info("{} flight offers found", flightResponseList.size());
 
+            // Save booking details for each response
+            for (FetchFlightBookingResponse response1 : response) {
+                tboFlightService.saveBookingDetails(response1);
+            }
+
             return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
         } catch (Exception e) {
             log.error("An internal error occurred while processing flight offer search API: {}", e.getMessage());
@@ -205,6 +210,11 @@ public class TboFlightController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Error: " + e.getMessage());
         }
+    }
+
+    @GetMapping("/admin")
+    public ResponseEntity<?> getAllBooking(){
+        return ResponseEntity.ok().body(tboFlightService.getAllBooking());
     }
 
 
