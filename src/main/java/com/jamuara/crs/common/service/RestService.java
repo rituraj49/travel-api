@@ -51,11 +51,12 @@ public class RestService {
         HttpEntity<?> entity = new HttpEntity<>(body, httpHeaders);
 
         try {
-            var res = restTemplate.exchange(url, method, entity, responseType);
+            ResponseEntity<T> res = restTemplate.exchange(url, method, entity, responseType);
             log.info("rest request completed successfully with status: {}", res.getStatusCode());
             return res;
         } catch (RestClientException e) {
-            log.error("Error in restTemplate exchange", e);
+            e.printStackTrace();
+            log.error("Error in restTemplate exchange {}", e.getMessage());
             throw new RuntimeException(e);
         }
     }

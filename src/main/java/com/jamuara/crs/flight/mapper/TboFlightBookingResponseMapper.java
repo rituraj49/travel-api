@@ -14,7 +14,7 @@ public interface TboFlightBookingResponseMapper {
 
     @Mapping(source = "traceId", target = "traceId")
     @Mapping(source = "response", target = "bookingDetails")
-    FlightBookingResponseNonLcc mapToBookingResponse(TboApiFlightBookingResponseDto source);
+    FlightBookingResponseNonLcc mapToBookingResponse(TboApiFlightBookingResponseDto.Response source);
 
     @Mapping(source = "pnr", target = "pnr")
     @Mapping(source = "bookingId", target = "bookingId")
@@ -22,7 +22,7 @@ public interface TboFlightBookingResponseMapper {
     @Mapping(source = "priceChanged", target = "priceChanged")
     @Mapping(source = "timeChanged", target = "timeChanged")
     @Mapping(source = "flightItinerary", target = "flightDetails")
-    FlightBookingResponseNonLcc.BookingDetails mapToBookingDetails(TboApiFlightBookingResponseDto.ResponseData source);
+    FlightBookingResponseNonLcc.BookingDetails mapToBookingDetails(TboApiFlightBookingResponseDto.Response.ResponseData source);
 
     @Mapping(source = "LCC", target = "LCC")
     @Mapping(source = "nonRefundable", target = "nonRefundable")
@@ -32,7 +32,7 @@ public interface TboFlightBookingResponseMapper {
     @Mapping(source = "lastTicketDate", target = "lastTicketDate")
     @Mapping(source = "fare", target = "fare")
     @Mapping(source = "passengers", target = "travelers")
-    FlightBookingResponseNonLcc.BookFlightDetails mapToBookFlightDetails(TboApiFlightBookingResponseDto.FlightItinerary source);
+    FlightBookingResponseNonLcc.BookFlightDetails mapToBookFlightDetails(TboApiFlightBookingResponseDto.Response.FlightItinerary source);
 
     @Mapping(source = "paxId", target = "id")
     @Mapping(source = "title", target = "title")
@@ -48,9 +48,9 @@ public interface TboFlightBookingResponseMapper {
     @Mapping(expression = "java(mapPassportDetails(source))", target = "passportDetails")
     @Mapping(expression = "java(mapAddressDetails(source))", target = "address")
     @Mapping(source = "fare", target = "farePerTraveler")
-    TravelerDto mapToTravelerDetails(TboApiFlightBookingResponseDto.Passenger source);
+    TravelerDto mapToTravelerDetails(TboApiFlightBookingResponseDto.Response.Passenger source);
 
-    default TravelerDto.IdentityDocument mapPassportDetails(TboApiFlightBookingResponseDto.Passenger passenger) {
+    default TravelerDto.IdentityDocument mapPassportDetails(TboApiFlightBookingResponseDto.Response.Passenger passenger) {
         if(passenger == null) return null;
 
         TravelerDto.IdentityDocument passportDetails = new TravelerDto.IdentityDocument();
@@ -61,7 +61,7 @@ public interface TboFlightBookingResponseMapper {
         return passportDetails;
     }
 
-    default TravelerDto.AddressDto mapAddressDetails(TboApiFlightBookingResponseDto.Passenger source) {
+    default TravelerDto.AddressDto mapAddressDetails(TboApiFlightBookingResponseDto.Response.Passenger source) {
         TravelerDto.AddressDto addressDto = new TravelerDto.AddressDto();
         addressDto.setLine1(source.getAddressLine1());
         addressDto.setLine2(source.getAddressLine2());
@@ -86,6 +86,6 @@ public interface TboFlightBookingResponseMapper {
     @Mapping(expression = "java(String.valueOf(source.getTotalMealCharges()))", target = "mealCharges")
     @Mapping(expression = "java(String.valueOf(source.getTotalSeatCharges()))", target = "seatCharges")
     @Mapping(expression = "java(String.valueOf(source.getTotalSpecialServiceCharges()))", target = "specialServiceCharges")
-    FlightBookingResponseNonLcc.Fare mapToBookingFare(TboApiFlightBookingResponseDto.Fare source);
+    FlightBookingResponseNonLcc.Fare mapToBookingFare(TboApiFlightBookingResponseDto.Response.Fare source);
 
 }

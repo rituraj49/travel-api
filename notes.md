@@ -12,6 +12,8 @@
 ### Id and journeyWayType in ticket response passenger barcode section
 ### Why is there an invoice details array and invoice outside the array also
 ### what is invoice status 3
+### booking response null at times
+### booking status coming as 5 for ticketing done lcc flight and 1 for ticketing not done non lcc flight. Means if ticketing is done, then status is InProgress and if booking is done and ticketing is still pending then the status is Successful.
 
 ## Booking Flow - 
 ### booking request traveler fare details would be taken from the fare quote response.

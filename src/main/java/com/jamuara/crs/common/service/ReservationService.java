@@ -4,7 +4,10 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.common.repository.ReservationRepository;
+import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
+import com.jamuara.crs.flight.dto.tbo.book.TboApiFetchFlightBookingResponseDto;
 import com.jamuara.crs.model.Reservation;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -51,13 +54,53 @@ public class ReservationService {
         String bookingResponseJson = objectMapper.writeValueAsString(bookingResponse);
         saveReservation(bookingId,price,currencyCode,source,destination,travelerName,email,phoneNo,bookingStatus,bookingResponseJson);
     }
+//
+//    public List<Reservation> findAllReservationByName(String name) {
+//        return reservationRepository.findReservationByTravelerNameContainingIgnoreCase(name);
+//    }
 
-    public List<Reservation> findAllReservationByName(String name) {
-        return reservationRepository.findReservationByTravelerNameContainingIgnoreCase(name);
+    public Reservation findByBookingId(String bookingId) throws NotFoundException {
+        Reservation res = reservationRepository.findReservationByBookingId(bookingId);
+
+        if(res == null) {
+            throw new NotFoundException("reservation not found");
+        }
+
+        return res;
     }
 
-    public Reservation findByBookingId(String bookingId){
-        return  reservationRepository.findReservationByBookingId(bookingId);
+    public Reservation createReservationTbo(FetchFlightBookingResponse response, Reservation.BookingStatus status, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
+        Reservation res = new Reservation();
+
+        res.setTravelerFirstName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getFirstName());
+        res.setTravelerLastName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getLastName());
+        res.setEmail(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail());
+        res.setPhone(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhone());
+        res.setCountryCallingCode(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhoneCountryCode());
+        res.setDestination(response.getTicketBookingDetails().getFlightDetails().getDestination());
+        res.setOrigin(response.getTicketBookingDetails().getFlightDetails().getOrigin());
+        res.setPnr(response.getTicketBookingDetails().getPnr());
+        res.setBookingId(response.getTicketBookingDetails().getBookingId());
+        res.setPrice(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getPublishedFare());
+        res.setCurrencyCode(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getCurrency());
+        res.setBookingStatus(status);
+        res.setLcc(response.getTicketBookingDetails().getFlightDetails().isLCC());
+        res.setDomestic(response.getTicketBookingDetails().getFlightDetails().isDomestic());
+        res.setBookingResponse(objectMapper.writeValueAsString(rawResponse));
+
+        return this.reservationRepository.save(res);
+    }
+
+    public List<Reservation> findAllReservations() {
+        List<Reservation> reservations = reservationRepository.findAll();
+        return reservations;
+    }
+
+    public List<Reservation> findReservationsByStatus(Reservation.BookingStatus status) {
+        return reservationRepository.findReservationByBookingStatus(status);
+    }
+
+    public Reservation saveReservation(Reservation reservation) {
+        return reservationRepository.save(reservation);
     }
 }
-

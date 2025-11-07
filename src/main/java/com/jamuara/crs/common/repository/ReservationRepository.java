@@ -9,9 +9,11 @@ import java.util.List;
 @Profile("!nodb")
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 
-    List<Reservation> findReservationByTravelerNameContainingIgnoreCase(String name);
+//    List<Reservation> findReservationByTravelerNameContainingIgnoreCase(String name);
+    List<Reservation> findReservationByBookingStatus(Reservation.BookingStatus status);
 
     Reservation findReservationByBookingId(String id);
 
+    Reservation findReservationByPnr(String pnr);
 }
 
