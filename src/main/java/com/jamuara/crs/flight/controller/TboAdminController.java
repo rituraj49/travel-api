@@ -33,13 +33,14 @@ public class TboAdminController {
         return ResponseEntity.ok().body(reservations);
     }
 
-    @PutMapping("/update-reservation")
+    @PostMapping("/bookings/update-status")
     public ResponseEntity<?> updateReservationStatus(@RequestBody ReservationStatusUpdateDto dto) {
         try {
-            Reservation.BookingStatus status = Reservation.BookingStatus.values()[dto.getStatus() - 1];
-            tboFlightService.updateBookingStatus(dto.getBookingId(), status);
+//            Reservation.BookingStatus status = Reservation.BookingStatus.values()[dto.getStatus() - 1];
+            tboFlightService.updateBookingStatus(dto.getBookingId(), Reservation.BookingStatus.valueOf(dto.getStatus()));
             return ResponseEntity.status(HttpStatus.OK).body("status updated successfully");
         } catch (Exception e) {
+            e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("status update failed: " + e.getMessage());
         }
     }

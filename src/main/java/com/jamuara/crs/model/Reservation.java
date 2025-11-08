@@ -23,6 +23,8 @@ public class Reservation {
 
     private String price;
 
+    private String lastTicketDate;
+
     private String currencyCode;
 
     private String origin;

@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.convert.converter.Converter;
 import org.springframework.security.authentication.AbstractAuthenticationToken;
+import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.GrantedAuthority;
@@ -14,6 +15,7 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -23,6 +25,23 @@ public class SecurityConfig {
 
     @Value("${app.keycloak.admin.clientId}")
     private String keycloakClientId;
+
+//    @Bean
+//    CorsConfigurationSource configurationSource() {
+////            CorsConfigurationSource source = request -> {
+////                    ConfigurationSource source = request -> {
+//                CorsConfiguration config = new CorsConfiguration();
+//                config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
+//                config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+//                config.setAllowedHeaders(List.of("*"));
+//                config.setAllowCredentials(false);
+////                return config;
+////            };
+////            c.configurationSource(source);
+//        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+//        source.registerCorsConfiguration("/**", config);
+//        return source;
+//    }
 
     @Bean
     SecurityFilterChain resourceSecurityFilterChain(
@@ -38,11 +57,12 @@ public class SecurityConfig {
         http.sessionManagement(sessions -> {
                     sessions.sessionCreationPolicy(SessionCreationPolicy.STATELESS);
                 }).csrf(csrf -> csrf.disable())
+//                .cors(Customizer.withDefaults());
                 .cors(c -> {
                     CorsConfigurationSource source = request -> {
 //                    ConfigurationSource source = request -> {
                         CorsConfiguration config = new CorsConfiguration();
-                        config.setAllowedOrigins(List.of("*"));
+                        config.setAllowedOrigins(List.of("http://localhost:3000", "http://localhost:5173"));
                         config.setAllowedMethods(List.of("GET", "POST", "PUT", "DELETE", "OPTIONS"));
                         config.setAllowedHeaders(List.of("*"));
                         config.setAllowCredentials(false);

@@ -4,7 +4,6 @@ import lombok.Data;
 
 @Data
 public class FetchBookingRequest {
-    private String traceId;
 
     private String pnr;
 

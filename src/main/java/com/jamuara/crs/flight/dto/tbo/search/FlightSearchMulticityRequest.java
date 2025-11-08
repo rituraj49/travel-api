@@ -1,7 +1,6 @@
 package com.jamuara.crs.flight.dto.tbo.search;
 
 import com.jamuara.crs.enums.TravelClass;
-import com.jamuara.crs.flight.dto.FlightAvailabilityRequest;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -28,10 +27,10 @@ public class FlightSearchMulticityRequest {
     @Data
     public static class TripDetailsDto {
         @Schema(example = "DEL")
-        private String from; // IATA code
+        private String originLocationCode; // IATA code
 
         @Schema(example = "DEL")
-        private String to; // IATA code
+        private String destinationLocationCode; // IATA code
 
         @Schema(example = "ECONOMY")
         private TravelClass cabin;

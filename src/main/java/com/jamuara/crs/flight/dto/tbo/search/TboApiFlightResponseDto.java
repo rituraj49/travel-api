@@ -1,17 +1,21 @@
 package com.jamuara.crs.flight.dto.tbo.search;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class TboApiFlightResponseDto {
 
     @JsonProperty("Response")
     private Response response;
 
     @Data
+    @JsonIgnoreProperties(ignoreUnknown = true)
     public static class Response {
         @JsonProperty("ResultRecommendationType")
         private int resultRecommendationType;
@@ -35,6 +39,7 @@ public class TboApiFlightResponseDto {
         private List<List<Result>> results;
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Error {
             @JsonProperty("ErrorCode")
             private int errorCode;
@@ -44,6 +49,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Result {
             @JsonProperty("FareCombinationId")
             private String fareCombinationId;
@@ -154,6 +160,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Fare {
             @JsonProperty("ServiceFeeDisplayType")
             private int serviceFeeDisplayType;
@@ -234,6 +241,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class KeyValue {
             @JsonProperty("key")
             private String key;
@@ -245,6 +253,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class FareBreakdown {
             @JsonProperty("Currency")
             private String currency;
@@ -281,6 +290,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Segment {
             @JsonProperty("Baggage")
             private String baggage;
@@ -356,6 +366,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Airline {
             @JsonProperty("AirlineCode")
             private String airlineCode;
@@ -374,6 +385,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class AirportInfo {
             @JsonProperty("Airport")
             private Airport airport;
@@ -386,6 +398,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class Airport {
             @JsonProperty("AirportCode")
             private String airportCode;
@@ -410,6 +423,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class FareRule {
             @JsonProperty("FareBasisCode")
             private String fareBasisCode;
@@ -434,6 +448,8 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
+        @JsonDeserialize(using = FareClassificationDeserializer.class)
         public static class FareClassification {
             @JsonProperty("Color")
             private String color;
@@ -443,6 +459,7 @@ public class TboApiFlightResponseDto {
         }
 
         @Data
+        @JsonIgnoreProperties(ignoreUnknown = true)
         public static class MiniFareRule {
             @JsonProperty("FareRuleType")
             private String fareRuleType;

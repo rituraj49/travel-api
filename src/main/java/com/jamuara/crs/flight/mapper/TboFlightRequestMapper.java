@@ -4,15 +4,11 @@ import com.jamuara.crs.common.service.TboAuthService;
 import com.jamuara.crs.flight.dto.tbo.FareQuoteCacheEntry;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteDetailsResponse;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
-import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
-import com.jamuara.crs.flight.dto.tbo.book.FlightTicketRequestLcc;
-import com.jamuara.crs.flight.dto.tbo.book.FetchBookingRequest;
-import com.jamuara.crs.flight.dto.tbo.book.TravelerRequestDto;
+import com.jamuara.crs.flight.dto.tbo.book.*;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchMulticityRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -64,10 +60,10 @@ public class TboFlightRequestMapper {
         List<Map<String, Object>> trips = new ArrayList<>();
 
         dto.getTripDetails().forEach(t -> {
-            String depTime = !t.getDepartureTime().isEmpty() ? t.getDepartureTime() : "00:00:00";
+            String depTime = !(t.getDepartureTime() == null) ? t.getDepartureTime() : "00:00:00";
             Map<String, Object> trip = new HashMap<>();
-            trip.put("Origin", t.getFrom());
-            trip.put("Destination", t.getTo());
+            trip.put("Origin", t.getOriginLocationCode());
+            trip.put("Destination", t.getDestinationLocationCode());
             trip.put("FlightCabinClass", t.getCabin().ordinal() + 1);
             trip.put("PreferredDepartureTime", t.getDepartureDate() + "T" + depTime);
             trips.add(trip);
@@ -181,74 +177,16 @@ public class TboFlightRequestMapper {
         return combinedReq;
     }
 
-    public static Map<String, Object> mapToTicketingRequest(FlightTicketRequestLcc req, CacheManager cacheManager) {
-        Map<String, Object> combinedReq = new HashMap<>();
+    public static Map<String, Object> mapToTicketingRequestNonLcc(FlightTicketRequestNonLcc request) {
+        Map<String, Object> req = new HashMap<>();
 
-        Map<String, Object> outboundReq = new HashMap<>();
-        Map<String, Object> inboundReq = new HashMap<>();
+        req.put("EndUserIp", "192.168.97.1");
+        req.put("TokenId", token);
+        req.put("TraceId", request.getTraceId());
+        req.put("BookingId", request.getBookingId());
+        req.put("PNR", request.getPnr());
 
-        int totalTravelers = req.getTravelers().size();
-
-        Cache cache = cacheManager.getCache("fareQuote");
-        assert cache != null;
-        Cache.ValueWrapper wrapper = cache.get(req.getTraceId());
-
-//                (FlightFareQuoteDetailsResponse) cacheManager.getCache("fareQuote").get(req.getTraceId());
-        Map<String, Object> fareOutbound = new HashMap<>();
-        Map<String, Object> fareInbound = new HashMap<>();
-        if(wrapper != null) {
-            FareQuoteCacheEntry cacheEntry = (FareQuoteCacheEntry) wrapper.get();
-
-            if(cacheEntry != null) {
-                FlightFareQuoteDetailsResponse fareDetails = (FlightFareQuoteDetailsResponse) cacheEntry.getOutboundFlight();
-
-                fareOutbound.put("Currency", fareDetails.getCurrency());
-                fareOutbound.put("BaseFare", (Double.parseDouble(fareDetails.getTotalBaseFareAmount())/totalTravelers));
-                fareOutbound.put("Tax", (Double.parseDouble(fareDetails.getTotalTaxAmount())/totalTravelers));
-                fareOutbound.put("YqTax", fareDetails.getYqTax());
-                fareOutbound.put("pgCharge", fareDetails.getPgCharge());
-
-                if(cacheEntry.getInboundFlight() != null) {
-                    FlightFareQuoteDetailsResponse fareDetailsInbound = (FlightFareQuoteDetailsResponse) cacheEntry.getInboundFlight();
-
-                    fareInbound.put("Currency", fareDetailsInbound.getCurrency());
-                    fareInbound.put("BaseFare", (Double.parseDouble(fareDetailsInbound.getTotalBaseFareAmount())/totalTravelers));
-                    fareInbound.put("Tax", (Double.parseDouble(fareDetailsInbound.getTotalTaxAmount())/totalTravelers));
-                    fareInbound.put("YqTax", fareDetailsInbound.getYqTax());
-                    fareInbound.put("pgCharge", fareDetailsInbound.getPgCharge());
-                }
-            }
-        }
-        List<Map<String, Object>> passengersOutbound = new ArrayList<>(req.getTravelers().size());
-        List<Map<String, Object>> passengersInbound = new ArrayList<>(req.getTravelers().size());
-
-        passengersOutbound = req.getTravelers().stream()
-                .map(t -> createPassengerMap(t, fareOutbound))
-                .toList();
-
-        passengersInbound = req.getTravelers().stream()
-                .map(t -> createPassengerMap(t, fareInbound))
-                .toList();
-
-        outboundReq.put("EndUserIp", "192.168.97.1");
-        outboundReq.put("TokenId", token);
-        outboundReq.put("TraceId", req.getTraceId());
-        outboundReq.put("ResultIndex", req.getResultIndexOutbound());
-        outboundReq.put("Passengers", passengersOutbound);
-
-        if(!fareInbound.isEmpty()) {
-            inboundReq.put("EndUserIp", "192.168.97.1");
-            inboundReq.put("TokenId", token);
-            inboundReq.put("TraceId", req.getTraceId());
-            inboundReq.put("ResultIndex", req.getResultIndexInbound());
-            inboundReq.put("Passengers", passengersInbound);
-
-            combinedReq.put("inbound", inboundReq);
-        }
-
-        combinedReq.put("outbound", outboundReq);
-
-        return combinedReq;
+        return req;
     }
 
     private static Map<String, Object> createPassengerMap(TravelerRequestDto traveler, Map<String, Object> fare) {
@@ -286,11 +224,10 @@ public class TboFlightRequestMapper {
         return pass;
     }
 
-    public static Map<String, Object> mapToBookingDetailsRequest(FetchBookingRequest req) {
+    public static Map<String, Object> mapToFetchBookingDetailsRequest(FetchBookingRequest req) {
         Map<String, Object> reqBody = new HashMap<>();
         reqBody.put("EndUserIp", "192.168.97.1");
         reqBody.put("TokenId", token);
-        if(req.getTraceId() != null) reqBody.put("TraceId", req.getTraceId());
         if(req.getPnr() != null) reqBody.put("PNR", req.getPnr());
         if(req.getBookingId() != null) reqBody.put("BookingId", req.getBookingId());
         if(req.getFirstName() != null) reqBody.put("FirstName", req.getFirstName());

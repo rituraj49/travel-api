@@ -47,6 +47,8 @@ public class FlightDetailsResponse {
 
     private String totalLayover;
 
+    private String totalDuration;
+
     @Data
     public static class TaxChargeBreakup {
         private String key;

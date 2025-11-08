@@ -181,7 +181,7 @@ public class TboFlightController {
             @ApiResponse(responseCode = "200", description = "Booking details retrieved successfully"),
             @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
     })
-    @PostMapping("/fetch-booking")
+    @PostMapping("/bookings/fetch")
     public ResponseEntity<?> getBookingDetails(
             @io.swagger.v3.oas.annotations.parameters.RequestBody(
                     required = true,
