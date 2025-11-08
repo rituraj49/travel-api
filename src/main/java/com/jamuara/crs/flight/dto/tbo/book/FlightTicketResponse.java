@@ -1,6 +1,7 @@
 package com.jamuara.crs.flight.dto.tbo.book;
 
 import com.jamuara.crs.enums.Gender;
+import com.jamuara.crs.enums.TicketStatus;
 import com.jamuara.crs.enums.TravelerType;
 import com.jamuara.crs.enums.TripType;
 import com.jamuara.crs.flight.dto.tbo.FlightDetailsResponse;
@@ -196,17 +197,5 @@ public class FlightTicketResponse {
         private String documentType;
 
         private String travelerId;
-    }
-
-    public static enum TicketStatus {
-        Failed,
-        Successful,
-        NotSaved,
-        NotCreated,
-        NotAllowed,
-        InProgress,
-        TicketeAlreadyCreated,
-        PriceChanged,
-        OtherError
     }
 }

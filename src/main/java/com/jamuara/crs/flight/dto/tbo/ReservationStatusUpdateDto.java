@@ -7,5 +7,5 @@ import lombok.Data;
 public class ReservationStatusUpdateDto {
     private String bookingId;
 
-    private int status;
+    private String status;
 }

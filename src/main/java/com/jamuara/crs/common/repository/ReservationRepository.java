@@ -5,6 +5,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.List;
+import java.util.Optional;
 
 @Profile("!nodb")
 public interface ReservationRepository extends JpaRepository<Reservation,Long> {
@@ -12,8 +13,8 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 //    List<Reservation> findReservationByTravelerNameContainingIgnoreCase(String name);
     List<Reservation> findReservationByBookingStatus(Reservation.BookingStatus status);
 
-    Reservation findReservationByBookingId(String id);
+    Optional<Reservation> findReservationByBookingId(String id);
 
-    Reservation findReservationByPnr(String pnr);
+    Optional<Reservation> findReservationByPnr(String pnr);
 }
 

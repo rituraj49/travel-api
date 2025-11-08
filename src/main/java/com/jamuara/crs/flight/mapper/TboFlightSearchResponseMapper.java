@@ -139,6 +139,7 @@ public interface TboFlightSearchResponseMapper {
     @AfterMapping
     default void calculateLayovers(TboApiFlightResponseDto.Response.Result result, @MappingTarget FlightDetailsResponse flightDetailsResponse) {
         Duration totalLayover = Duration.ZERO;
+        Duration totalDuration = Duration.ZERO;
         var fareRules = result.getFareRules();
 
         int globalIndex = 0;
@@ -148,6 +149,7 @@ public interface TboFlightSearchResponseMapper {
                 TboApiFlightResponseDto.Response.Segment segment = segmentList.get(i);
                 FlightDetailsResponse.FlightLeg currentLeg = flightDetailsResponse.getFlightLegs().get(globalIndex);
 
+//                totalDuration = totalDuration.plus(Duration.parse(currentLeg.getDuration()));
 //                segment.getSegmentIndicator();
                 if(fareRules != null) {
                     String fareBasisCode = fareRules.get(globalIndex).getFareBasisCode();
@@ -163,11 +165,13 @@ public interface TboFlightSearchResponseMapper {
                 } else {
                     currentLeg.setLayoverDuration(null);
                 }
+                totalDuration = totalDuration.plus(totalLayover);
 
                 globalIndex++;
             }
         }
 
         flightDetailsResponse.setTotalLayover(Helper.getDurationString(totalLayover.toString()));
+        flightDetailsResponse.setTotalDuration(Helper.getDurationString(totalDuration.toString()));
     }
 }

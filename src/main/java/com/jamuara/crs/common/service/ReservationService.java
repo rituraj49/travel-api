@@ -60,7 +60,8 @@ public class ReservationService {
 //    }
 
     public Reservation findByBookingId(String bookingId) throws NotFoundException {
-        Reservation res = reservationRepository.findReservationByBookingId(bookingId);
+        Reservation res = reservationRepository.findReservationByBookingId(bookingId)
+                .orElseThrow(() -> new NotFoundException("Reservation not found"));
 
         if(res == null) {
             throw new NotFoundException("reservation not found");
@@ -84,6 +85,7 @@ public class ReservationService {
         res.setPrice(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getPublishedFare());
         res.setCurrencyCode(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getCurrency());
         res.setBookingStatus(status);
+        res.setLastTicketDate(response.getTicketBookingDetails().getFlightDetails().getLastTicketDate());
         res.setLcc(response.getTicketBookingDetails().getFlightDetails().isLCC());
         res.setDomestic(response.getTicketBookingDetails().getFlightDetails().isDomestic());
         res.setBookingResponse(objectMapper.writeValueAsString(rawResponse));
