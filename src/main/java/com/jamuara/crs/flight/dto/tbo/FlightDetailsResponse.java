@@ -13,6 +13,8 @@ public class FlightDetailsResponse {
 
     private boolean LCC;
 
+    private boolean domestic;
+
     private boolean refundable;
 
     private boolean passportRequired;

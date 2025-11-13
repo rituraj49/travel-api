@@ -24,7 +24,7 @@ public interface TboFlightTicketMapper {
     // === TicketBookingDetails ===
     @Mapping(source = "pnr", target = "pnr")
     @Mapping(source = "bookingId", target = "bookingId")
-    @Mapping(expression = "java(com.jamuara.crs.flight.dto.tbo.book.FlightTicketResponse.TicketStatus.values()[source.getTicketStatus()])", target = "ticketStatus")
+    @Mapping(expression = "java(com.jamuara.crs.enums.TicketStatus.values()[source.getTicketStatus()])", target = "ticketStatus")
     @Mapping(source = "priceChanged", target = "priceChanged")
     @Mapping(source = "timeChanged", target = "timeChanged")
     @Mapping(source = "flightItinerary", target = "flightDetails")

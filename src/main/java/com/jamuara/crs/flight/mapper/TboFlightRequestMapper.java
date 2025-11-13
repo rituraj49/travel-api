@@ -3,7 +3,7 @@ package com.jamuara.crs.flight.mapper;
 import com.jamuara.crs.common.service.TboAuthService;
 import com.jamuara.crs.flight.dto.tbo.FareQuoteCacheEntry;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteDetailsResponse;
-import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
+import com.jamuara.crs.flight.dto.tbo.FlightFareRulesCumQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.book.*;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchMulticityRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
@@ -83,7 +83,7 @@ public class TboFlightRequestMapper {
         return  req;
     }
 
-    public static Map<String, Object> mapToFareQuoteRequest(FlightFareQuoteRequest req) {
+    public static Map<String, Object> mapToFareQuoteRulesRequest(FlightFareRulesCumQuoteRequest req) {
         Map<String, Object> reqBody = new HashMap<>();
 
         Map<String, Object> outboundReq = new HashMap<>();

@@ -1,6 +1,7 @@
 package com.jamuara.crs.flight.controller;
 
-import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteRequest;
+import com.jamuara.crs.flight.dto.tbo.FlightFareRuleResponse;
+import com.jamuara.crs.flight.dto.tbo.FlightFareRulesCumQuoteRequest;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteResponse;
 import com.jamuara.crs.flight.dto.tbo.book.*;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchMulticityRequest;
@@ -60,6 +61,45 @@ public class TboFlightController {
     }
 
     @Operation(
+            summary = "Fetch fare rules for selected flight(s)",
+            description = "Retrieves fare rules details (fare rules details for each leg) for the selected flight combinations using trace ID and result indices."
+    )
+    @ApiResponses({
+            @ApiResponse(responseCode = "200", description = "Fare rules retrieved successfully"),
+            @ApiResponse(responseCode = "500", description = "Internal server error", content = @Content)
+    })
+    @PostMapping("/fare-rules")
+    public ResponseEntity<?> fetchFareRules(@io.swagger.v3.oas.annotations.parameters.RequestBody(
+                                               required = true,
+                                               description = "Flight fare rule request details",
+                                               content = @Content(
+                                                       schema = @Schema(implementation = FlightFareRulesCumQuoteRequest.class),
+                                                       examples = @ExampleObject(
+                                                               name = "Sample Request",
+                                                               value = """
+                                                    {
+                                                      "traceId": "a1b2c3d4-e5f6-7890-gh12-i345j678k901",
+                                                      "resultIndexOutbound": "OB123456",
+                                                      "resultIndexInbound": "IB654321"
+                                                    }
+                                                    """
+                                                       )
+                                               )
+                                       )
+                                       @RequestBody FlightFareRulesCumQuoteRequest request
+    ) {
+        try {
+            List<Map<String, FlightFareRuleResponse>> response = tboFlightService.flightFareRules(request);
+//            log.info("{} flight offers found", flightResponseList.size());
+
+            return ResponseEntity.ok().contentType(MediaType.APPLICATION_JSON).body(response);
+        } catch (Exception e) {
+            log.error("An internal error occurred while processing flight offer search API: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Error: " + e.getMessage());
+        }
+    }
+
+    @Operation(
             summary = "Fetch fare quote for selected flight(s)",
             description = "Retrieves fare quote details (price, availability, and booking conditions) for the selected flight combinations using trace ID and result indices."
     )
@@ -72,7 +112,7 @@ public class TboFlightController {
                                        required = true,
                                        description = "Flight fare quote request details",
                                        content = @Content(
-                                       schema = @Schema(implementation = FlightFareQuoteRequest.class),
+                                       schema = @Schema(implementation = FlightFareRulesCumQuoteRequest.class),
                                        examples = @ExampleObject(
                                             name = "Sample Request",
                                             value = """
@@ -85,7 +125,7 @@ public class TboFlightController {
                                        )
                                  )
                             )
-            @RequestBody FlightFareQuoteRequest request
+            @RequestBody FlightFareRulesCumQuoteRequest request
     ) {
         try {
             List<Map<String, FlightFareQuoteResponse>> response = tboFlightService.flightFareQuote(request);

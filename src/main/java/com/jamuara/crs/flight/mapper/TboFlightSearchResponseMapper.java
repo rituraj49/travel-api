@@ -171,6 +171,10 @@ public interface TboFlightSearchResponseMapper {
             }
         }
 
+        boolean isDomestic =
+                result.getSegments().get(0).get(0).getOrigin().getAirport().getCityCode()
+                        .equals(result.getSegments().get(0).get(0).getDestination().getAirport().getCountryCode());
+        flightDetailsResponse.setDomestic(isDomestic);
         flightDetailsResponse.setTotalLayover(Helper.getDurationString(totalLayover.toString()));
         flightDetailsResponse.setTotalDuration(Helper.getDurationString(totalDuration.toString()));
     }

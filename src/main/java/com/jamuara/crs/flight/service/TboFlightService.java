@@ -33,6 +33,8 @@ public class TboFlightService {
 
     TboFlightBookingResponseMapper tboFlightBookingResponseMapper;
 
+    TboFlightFareRulesMapper tboFlightFareRulesMapper;
+
     TboFlightFareQuoteResponseMapper tboFlightFareQuoteResponseMapper;
 
     TboFlightTicketMapper tboFlightTicketMapper;
@@ -50,6 +52,7 @@ public class TboFlightService {
             RestService restService,
             TboFlightSearchResponseMapper tboFlightSearchResponseMapper,
             TboFlightBookingResponseMapper tboFlightBookingResponseMapper,
+            TboFlightFareRulesMapper tboFlightFareRulesMapper,
             TboFlightFareQuoteResponseMapper tboFlightFareQuoteResponseMapper,
             TboFlightTicketMapper tboFlightTicketMapper,
             TboFetchFlightBookingResponseMapper tboFetchFlightBookingResponseMapper,
@@ -58,6 +61,7 @@ public class TboFlightService {
         this.restService = restService;
         this.tboFlightSearchResponseMapper = tboFlightSearchResponseMapper;
         this.tboFlightBookingResponseMapper = tboFlightBookingResponseMapper;
+        this.tboFlightFareRulesMapper = tboFlightFareRulesMapper;
         this.tboFlightFareQuoteResponseMapper = tboFlightFareQuoteResponseMapper;
         this.tboFlightTicketMapper = tboFlightTicketMapper;
         this.tboFetchFlightBookingResponseMapper = tboFetchFlightBookingResponseMapper;
@@ -99,10 +103,63 @@ public class TboFlightService {
         return tboFlightSearchResponseMapper.mapToFlightSearchResponse(response.getBody().getResponse());
     }
 
-    public List<Map<String, FlightFareQuoteResponse>> flightFareQuote(FlightFareQuoteRequest request) throws Exception {
+    public List<Map<String, FlightFareRuleResponse>> flightFareRules(FlightFareRulesCumQuoteRequest request) throws Exception {
+
+        log.info("flight fare rules request received");
+        Map<String, Object> requestBody = TboFlightRequestMapper.mapToFareQuoteRulesRequest(request);
+
+        ResponseEntity<TboApiFareRuleResponseDto> outboundResponse = restService.sendRequest(
+                TBO_FLIGHT_URL + "/FareRule",
+                HttpMethod.POST,
+                new HashMap<>(),
+                requestBody.get("outbound"),
+                new ParameterizedTypeReference<TboApiFareRuleResponseDto>() {}
+        );
+
+        System.out.println(outboundResponse.getBody().toString());
+        if(!Objects.equals(outboundResponse.getBody().getResponse().getError().getErrorMessage(), "")) {
+            throw new Exception(outboundResponse.getBody().getResponse().getError().getErrorMessage());
+        }
+
+        FlightFareRuleResponse outboundFareRules = tboFlightFareRulesMapper.mapToFareRulesResponse(outboundResponse.getBody().getResponse());
+
+        ResponseEntity<TboApiFareRuleResponseDto> inboundResponse = null;
+        if(requestBody.containsKey("inbound")) {
+            inboundResponse = restService.sendRequest(
+                    TBO_FLIGHT_URL + "/FareRule",
+                    HttpMethod.POST,
+                    new HashMap<>(),
+                    requestBody.get("inbound"),
+                    new ParameterizedTypeReference<TboApiFareRuleResponseDto>() {}
+            );
+
+            if(!Objects.equals(inboundResponse.getBody().getResponse().getError().getErrorMessage(), "")) {
+                throw new Exception(outboundResponse.getBody().getResponse().getError().getErrorMessage());
+            }
+        }
+
+        Object inboundFlightDetails = null;
+        FlightFareRuleResponse inboundFareRules = new FlightFareRuleResponse();
+
+        if(inboundResponse != null) inboundFareRules = tboFlightFareRulesMapper.mapToFareRulesResponse(inboundResponse.getBody().getResponse());
+
+        List<Map<String, FlightFareRuleResponse>> result = new ArrayList<>();
+
+        Map<String, FlightFareRuleResponse> outboundResult = Map.of("outboundFareQuote", outboundFareRules);
+        result.add(outboundResult);
+
+        if(inboundFareRules != null) {
+            Map<String, FlightFareRuleResponse> inboundResult = Map.of("inboundFareQuote", inboundFareRules);
+            result.add(inboundResult);
+        }
+
+        return result;
+    }
+
+    public List<Map<String, FlightFareQuoteResponse>> flightFareQuote(FlightFareRulesCumQuoteRequest request) throws Exception {
 
         log.info("flight fare quote request received");
-        Map<String, Object> requestBody = TboFlightRequestMapper.mapToFareQuoteRequest(request);
+        Map<String, Object> requestBody = TboFlightRequestMapper.mapToFareQuoteRulesRequest(request);
 
         ResponseEntity<TboApiFareQuoteResponseDto> outboundResponse = restService.sendRequest(
                 TBO_FLIGHT_URL + "/FareQuote",
