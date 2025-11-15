@@ -51,6 +51,9 @@ public class TravelerRequestDto {
         @Schema(example = "AB1234567")
         private String number;
 
+        @Schema(example = "2016-08-06")
+        private String issuanceDate;
+
         @Schema(example = "2026-03-01")
         private String expiryDate;
 

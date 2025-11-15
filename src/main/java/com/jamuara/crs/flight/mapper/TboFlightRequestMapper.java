@@ -201,6 +201,7 @@ public class TboFlightRequestMapper {
         if (traveler.getPassportDetails() != null) {
             pass.put("PassportNo", traveler.getPassportDetails().getNumber());
             pass.put("PassportExpiry", traveler.getPassportDetails().getExpiryDate());
+            pass.put("PassportIssueDate", traveler.getPassportDetails().getIssuanceDate());
 //                pass.put("Nationality", traveler.getPassportDetails().getNationality());
             pass.put("Nationality", traveler.getAddress().getCountryCode());
         }

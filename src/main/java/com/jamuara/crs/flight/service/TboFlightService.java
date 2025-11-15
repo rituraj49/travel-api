@@ -487,6 +487,8 @@ public class TboFlightService {
 //        }
 
         FetchFlightBookingResponse fetchedFlight = tboFetchFlightBookingResponseMapper.toFetchFlightBookingResponse(response.getBody());
+        String arrTime = fetchedFlight.getTicketBookingDetails().getFlightDetails().getFlightLegs().get(0).getArrivalDateTime();
+        String depTime = fetchedFlight.getTicketBookingDetails().getFlightDetails().getFlightLegs().get(0).getDepartureDateTime();
 //        return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
         saveBookingToDb(fetchedFlight, response.getBody());
 

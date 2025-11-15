@@ -97,6 +97,8 @@ public interface TboFetchFlightBookingResponseMapper {
 //    FetchFlightBookingResponse.BarcodeDetails toBarcodeDetails(TboApiFetchFlightBookingResponseDto.Response.BarcodeDetails source);
 
     // === FlightLeg ===
+    @Mapping(target = "legNo", source = "segmentIndicator")
+    @Mapping(target = "tripNo", source = "tripIndicator")
     @Mapping(source = "airline.airlineCode", target = "carrierCode")
     @Mapping(source = "airline.airlineName", target = "carrierName")
     @Mapping(source = "airline.operatingCarrier", target = "operatingCarrier")

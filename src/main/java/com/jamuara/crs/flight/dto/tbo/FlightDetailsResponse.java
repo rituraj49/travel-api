@@ -75,7 +75,8 @@ public class FlightDetailsResponse {
     }
 
     @Data
-    public static class FlightLeg {
+    public static class
+    FlightLeg {
         private int legNo;
 
         private TripType tripType;
