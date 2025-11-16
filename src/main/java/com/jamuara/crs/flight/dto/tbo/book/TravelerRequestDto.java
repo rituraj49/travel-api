@@ -57,6 +57,9 @@ public class TravelerRequestDto {
         @Schema(example = "2026-03-01")
         private String expiryDate;
 
+//        @Schema(example = "IN")
+//        private String issuanceCountry;
+
         @Schema(example = "IN")
         private String nationality;
     }
