@@ -69,11 +69,11 @@
         </thead>
         <tbody>
         <tr th:each="t : ${booking.travelers}">
-            <td th:text="t.firstName + ' ' + t.lastName"></td>
-            <td th:text="t.gender"></td>
-            <td th:text="t.travelerType"></td>
-            <td th:text="t.dateOfBirth"></td>
-            <td th:text="t.leadTraveler ? 'Yes' : 'No'"></td>
+            <td th:text="${t.firstName} + ' ' + ${t.lastName}"></td>
+            <td th:text="${t.gender}"></td>
+            <td th:text="${t.travelerType}"></td>
+            <td th:text="${t.dateOfBirth}"></td>
+            <td th:text="${t.leadTraveler} ? 'Yes' : 'No'"></td>
         </tr>
         </tbody>
     </table>
@@ -97,7 +97,7 @@
         <tbody>
         <tr th:each="leg : ${booking.flightLegs}">
             <td th:text="${leg.legNo}"></td>
-            <td th:text="${leg.carrierName} + ' (' + leg.carrierCode + ')'"></td>
+            <td th:text="${leg.carrierName} + ' (' + ${leg.carrierCode} + ')'"></td>
             <td th:text="${leg.flightNumber}"></td>
             <td th:text="${leg.departureAirport}"></td>
             <td th:text="${leg.arrivalAirport}"></td>

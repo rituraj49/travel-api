@@ -19,6 +19,8 @@ public class FlightDetailsResponse {
 
     private boolean passportRequired;
 
+    private int stops;
+
     private String currency;
 
     private String lastTicketDate;

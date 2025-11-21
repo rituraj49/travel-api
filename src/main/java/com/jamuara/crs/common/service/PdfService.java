@@ -22,13 +22,15 @@ public class PdfService {
         Files.write(filePath, pdfBytes);
     }
 
-    public byte[] generatePdf(String html) {
+    public byte[] generatePdf(String html) throws IOException {
         ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
         ITextRenderer renderer = new ITextRenderer();
 
         renderer.setDocumentFromString(html);
         renderer.layout();
         renderer.createPDF(outputStream);
+
+        outputStream.close();
 
         return outputStream.toByteArray();
     }

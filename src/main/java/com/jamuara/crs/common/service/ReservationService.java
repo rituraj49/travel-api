@@ -7,6 +7,7 @@ import com.jamuara.crs.common.repository.ReservationRepository;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.TboApiFetchFlightBookingResponseDto;
 import com.jamuara.crs.model.Reservation;
+import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @Profile("!nodb")
@@ -73,24 +75,17 @@ public class ReservationService {
         return res;
     }
 
+    @Transactional
+    public Reservation findByBookingIdWithAllRelations(String bookingId) throws NotFoundException {
+//        return reservationRepository.findReservationWithAllRelations(bookingId)
+        Reservation r = reservationRepository.findReservationByBookingId(bookingId)
+                .orElseThrow(() -> new NotFoundException("reservation not found"));
+        int t = r.getTravelers().size();
+        int f = r.getFlightLegs().size();
+        return r;
+    }
+
     public Reservation createReservationTbo(FetchFlightBookingResponse response, Reservation.BookingStatus status, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
-//        Reservation res = new Reservation();
-
-//        res.setTravelerFirstName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getFirstName());
-//        res.setTravelerLastName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getLastName());
-//        res.setEmail(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail());
-//        res.setPhone(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhone());
-//        res.setCountryCallingCode(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhoneCountryCode());
-//        res.setDestination(response.getTicketBookingDetails().getFlightDetails().getDestination());
-//        res.setOrigin(response.getTicketBookingDetails().getFlightDetails().getOrigingetTicketFare());
-//        res.setPnr(response.getTicketBookingDetails().getPnr());
-//        res.setBookingId(response.getTicketBookingDetails().getBookingId());
-//        res.setPrice(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getPublishedFare());
-//        res.setCurrencyCode(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getCurrency());
-//        res.setLastTicketDate(response.getTicketBookingDetails().getFlightDetails().getLastTicketDate());
-//        res.setLcc(response.getTicketBookingDetails().getFlightDetails().isLCC());
-//        res.setDomestic(response.getTicketBookingDetails().getFlightDetails().isDomestic());
-
         Reservation res = reservationMapper.toReservation(response);
         res.setBookingStatus(status);
         res.setBookingResponse(objectMapper.writeValueAsString(rawResponse));

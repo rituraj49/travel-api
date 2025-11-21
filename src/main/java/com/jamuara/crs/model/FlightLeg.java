@@ -4,6 +4,8 @@ import com.jamuara.crs.enums.TravelClass;
 import com.jamuara.crs.enums.TripType;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -42,5 +44,7 @@ public class FlightLeg {
 
     @ManyToOne
     @JoinColumn(name = "reservation_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Reservation reservation;
 }

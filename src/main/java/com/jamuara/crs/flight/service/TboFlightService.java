@@ -597,9 +597,7 @@ public class TboFlightService {
         log.info("emitting flight booking event");
         Map<String, byte[]> ticketPdfs = new HashMap<>();
         List<Reservation> reservations = bookings.stream().map(b ->
-                reservationService.findByBookingId(
-                        b.getTicketBookingDetails().getBookingId()
-                )
+                reservationService.findByBookingIdWithAllRelations(b.getTicketBookingDetails().getBookingId())
         ).toList();
 
         List<String> htmlTickets = reservations.stream().map(b -> {

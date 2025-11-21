@@ -7,6 +7,8 @@ import com.jamuara.crs.flight.dto.tbo.book.TravelerDto;
 import io.swagger.v3.oas.annotations.media.Schema;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 @Entity
 @Data
@@ -39,5 +41,7 @@ public class Traveler {
 
     @ManyToOne
     @JoinColumn(name = "reservation_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Reservation reservation;
 }

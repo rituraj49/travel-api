@@ -52,7 +52,7 @@
 <div th:each="b, iter : ${bookings}"
      style="border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; border-radius: 6px;">
 
-    <h3 th:text="'Trip ' + (iter.index + 1)"
+    <h3 th:text="'Trip ' + (${iter.index} + 1)"
         style="margin: 0 0 10px; color: #222;"></h3>
 
     <p><strong>PNR:</strong> <span th:text="${b.pnr}"></span></p>

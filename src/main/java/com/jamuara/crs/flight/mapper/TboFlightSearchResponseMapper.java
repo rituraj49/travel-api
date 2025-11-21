@@ -145,10 +145,10 @@ public interface TboFlightSearchResponseMapper {
         int globalIndex = 0;
 
         for(List<TboApiFlightResponseDto.Response.Segment> segmentList: result.getSegments()) {
+            flightDetailsResponse.setStops(segmentList.size() - 1);
             for(int i = 0; i < segmentList.size(); i++) {
                 TboApiFlightResponseDto.Response.Segment segment = segmentList.get(i);
                 FlightDetailsResponse.FlightLeg currentLeg = flightDetailsResponse.getFlightLegs().get(globalIndex);
-
 //                totalDuration = totalDuration.plus(Duration.parse(currentLeg.getDuration()));
 //                segment.getSegmentIndicator();
                 if(fareRules != null) {

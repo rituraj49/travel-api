@@ -2,12 +2,16 @@ package com.jamuara.crs.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -43,9 +47,15 @@ public class Reservation {
     private String bookingResponse;
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Traveler> travelers = new ArrayList<>();
 
     @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<FlightLeg> flightLegs = new ArrayList<>();
 
 //    public Reservation(String bookingId, String price, String currencyCode, String origin, String destination, String traveler_name, String email, String phone, BookingStatus bookingStatus, String bookingResponse) {
@@ -65,9 +75,5 @@ public class Reservation {
         CONFIRM,
         PENDING,
         CANCEL
-    }
-
-
-    public Reservation() {
     }
 }
