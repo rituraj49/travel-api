@@ -6,16 +6,26 @@ import com.jamuara.crs.common.location.dto.LocationResponse;
 import com.jamuara.crs.enums.LocationType;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Component;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
 import java.io.IOException;
 import java.io.Reader;
+import java.nio.file.Files;
 import java.time.Duration;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Component
 public class Helper {
+
+    private final TemplateEngine templateEngine;
+
+    public Helper(TemplateEngine templateEngine) {
+        this.templateEngine = templateEngine;
+    }
 
     public static <T> List<T> convertCsv(Reader reader, Class<T> tClass) throws IOException {
         CsvToBean<T> csvToBean = new CsvToBeanBuilder<T>(reader)
@@ -144,5 +154,9 @@ public class Helper {
         long hrs = dur.toHours();
         long min = dur.minusHours(hrs).toMinutes();
         return String.format("%dh %dm", hrs, min);
+    }
+
+    public String getHtmlBody(String templateName, Context context) {
+        return templateEngine.process(templateName, context);
     }
 }

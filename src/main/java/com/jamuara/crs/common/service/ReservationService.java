@@ -25,9 +25,12 @@ public class ReservationService {
     @Autowired
     private ObjectMapper objectMapper;
 
+    @Autowired
+    private ReservationMapper reservationMapper;
+
     public void saveReservation(String bookingId, String price, String currencyCode, String source, String destination, String traveler_name, String email, String phoneNo , Reservation.BookingStatus bookingStatus, String bookingResponseJson){
-        Reservation reservation = new Reservation(bookingId,price,currencyCode,source,destination,traveler_name,email,phoneNo,bookingStatus,bookingResponseJson);
-        reservationRepository.save(reservation);
+//        Reservation reservation = new Reservation(bookingId,price,currencyCode,source,destination,traveler_name,email,phoneNo,bookingStatus,bookingResponseJson);
+//        reservationRepository.save(reservation);
     }
 
     public void createReservation(FlightBookingResponse bookingResponse) throws JsonProcessingException {
@@ -71,23 +74,25 @@ public class ReservationService {
     }
 
     public Reservation createReservationTbo(FetchFlightBookingResponse response, Reservation.BookingStatus status, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
-        Reservation res = new Reservation();
+//        Reservation res = new Reservation();
 
-        res.setTravelerFirstName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getFirstName());
-        res.setTravelerLastName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getLastName());
-        res.setEmail(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail());
-        res.setPhone(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhone());
-        res.setCountryCallingCode(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhoneCountryCode());
-        res.setDestination(response.getTicketBookingDetails().getFlightDetails().getDestination());
-        res.setOrigin(response.getTicketBookingDetails().getFlightDetails().getOrigin());
-        res.setPnr(response.getTicketBookingDetails().getPnr());
-        res.setBookingId(response.getTicketBookingDetails().getBookingId());
-        res.setPrice(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getPublishedFare());
-        res.setCurrencyCode(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getCurrency());
+//        res.setTravelerFirstName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getFirstName());
+//        res.setTravelerLastName(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getLastName());
+//        res.setEmail(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail());
+//        res.setPhone(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhone());
+//        res.setCountryCallingCode(response.getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getPhoneCountryCode());
+//        res.setDestination(response.getTicketBookingDetails().getFlightDetails().getDestination());
+//        res.setOrigin(response.getTicketBookingDetails().getFlightDetails().getOrigingetTicketFare());
+//        res.setPnr(response.getTicketBookingDetails().getPnr());
+//        res.setBookingId(response.getTicketBookingDetails().getBookingId());
+//        res.setPrice(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getPublishedFare());
+//        res.setCurrencyCode(response.getTicketBookingDetails().getFlightDetails().getTicketFare().getCurrency());
+//        res.setLastTicketDate(response.getTicketBookingDetails().getFlightDetails().getLastTicketDate());
+//        res.setLcc(response.getTicketBookingDetails().getFlightDetails().isLCC());
+//        res.setDomestic(response.getTicketBookingDetails().getFlightDetails().isDomestic());
+
+        Reservation res = reservationMapper.toReservation(response);
         res.setBookingStatus(status);
-        res.setLastTicketDate(response.getTicketBookingDetails().getFlightDetails().getLastTicketDate());
-        res.setLcc(response.getTicketBookingDetails().getFlightDetails().isLCC());
-        res.setDomestic(response.getTicketBookingDetails().getFlightDetails().isDomestic());
         res.setBookingResponse(objectMapper.writeValueAsString(rawResponse));
 
         return this.reservationRepository.save(res);

@@ -1,6 +1,9 @@
 package com.jamuara.crs.flight.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jamuara.crs.common.Helper;
+import com.jamuara.crs.common.service.EmailService;
+import com.jamuara.crs.common.service.PdfService;
 import com.jamuara.crs.common.service.ReservationService;
 import com.jamuara.crs.common.service.RestService;
 import com.jamuara.crs.enums.TicketStatus;
@@ -12,6 +15,7 @@ import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
 import com.jamuara.crs.flight.dto.tbo.search.TboApiFlightResponseDto;
 import com.jamuara.crs.flight.mapper.*;
 import com.jamuara.crs.model.Reservation;
+import jakarta.mail.MessagingException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
@@ -19,7 +23,9 @@ import org.springframework.cache.CacheManager;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
+import org.thymeleaf.context.Context;
 
+import java.io.IOException;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -46,6 +52,13 @@ public class TboFlightService {
 
     CacheManager cacheManager;
 
+    private final PdfService pdfService;
+
+    private final EmailService emailService;
+
+    @Autowired
+    private Helper helper;
+
     private final String TBO_FLIGHT_URL = "http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest";
 
     public TboFlightService(
@@ -56,7 +69,9 @@ public class TboFlightService {
             TboFlightFareQuoteResponseMapper tboFlightFareQuoteResponseMapper,
             TboFlightTicketMapper tboFlightTicketMapper,
             TboFetchFlightBookingResponseMapper tboFetchFlightBookingResponseMapper,
-            CacheManager cacheManager
+            CacheManager cacheManager,
+            PdfService pdfService,
+            EmailService emailService
     ) {
         this.restService = restService;
         this.tboFlightSearchResponseMapper = tboFlightSearchResponseMapper;
@@ -66,6 +81,8 @@ public class TboFlightService {
         this.tboFlightTicketMapper = tboFlightTicketMapper;
         this.tboFetchFlightBookingResponseMapper = tboFetchFlightBookingResponseMapper;
         this.cacheManager = cacheManager;
+        this.pdfService = pdfService;
+        this.emailService = emailService;
     }
 
     public FlightSearchResponse flightSearch(FlightSearchRequest searchRequest) throws Exception {
@@ -250,26 +267,18 @@ public class TboFlightService {
             ibFlight = (FlightFareQuoteDetailsResponse) (entry != null ? entry.getInboundFlight() : null);
         }
 
-        if(obFlight.isLCC()) {
-            obBooking = getFlightTicket((Map<String, Object>) combinedReq.get("outbound"));
+        if(obFlight != null) {
+            if(obFlight.isLCC()) {
+                obBooking = getFlightTicket((Map<String, Object>) combinedReq.get("outbound"));
 
-            bookings.add(obBooking);
-        }
+                bookings.add(obBooking);
+            }
 
-        if (!obFlight.isLCC()) {
-            obBooking = getFlightBooking((Map<String, Object>) combinedReq.get("outbound"));
+            if (!obFlight.isLCC()) {
+                obBooking = getFlightBooking((Map<String, Object>) combinedReq.get("outbound"));
 
-            bookings.add(obBooking);
-
-//            saveBookingToDb(obBooking);
-//            Map<String, Object> reqBody = new HashMap<>();
-//            reqBody.put("EndUserIp", "192.168.97.1");
-//            reqBody.put("TokenId", TboAuthService.getToken());
-//            reqBody.put("TraceId", obBooking.getTraceId());
-//            reqBody.put("PNR", obBooking.getBookingDetails().getPnr());
-//            reqBody.put("BookingId", obBooking.getBookingDetails().getBookingId());
-//
-//            obTicket = getFlightTicket(reqBody);
+                bookings.add(obBooking);
+            }
         }
 
         if(ibFlight != null) {
@@ -296,6 +305,7 @@ public class TboFlightService {
             }
         }
 
+        emitFlightBookingEvent(bookings);
         return bookings;
     }
 
@@ -440,13 +450,14 @@ public class TboFlightService {
                 .getPassengers().stream().filter(TboApiFlightBookingResponseDto.Response.Passenger::isLeadPax).toList()
                 .get(0).getFirstName()
         );
-        System.out.println("pnr not null case req body: " + fetchBookingRequest.toString());
+//        System.out.println("pnr not null case req body: " + fetchBookingRequest.toString());
         fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest);
 
         return fetchBooking;
     }
 
     public void saveBookingToDb(FetchFlightBookingResponse booking, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
+        log.info("saving booking data to database");
         Reservation.BookingStatus status = null;
         status = booking.getTicketBookingDetails().getFlightDetails().isLCC() ? Reservation.BookingStatus.CONFIRM : Reservation.BookingStatus.PENDING;
 
@@ -580,5 +591,45 @@ public class TboFlightService {
         }
 
         log.info("reservation status updated successfully");
+    }
+
+    public void emitFlightBookingEvent(List<FetchFlightBookingResponse> bookings) throws MessagingException, IOException {
+        log.info("emitting flight booking event");
+        Map<String, byte[]> ticketPdfs = new HashMap<>();
+        List<Reservation> reservations = bookings.stream().map(b ->
+                reservationService.findByBookingId(
+                        b.getTicketBookingDetails().getBookingId()
+                )
+        ).toList();
+
+        List<String> htmlTickets = reservations.stream().map(b -> {
+            Context ctx = new Context();
+            ctx.setVariable("booking", b);
+            return helper.getHtmlBody("ticket-pdf", ctx);
+        }).toList();
+
+        for(int i = 0; i < htmlTickets.size(); i++) {
+            String html = htmlTickets.get(i);
+            if(htmlTickets.size() == 1) {
+                byte[] pdf = pdfService.generatePdf(html);
+                ticketPdfs.put("ticket", pdf);
+                pdfService. savePdf("ticket-" + reservations.get(i).getBookingId(), pdf);
+            } else if(htmlTickets.size() == 2) {
+                byte[] pdf = pdfService.generatePdf(html);
+                ticketPdfs.put(i == 0 ? "outbound" : "inbound", pdf);
+                pdfService. savePdf("ticket-" + reservations.get(i).getBookingId(), pdf);
+            } else {
+                byte[] pdf = pdfService.generatePdf(html);
+                ticketPdfs.put("trip "+i, pdf);
+                pdfService. savePdf("ticket-" + reservations.get(i).getBookingId(), pdf);
+            }
+        }
+
+        Context context = new Context();
+        context.setVariable("bookings", reservations);
+
+        String body = helper.getHtmlBody("ticket-booking", context);
+//        String receiverEmail = bookings.get(0).getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail();
+        emailService.sendEmail("rthakur.0211@gmail.com", "Ticket confirmation", body, ticketPdfs);
     }
 }

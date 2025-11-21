@@ -1,0 +1,88 @@
+<!doctype html>
+<html xmlns:th="http://www.thymeleaf.org" lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Flight Booking</title>
+</head>
+<body>
+<!--<h2>Your Flight Booking Confirmation</h2>
+
+<p>Hello <b th:text="${bookings[0].firstName} + ' ' + ${bookings[0].lastName}"></b>,</p>
+
+<p>Thank you for bookings[0] with us! Here is a quick summary of your reservation:</p>
+
+<h3>Booking Details</h3>
+<ul>
+    <li><b>Booking ID:</b> <span th:text="${bookings[0].bookingId}"></span></li>
+    <li><b>PNR:</b> <span th:text="${bookings[0].pnr}"></span></li>
+    <li><b>Route:</b>
+        <span th:text="${bookings[0].origin}"></span> →
+        <span th:text="${bookings[0].destination}"></span>
+    </li>
+    <li><b>Total Price:</b>
+        <span th:text="${bookings[0].currencyCode} + ' ' + ${bookings[0].price}"></span>
+    </li>
+    <li><b>Status:</b> <span th:text="${bookings[0].bookingStatus}"></span></li>
+</ul>
+
+<h3>Passengers</h3>
+<ul>
+    <li th:each="t : ${bookings[0].travelers}">
+        <span th:text="t.firstName + ' ' + t.lastName"></span>
+        (<span th:text="t.travelerType"></span>)
+    </li>
+</ul>
+
+<p style="margin-top: 20px;">
+    The detailed ticket PDF is attached to this email.
+</p>
+
+<p>Have a pleasant journey!</p>
+
+<p><b>Your Travel Team</b></p>
+
+<hr />
+<p> second template</p>-->
+<p>Dear Customer,</p>
+
+<p>Your flight booking is confirmed. Below is your booking summary:</p>
+
+<!-- LOOP THROUGH MULTIPLE BOOKINGS (Outbound / Inbound) -->
+<div th:each="b, iter : ${bookings}"
+     style="border: 1px solid #ddd; padding: 12px; margin-bottom: 16px; border-radius: 6px;">
+
+    <h3 th:text="'Trip ' + (iter.index + 1)"
+        style="margin: 0 0 10px; color: #222;"></h3>
+
+    <p><strong>PNR:</strong> <span th:text="${b.pnr}"></span></p>
+    <p>
+        <strong>Route:</strong>
+        <span th:text="${b.origin}"></span> → <span th:text="${b.destination}"></span>
+    </p>
+
+    <p>
+        <strong>Travel Date:</strong>
+        <span th:text="${b.flightLegs.get(0).departureDateTime}"></span>
+    </p>
+
+    <p><strong>Total Price:</strong>
+        <span th:text="${b.currencyCode}"></span>
+        <span th:text="${b.price}"></span>
+    </p>
+
+    <!-- Travelers list -->
+    <p><strong>Travelers:</strong></p>
+    <ul>
+        <li th:each="t : ${b.travelers}"
+            th:text="|${t.firstName} ${t.lastName} (${t.travelerType})|">
+        </li>
+    </ul>
+
+</div>
+
+<p>Your full ticket(s) are attached as PDF.</p>
+
+<p>Thank you for booking with us.</p>
+</body>
+</html>
