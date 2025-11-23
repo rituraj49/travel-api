@@ -49,4 +49,5 @@ Thumbs.db
 *.wmv
 
 pdf-store/
+**/secrets-dev.properties
 

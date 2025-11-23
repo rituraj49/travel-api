@@ -85,6 +85,11 @@ public class ReservationService {
         return r;
     }
 
+    public List<Reservation> findReservationsByPaymentId(Long paymentId) {
+        return reservationRepository.findByPaymentId(paymentId)
+                .orElseThrow(() -> new NotFoundException("no reservations found for payment id: " + paymentId));
+    }
+
     public Reservation createReservationTbo(FetchFlightBookingResponse response, Reservation.BookingStatus status, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
         Reservation res = reservationMapper.toReservation(response);
         res.setBookingStatus(status);

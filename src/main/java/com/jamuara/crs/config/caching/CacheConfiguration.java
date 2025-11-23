@@ -53,7 +53,7 @@ public class CacheConfiguration {
             }
         };
 
-        caffeineCacheManager.setCacheNames(List.of("locations", "flightOffers", "activities", "fareQuote"));
+        caffeineCacheManager.setCacheNames(List.of("locations", "flightOffers", "activities", "fareQuote", "bookingIntent"));
 
         return caffeineCacheManager;
     }

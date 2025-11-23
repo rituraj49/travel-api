@@ -15,6 +15,13 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 //    List<Reservation> findReservationByTravelerNameContainingIgnoreCase(String name);
     List<Reservation> findReservationByBookingStatus(Reservation.BookingStatus status);
 
+//    @Query("""
+//            SELECT r FROM reservation
+//            LEFT JOIN FETCH r.payment
+//            WHERE r.payment_id=:id
+//            """)
+    Optional<List<Reservation>> findByPaymentId(Long id);
+
     Optional<Reservation> findReservationByBookingId(String id);
 
     @Query("""
