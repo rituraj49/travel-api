@@ -11,6 +11,9 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.User;
@@ -115,13 +118,14 @@ public class ReservationService {
         return this.reservationRepository.save(res);
     }
 
-    public List<Reservation> findAllReservations() {
-        List<Reservation> reservations = reservationRepository.findAll();
-        return reservations;
+    public Page<Reservation> findReservationsByStatus(Reservation.BookingStatus status, int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return reservationRepository.findReservationByBookingStatus(status, pageable);
     }
 
-    public List<Reservation> findReservationsByStatus(Reservation.BookingStatus status) {
-        return reservationRepository.findReservationByBookingStatus(status);
+    public Page<Reservation> findAllReservations(int pageNumber, int pageSize) {
+        Pageable pageable = PageRequest.of(pageNumber, pageSize);
+        return reservationRepository.findAll(pageable);
     }
 
     public Reservation saveReservation(Reservation reservation) {

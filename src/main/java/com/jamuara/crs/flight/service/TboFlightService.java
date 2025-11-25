@@ -535,13 +535,13 @@ public class TboFlightService {
         return tboFetchFlightBookingResponseMapper.toFetchFlightBookingResponse(response.getBody());
     }
 
-    public  List<Reservation> getAllBookings(Reservation.BookingStatus status) {
+   /* public  List<Reservation> getAllBookings(Reservation.BookingStatus status) {
         return reservationService.findReservationsByStatus(status);
     }
 
     public  List<Reservation> getAllBookings() {
         return reservationService.findAllReservations();
-    }
+    }*/
 
     public FlightTicketResponse getFlightTicketNonLcc(FlightTicketRequestNonLcc requestNonLcc) {
         Map<String, Object> requestBody = TboFlightRequestMapper.mapToTicketingRequestNonLcc(requestNonLcc);
