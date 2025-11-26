@@ -1,8 +1,9 @@
+### Authentication differentiate between test and live environments.
 ### How to specify currency of flights returned, cabin class
 ### how is layover calculated, in the current leg or the next leg? and what is ground time￼
 
 ### how are taxes being calculated and what are different taxes? And chargeeBU and additionalTxnFeePub
-### difference between craft and flight number
+### difference between craft and flight number - add request body in excel
 ### Stop point times always coming as `0001-01-01T00:00:00`
 ### Response time almost 15 seconds
 ### isManual in booking response
@@ -14,6 +15,9 @@
 ### what is invoice status 3
 ### booking response null at times
 ### booking status coming as 5 for ticketing done lcc flight and 1 for ticketing not done non lcc flight. Means if ticketing is done, then status is InProgress and if booking is done and ticketing is still pending then the status is Successful.
+### Booking response gives - `errorCode=35, errorMessage=Booking failed from supplier side.`. 
+### On manually fetching booking details from GetBookingDetails api with trace id, it shows - ` "ErrorCode": 28,
+            "ErrorMessage": "Your request could not be processed as booking is under process."`
 
 ## Booking Flow - 
 ### booking request traveler fare details would be taken from the fare quote response.

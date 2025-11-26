@@ -7,6 +7,7 @@ import jakarta.ws.rs.QueryParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.jamuara.crs.enums.PaymentStatus;
@@ -34,6 +35,53 @@ public class PaymentController {
         }
     }
 
+    @PostMapping("/success")
+    public ResponseEntity<?> successUrl(@RequestParam("txnid") String txnid) {
+//        log.info("success url req body: " + req.toString());
+        log.info("param txnid: " + txnid);
+//        String txnid = req.get("txnid");
+        String txnidFinal = "";
+        if(txnid.contains(",")) {
+            txnidFinal = txnid.split(",")[0];
+        }
+            String html = """
+            <html>
+                <body>
+                    <script>
+                        window.location.href = "http://localhost:5173/payment/return?txnid=%s";
+                    </script>
+                </body>
+            </html>
+        """.formatted(txnidFinal);
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(html);
+    }
+
+    @GetMapping("/failure")
+    public ResponseEntity<?> failureUrl(Map<String, String> req) {
+        log.info("failure url req body: " + req.toString());
+
+        String txnid = req.get("txnid");
+
+            String html = """
+            <html>
+            <h6>redirecting to bookings</h6>
+                <body>
+                    <script>
+                        window.location.href = "http://localhost:5173/payment/failure";
+                    </script>
+                </body>
+            </html>
+        """.formatted(txnid);
+
+            return ResponseEntity
+                    .ok()
+                    .contentType(MediaType.TEXT_HTML)
+                    .body(html);
+    }
+
     @PostMapping("/payu-webhook")
     public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> requestBody) {
     log.info("webhook request body received: {}", requestBody.toString());
@@ -52,6 +100,7 @@ public class PaymentController {
     @GetMapping("/status")
     public ResponseEntity<?> getPaymentStatus(@RequestParam("txnid") String txnid) {
         try {
+            log.info("txnid in payment status request: {}", txnid);
             PaymentStatus status = paymentService.getpaymentStatus(txnid);
             return ResponseEntity.ok(status);
         } catch (Exception e) {

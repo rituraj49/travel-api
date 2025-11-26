@@ -23,6 +23,7 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -77,8 +78,8 @@ public class PaymentService {
             response.put("email", email);
             response.put("phone", phone);
             response.put("productinfo", productinfo);
-            response.put("surl", "http://localhost:5173/payment-return?txnid="+txnid);
-            response.put("furl", "http://localhost:5173/payment-return?txnid="+txnid);
+            response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
+            response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
             response.put("hash", hash);
 
         return response;
@@ -157,10 +158,10 @@ public class PaymentService {
 
         Cache cache = cacheManager.getCache("bookingIntent");
 
-//        Cache.ValueWrapper wrapper = cache.get(p.getTxnid());
+        Cache.ValueWrapper wrapper = cache.get(p.getTxnid());
 
         FlightBookingTicketingRequest bookingIntent =
-                cache != null ? (FlightBookingTicketingRequest) cache.get(p.getTxnid()) : null;
+                wrapper != null ? (FlightBookingTicketingRequest) wrapper.get() : null;
 
         if(bookingIntent == null) {
             throw new IllegalStateException("Booking intent missing for txn id: " + p.getTxnid());
@@ -168,16 +169,16 @@ public class PaymentService {
 
         List<FetchFlightBookingResponse> bookings = tboFlightService.flightBookAndTicket(bookingIntent);
         log.info("bookings created after successful payment");
-        List<Reservation> reservations = bookings.stream()
+        List<Reservation> reservations = new ArrayList<>(bookings.stream()
                 .map(b ->
                         reservationService.findByBookingId(b.getTicketBookingDetails().getBookingId()))
-                .toList();
+                .collect(Collectors.toList()));
 
         reservations.forEach(res -> {
             if(p.getStatus().equals(PaymentStatus.SUCCESS)) {
                 log.info("setting payment into the reservation object");
                 res.setPayment(p);
-                reservationService.saveReservation(res);
+//                reservationService.saveReservation(res);
             }
         });
 
@@ -193,9 +194,11 @@ public class PaymentService {
     }
 
     public List<FetchFlightBookingResponse> fetchBookingsByPayment(String txnid) {
+        log.info("fetching reservations for txnid: {}", txnid);
         Payment p = findPaymentByTxnid(txnid);
         List<Reservation> reservations = reservationService.findReservationsByPaymentId(p.getId());
         if(reservations.isEmpty()) {
+            log.info("no reservations found, returning empty list");
             return Collections.emptyList();
         }
 
@@ -207,6 +210,7 @@ public class PaymentService {
         try {
             FetchBookingRequest req = new FetchBookingRequest();
             req.setBookingId(bookingId);
+            log.info("fetching single booking for booking id: {}", bookingId);
             return tboFlightService.fetchBookingDetails(req);
         } catch (Exception e) {
             log.error("error while fetching flight booking from tbo flight service: {}", e.getMessage());

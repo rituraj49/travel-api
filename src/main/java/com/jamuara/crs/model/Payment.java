@@ -3,6 +3,8 @@ package com.jamuara.crs.model;
 import com.jamuara.crs.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.ToString;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,5 +30,7 @@ public class Payment {
 //    private String hash;
 
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private List<Reservation> reservations = new ArrayList<>();
 }

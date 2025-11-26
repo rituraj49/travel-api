@@ -58,8 +58,10 @@ public class Reservation {
     @EqualsAndHashCode.Exclude
     private List<FlightLeg> flightLegs = new ArrayList<>();
 
-    @ManyToOne(optional = false)
-    @JoinColumn(name = "payment_id", nullable = false)
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "payment_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
     private Payment payment;
 
 //    public Reservation(String bookingId, String price, String currencyCode, String origin, String destination, String traveler_name, String email, String phone, BookingStatus bookingStatus, String bookingResponse) {
