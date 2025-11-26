@@ -54,6 +54,8 @@ public class FetchFlightBookingResponse {
 
         private String totalLayover;
 
+        private String totalDuration;
+
         private boolean webCheckInEligible;
     }
 

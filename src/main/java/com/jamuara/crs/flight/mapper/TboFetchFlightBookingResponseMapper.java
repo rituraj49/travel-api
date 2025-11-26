@@ -16,19 +16,17 @@ import java.util.List;
 
 @Mapper(config = CentralMapperConfig.class, imports = { LocalDateTime.class })
 public interface TboFetchFlightBookingResponseMapper {
-    // === Root Mapping ===
+
     @Mapping(source = "response.traceId", target = "traceId")
     @Mapping(source = "response.flightItinerary", target = "ticketBookingDetails")
     FetchFlightBookingResponse toFetchFlightBookingResponse(TboApiFetchFlightBookingResponseDto source);
 
-    // === TicketBookingDetails ===
     @Mapping(source = "pnr", target = "pnr")
     @Mapping(source = "bookingId", target = "bookingId")
     @Mapping(expression = "java(com.jamuara.crs.enums.TicketStatus.values()[source.getStatus()])", target = "ticketStatus")
     @Mapping(source = ".", target = "flightDetails")
     FetchFlightBookingResponse.TicketBookingDetails toTicketBookingDetails(TboApiFetchFlightBookingResponseDto.Response.FlightItinerary source);
 
-    // === TicketBookFlightDetails ===
 //    @Mapping(source = "pnr", target = "pnr")
 //    @Mapping(source = "bookingId", target = "bookingId")
 //    @Mapping(expression = "java(com.jamuara.crs.enums.TicketStatus.values()[source.getStatus()])", target = "ticketStatus")
@@ -48,7 +46,6 @@ public interface TboFetchFlightBookingResponseMapper {
     @Mapping(source = "webCheckInAllowed", target = "webCheckInEligible")
     FetchFlightBookingResponse.TicketBookFlightDetails toTicketBookFlightDetails(TboApiFetchFlightBookingResponseDto.Response.FlightItinerary source);
 
-    // === TicketFare ===
     @Mapping(source = "currency", target = "currency")
     @Mapping(source = "baseFare", target = "totalBaseFareAmount")
     @Mapping(source = "tax", target = "totalTaxAmount")
@@ -65,7 +62,6 @@ public interface TboFetchFlightBookingResponseMapper {
     @Mapping(source = "totalSpecialServiceCharges", target = "specialServiceCharges")
     FetchFlightBookingResponse.TicketFare toTicketFare(TboApiFetchFlightBookingResponseDto.Response.Fare source);
 
-    // === Traveler ===
     @Mapping(source = "paxId", target = "travelerId")
     @Mapping(source = "title", target = "title")
     @Mapping(source = "firstName", target = "firstName")
@@ -83,7 +79,6 @@ public interface TboFetchFlightBookingResponseMapper {
 //    @Mapping(source = "ticket", target = "ticket")
     FetchFlightBookingResponse.TicketTravelerDto toTicketTraveler(TboApiFetchFlightBookingResponseDto.Response.Passenger source);
 
-    // === Document ===
     @Mapping(source = "documentNumber", target = "number")
     @Mapping(source = "documentExpiryDate", target = "expiryDate")
     @Mapping(source = "documentTypeId", target = "documentType")
@@ -96,7 +91,6 @@ public interface TboFetchFlightBookingResponseMapper {
 //    @Mapping(expression = "java(source.getBarcode().get(0).getBarCodeInBase64())", target = "inBase64")
 //    FetchFlightBookingResponse.BarcodeDetails toBarcodeDetails(TboApiFetchFlightBookingResponseDto.Response.BarcodeDetails source);
 
-    // === FlightLeg ===
     @Mapping(target = "legNo", source = "segmentIndicator")
     @Mapping(target = "tripNo", source = "tripIndicator")
     @Mapping(source = "airline.airlineCode", target = "carrierCode")
@@ -116,23 +110,28 @@ public interface TboFetchFlightBookingResponseMapper {
     @Mapping(source = "destination.airport.terminal", target = "arrivalTerminal")
     @Mapping(source = "destination.airport.cityName", target = "arrivalCityName")
     @Mapping(source = "destination.airport.countryName", target = "arrivalCountryName")
-    @Mapping(source = "destination.depTime", target = "arrivalDateTime")
-    @Mapping(source = "duration", target = "duration")
+    @Mapping(source = "destination.arrTime", target = "arrivalDateTime")
+    @Mapping(target = "duration", expression = "java(formatDuration(source.getDuration()))")
     @Mapping(source = "fareClassification", target = "fareBasisCode")
     @Mapping(source = "airlinePnr", target = "airlinePnr")
     FlightDetailsResponse.FlightLeg toFlightLeg(TboApiFetchFlightBookingResponseDto.Response.Segment source);
 
-    // === TaxBreakup ===
+    default String formatDuration(int durationInMinutes) {
+        int hours = durationInMinutes / 60;
+        int minutes = durationInMinutes % 60;
+        return String.format("%dh %dm", hours, minutes);
+    }
+
     @Mapping(source = "key", target = "key")
     @Mapping(source = "value", target = "value")
     FlightDetailsResponse.TaxChargeBreakup toTaxChargeBreakup(TboApiFetchFlightBookingResponseDto.Response.Fare.KeyValue source);
 
-    // === AfterMapping for Layover ===
     @AfterMapping
     default void calculateLayovers(TboApiFetchFlightBookingResponseDto.Response.FlightItinerary source,
                                    @MappingTarget FetchFlightBookingResponse.TicketBookFlightDetails target) {
         if (source == null || source.getSegments() == null || source.getSegments().isEmpty()) return;
 
+        Duration totalDuration = Duration.ZERO;
         Duration totalLayover = Duration.ZERO;
         List<FlightDetailsResponse.FlightLeg> legs = target.getFlightLegs();
         List<TboApiFetchFlightBookingResponseDto.Response.Segment> segments = source.getSegments();
@@ -141,8 +140,9 @@ public interface TboFetchFlightBookingResponseMapper {
             TboApiFetchFlightBookingResponseDto.Response.Segment segment = segments.get(i);
             FlightDetailsResponse.FlightLeg leg = legs.get(i);
 
+            totalDuration = totalDuration.plus(Duration.ofMinutes(segment.getDuration()));
             if (i < segments.size() - 1) {
-                String arrTime = segment.getDestination().getDepTime(); // Adjust if using ArrTime instead
+                String arrTime = segment.getDestination().getArrTime();
                 String nextDepTime = segments.get(i + 1).getOrigin().getDepTime();
 
                 try {
@@ -157,8 +157,10 @@ public interface TboFetchFlightBookingResponseMapper {
             } else {
                 leg.setLayoverDuration(null);
             }
+            totalDuration = totalDuration.plus(totalLayover);
         }
 
         target.setTotalLayover(Helper.getDurationString(totalLayover.toString()));
+        target.setTotalDuration(Helper.getDurationString(totalDuration.toString()));
     }
 }
