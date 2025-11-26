@@ -149,8 +149,12 @@ public interface TboFlightSearchResponseMapper {
             for(int i = 0; i < segmentList.size(); i++) {
                 TboApiFlightResponseDto.Response.Segment segment = segmentList.get(i);
                 FlightDetailsResponse.FlightLeg currentLeg = flightDetailsResponse.getFlightLegs().get(globalIndex);
-//                totalDuration = totalDuration.plus(Duration.parse(currentLeg.getDuration()));
-//                segment.getSegmentIndicator();
+
+                int hours = Integer.parseInt(currentLeg.getDuration().split("h")[0]);
+                int minutes = Integer.parseInt(currentLeg.getDuration().split("h")[1].replace(" ", "").replace("m", ""));
+
+                totalDuration = totalDuration.plus(Duration.ofHours(hours)).plus(Duration.ofMinutes(minutes));
+
                 if(fareRules != null) {
                     String fareBasisCode = fareRules.get(globalIndex).getFareBasisCode();
                     currentLeg.setFareBasisCode(fareBasisCode);
