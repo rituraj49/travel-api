@@ -349,7 +349,7 @@ public class TboFlightService {
             fetchBookingRequest.setBookingId((String) requestBody.get("BookingId"));
             fetchBookingRequest.setPnr((String) requestBody.get("PNR"));
 //            fetchBookingRequest.setTraceId((String) requestBody.get("TraceId"));
-            fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest);
+            fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest, requestBody);
             return fetchBooking;
         }
 
@@ -360,7 +360,7 @@ public class TboFlightService {
                 .get(0).getFirstName()
         );
 
-        fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest);
+        fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest, requestBody);
 
         return fetchBooking;
     }
@@ -435,7 +435,7 @@ public class TboFlightService {
                 fetchBookingRequest.setPnr(pnr);
                 fetchBookingRequest.setFirstName(firstName);
 //                System.out.println("pnr null case req body: " + fetchBookingRequest.toString());
-                fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest);
+                fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest, requestBody);
                 return fetchBooking;
             }
 
@@ -451,21 +451,21 @@ public class TboFlightService {
                 .get(0).getFirstName()
         );
 //        System.out.println("pnr not null case req body: " + fetchBookingRequest.toString());
-        fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest);
+        fetchBooking = fetchBookingDetailsAfterBookTicket(fetchBookingRequest, requestBody);
 
         return fetchBooking;
     }
 
-    public void saveBookingToDb(FetchFlightBookingResponse booking, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
+    public void saveBookingToDb(FetchFlightBookingResponse booking, Map<String, Object> bookingRequestBody, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
         log.info("saving booking data to database");
         Reservation.BookingStatus status = null;
         status = booking.getTicketBookingDetails().getFlightDetails().isLCC() ? Reservation.BookingStatus.CONFIRM : Reservation.BookingStatus.PENDING;
 
-        Reservation res = reservationService.createReservationTbo(booking,  status, rawResponse);
+        Reservation res = reservationService.createReservationTbo(booking, bookingRequestBody, rawResponse);
         log.info("reservation saved successfully to the database with booking id: {}", res.getBookingId());
     }
 
-    public FetchFlightBookingResponse fetchBookingDetailsAfterBookTicket(FetchBookingRequest request) throws Exception {
+    public FetchFlightBookingResponse fetchBookingDetailsAfterBookTicket(FetchBookingRequest request, Map<String, Object> bookingRequest) throws Exception {
         log.info("Fetching booking details for PNR: {} and BookingId: {}", request.getPnr(), request.getBookingId());
         Map<String, Object> requestBody = TboFlightRequestMapper.mapToFetchBookingDetailsRequest(request);
 
@@ -501,7 +501,7 @@ public class TboFlightService {
         String arrTime = fetchedFlight.getTicketBookingDetails().getFlightDetails().getFlightLegs().get(0).getArrivalDateTime();
         String depTime = fetchedFlight.getTicketBookingDetails().getFlightDetails().getFlightLegs().get(0).getDepartureDateTime();
 //        return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
-        saveBookingToDb(fetchedFlight, response.getBody());
+        saveBookingToDb(fetchedFlight, bookingRequest, response.getBody());
 
         return fetchedFlight;
     }

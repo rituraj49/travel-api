@@ -11,11 +11,16 @@ import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.net.URLDecoder;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Service
@@ -90,9 +95,21 @@ public class ReservationService {
                 .orElseThrow(() -> new NotFoundException("no reservations found for payment id: " + paymentId));
     }
 
-    public Reservation createReservationTbo(FetchFlightBookingResponse response, Reservation.BookingStatus status, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
+    public Reservation createReservationTbo(FetchFlightBookingResponse response, Map<String, Object> bookingRequest, TboApiFetchFlightBookingResponseDto rawResponse) throws JsonProcessingException {
         Reservation res = reservationMapper.toReservation(response);
+        Reservation.BookingStatus status = response.getTicketBookingDetails().getFlightDetails().isLCC()
+                ? Reservation.BookingStatus.CONFIRM
+                : Reservation.BookingStatus.PENDING;
+
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+//        System.out.println(jwt.getClaims().toString());
+
+        String userId = "";
+        if(jwt != null) userId = jwt.getClaim("sub");
+
+        res.setKcUserId(userId);
         res.setBookingStatus(status);
+        res.setBookingRequest(objectMapper.writeValueAsString(bookingRequest));
         res.setBookingResponse(objectMapper.writeValueAsString(rawResponse));
 
         return this.reservationRepository.save(res);
