@@ -2,9 +2,16 @@ package com.jamuara.crs.model;
 
 
 import jakarta.persistence.*;
-import lombok.Data;
+import lombok.*;
+import org.hibernate.annotations.Fetch;
+import org.hibernate.annotations.FetchMode;
 import org.hibernate.annotations.JdbcTypeCode;
 import org.hibernate.type.SqlTypes;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 @Entity
 @Data
@@ -17,7 +24,7 @@ public class Reservation {
 
     private String pnr;
 
-    private boolean isLcc;
+    private boolean lcc;
 
     private boolean domestic;
 
@@ -31,18 +38,6 @@ public class Reservation {
 
     private String destination;
 
-    @Column(name = "traveler_first_name")
-    private String travelerFirstName;
-
-    @Column(name = "traveler_last_name")
-    private String travelerLastName;
-
-    private String email;
-
-    private String phone;
-
-    private String countryCallingCode;
-
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
 
@@ -50,32 +45,41 @@ public class Reservation {
     @Column(columnDefinition = "jsonb")
     @JdbcTypeCode(SqlTypes.JSON)
     private String bookingResponse;
-/*
 
-    public Reservation(String bookingId, String price, String currencyCode, String source, String destination, String travelerName, String email, String phoneNo) {
-    }
-*/
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<Traveler> travelers = new ArrayList<>();
 
-    public Reservation(String bookingId, String price, String currencyCode, String origin, String destination, String traveler_name, String email, String phone, BookingStatus bookingStatus, String bookingResponse) {
-        this.bookingId = bookingId;
-        this.price = price;
-        this.currencyCode = currencyCode;
-        this.origin = origin;
-        this.destination = destination;
-        this.travelerFirstName = traveler_name;
-        this.email = email;
-        this.phone = phone;
-        this.bookingStatus = bookingStatus;
-        this.bookingResponse=bookingResponse;
-    }
+    @OneToMany(mappedBy = "reservation", cascade = CascadeType.ALL, orphanRemoval = true)
+    @Fetch(FetchMode.SUBSELECT)
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private List<FlightLeg> flightLegs = new ArrayList<>();
+
+    @ManyToOne(optional = true)
+    @JoinColumn(name = "payment_id")
+    @ToString.Exclude
+    @EqualsAndHashCode.Exclude
+    private Payment payment;
+
+//    public Reservation(String bookingId, String price, String currencyCode, String origin, String destination, String traveler_name, String email, String phone, BookingStatus bookingStatus, String bookingResponse) {
+//        this.bookingId = bookingId;
+//        this.price = price;
+//        this.currencyCode = currencyCode;
+//        this.origin = origin;
+//        this.destination = destination;
+//        this.travelerFirstName = traveler_name;
+//        this.email = email;
+//        this.phone = phone;
+//        this.bookingStatus = bookingStatus;
+//        this.bookingResponse=bookingResponse;
+//    }
 
     public enum BookingStatus{
         CONFIRM,
         PENDING,
         CANCEL
-    }
-
-
-    public Reservation() {
     }
 }

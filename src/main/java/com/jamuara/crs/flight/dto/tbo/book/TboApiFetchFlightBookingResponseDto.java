@@ -392,10 +392,10 @@ public class TboApiFetchFlightBookingResponseDto {
             private String airlinePnr;
 
             @JsonProperty("Origin")
-            private OriginDestination origin;
+            private Origin origin;
 
             @JsonProperty("Destination")
-            private OriginDestination destination;
+            private Destination destination;
 
             @JsonProperty("Duration")
             private int duration;
@@ -459,12 +459,21 @@ public class TboApiFetchFlightBookingResponseDto {
         }
 
         @Data
-        public static class OriginDestination {
+        public static class Origin {
             @JsonProperty("Airport")
             private Airport airport;
 
             @JsonProperty("DepTime")
             private String depTime;
+        }
+
+        @Data
+        public static class Destination {
+            @JsonProperty("Airport")
+            private Airport airport;
+
+            @JsonProperty("ArrTime")
+            private String arrTime;
         }
 
         @Data

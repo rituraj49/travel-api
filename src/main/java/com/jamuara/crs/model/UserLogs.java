@@ -15,8 +15,7 @@ import java.time.LocalDateTime;
 @NoArgsConstructor
 @Profile("!nodb")
 public class UserLogs {
-
-
+    
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
