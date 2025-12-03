@@ -66,7 +66,7 @@ public class TboApiFetchFlightBookingResponseDto {
             private boolean bookingAllowedForRoamer;
 
             @JsonProperty("BookingId")
-            private int bookingId;
+            private String bookingId;
 
             @JsonProperty("IsCouponAppilcable")
             private boolean isCouponAppilcable;

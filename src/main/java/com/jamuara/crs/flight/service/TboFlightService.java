@@ -133,7 +133,6 @@ public class TboFlightService {
                 new ParameterizedTypeReference<TboApiFareRuleResponseDto>() {}
         );
 
-        System.out.println(outboundResponse.getBody().toString());
         if(!Objects.equals(outboundResponse.getBody().getResponse().getError().getErrorMessage(), "")) {
             throw new Exception(outboundResponse.getBody().getResponse().getError().getErrorMessage());
         }
@@ -627,7 +626,7 @@ public class TboFlightService {
         context.setVariable("bookings", reservations);
 
         String body = helper.getHtmlBody("ticket-booking", context);
-//        String receiverEmail = bookings.get(0).getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail();
-        emailService.sendEmail("rthakur.0211@gmail.com", "Ticket confirmation", body, ticketPdfs);
+        String receiverEmail = bookings.get(0).getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail();
+        emailService.sendEmail(receiverEmail.contains("test") ? receiverEmail : "rthakur.0211@gmail.com", "Ticket confirmation", body, ticketPdfs);
     }
 }

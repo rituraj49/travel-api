@@ -1,5 +1,6 @@
 package com.jamuara.crs.payments.service;
 
+import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.common.repository.PaymentRepository;
 import com.jamuara.crs.common.service.ReservationService;
 import com.jamuara.crs.enums.PaymentStatus;
@@ -17,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.nio.charset.StandardCharsets;
@@ -47,12 +50,18 @@ public class PaymentService {
     private CacheManager cacheManager;
 
     public Map<String, Object> createPaymentIntent(InitiatePaymentRequestDto dto) {
-//        caching the booking request data to later book flight
+        String email = "";
+        if(Helper.isUserAuthenticated()) {
+            Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            email = jwt != null ? jwt.getClaim("email") : dto.getEmail();
+        } else {
+            email = dto.getEmail();
+        }
+
         String txnid = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
         String amount = dto.getAmount();
         String productinfo = "flight_ticket";
         String firstname = dto.getFirstName();
-        String email = dto.getEmail();
         String phone = dto.getPhone();
         String udf1 = "";
         String udf2 = "";
@@ -66,7 +75,8 @@ public class PaymentService {
 
         String hash = generateHash(hashString);
 
-        createBookingIntent(dto.getBookingTicketingRequest(), txnid);
+//        caching the booking request data to later book flight
+        cacheBookingIntent(dto.getBookingTicketingRequest(), txnid);
 
         createPayment(amount, txnid);
 
@@ -154,7 +164,7 @@ public class PaymentService {
         log.info("marking payment as successful");
         p.setStatus(PaymentStatus.SUCCESS);
         p.setPayuTxnid(req.get("mihpayid"));
-        paymentRepository.save(p);
+//        paymentRepository.save(p);
 
         Cache cache = cacheManager.getCache("bookingIntent");
 
@@ -169,14 +179,17 @@ public class PaymentService {
 
         List<FetchFlightBookingResponse> bookings = tboFlightService.flightBookAndTicket(bookingIntent);
         log.info("bookings created after successful payment");
-        List<Reservation> reservations = new ArrayList<>(bookings.stream()
+        List<Reservation> reservations = bookings.stream()
                 .map(b ->
-                        reservationService.findByBookingId(b.getTicketBookingDetails().getBookingId()))
-                .collect(Collectors.toList()));
+                        reservationService.findByBookingId(b.getTicketBookingDetails().getBookingId())).collect(Collectors.toList());
+
+//        log.info("marking payment as successful");
+//        p.setStatus(PaymentStatus.SUCCESS);
+//        p.setPayuTxnid(req.get("mihpayid"));
 
         reservations.forEach(res -> {
             if(p.getStatus().equals(PaymentStatus.SUCCESS)) {
-                log.info("setting payment into the reservation object");
+                log.info("setting payment into reservation");
                 res.setPayment(p);
 //                reservationService.saveReservation(res);
             }
@@ -197,6 +210,7 @@ public class PaymentService {
         log.info("fetching reservations for txnid: {}", txnid);
         Payment p = findPaymentByTxnid(txnid);
         List<Reservation> reservations = reservationService.findReservationsByPaymentId(p.getId());
+        System.out.println("found reservations: " + reservations.toString());
         if(reservations.isEmpty()) {
             log.info("no reservations found, returning empty list");
             return Collections.emptyList();
@@ -217,7 +231,7 @@ public class PaymentService {
             throw new RuntimeException(e);
         }
     }
-    public void createBookingIntent(FlightBookingTicketingRequest request, String txnid) {
+    public void cacheBookingIntent(FlightBookingTicketingRequest request, String txnid) {
         cacheManager.getCache("bookingIntent").put(txnid, request);
     }
 

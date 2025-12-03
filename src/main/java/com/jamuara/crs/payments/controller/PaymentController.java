@@ -26,7 +26,7 @@ public class PaymentController {
     @PostMapping("/initiate")
     public ResponseEntity<?> initiatePayment(@RequestBody InitiatePaymentRequestDto requestDto) {
         try {
-            System.out.println("initiate payment reqq: " + requestDto.toString());
+            log.info("initiate payment request: {}", requestDto.toString());
             Map<String, Object> payuReq = paymentService.createPaymentIntent(requestDto);
             return ResponseEntity.ok().body(payuReq);
         } catch (Exception e) {
@@ -59,7 +59,7 @@ public class PaymentController {
                     .body(html);
     }
 
-    @GetMapping("/failure")
+    @PostMapping("/failure")
     public ResponseEntity<?> failureUrl(Map<String, String> req) {
         log.info("failure url req body: " + req.toString());
 
@@ -106,7 +106,7 @@ public class PaymentController {
                 .body(html);
     }
 
-    @GetMapping("/test/failure")
+    @PostMapping("/test/failure")
     public ResponseEntity<?> failureUrlTest(Map<String, String> req) {
         log.info("failure url req body: " + req.toString());
 

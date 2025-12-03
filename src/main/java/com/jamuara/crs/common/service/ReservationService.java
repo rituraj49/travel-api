@@ -2,6 +2,7 @@ package com.jamuara.crs.common.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.common.repository.ReservationRepository;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
@@ -104,11 +105,13 @@ public class ReservationService {
                 ? Reservation.BookingStatus.CONFIRM
                 : Reservation.BookingStatus.PENDING;
 
-        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        String userId = "";
+        if(Helper.isUserAuthenticated()) {
+            Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(jwt != null) userId = jwt.getClaim("sub");
+        }
 //        System.out.println(jwt.getClaims().toString());
 
-        String userId = "";
-        if(jwt != null) userId = jwt.getClaim("sub");
 
         res.setKcUserId(userId);
         res.setBookingStatus(status);
