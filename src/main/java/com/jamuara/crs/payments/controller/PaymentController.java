@@ -70,7 +70,7 @@ public class PaymentController {
             <h6>redirecting to bookings</h6>
                 <body>
                     <script>
-                        window.location.href = "http://localhost:5173/payment/failure";
+                        window.location.href = "http://localhost:5173/payment/failure?txnid=%s";
                     </script>
                 </body>
             </html>
@@ -80,6 +80,53 @@ public class PaymentController {
                     .ok()
                     .contentType(MediaType.TEXT_HTML)
                     .body(html);
+    }
+
+    @PostMapping("/test/success")
+    public ResponseEntity<?> successUrlTest(@RequestParam("txnid") String txnid) {
+//        log.info("success url req body: " + req.toString());
+        log.info("param txnid: " + txnid);
+//        String txnid = req.get("txnid");
+        String txnidFinal = "";
+        if(txnid.contains(",")) {
+            txnidFinal = txnid.split(",")[0];
+        }
+        String html = """
+            <html>
+                <body>
+                    <script>
+                        window.location.href = "http://localhost:5173/payment/return?txnid=%s";
+                    </script>
+                </body>
+            </html>
+        """.formatted(txnidFinal);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(html);
+    }
+
+    @GetMapping("/test/failure")
+    public ResponseEntity<?> failureUrlTest(Map<String, String> req) {
+        log.info("failure url req body: " + req.toString());
+
+        String txnid = req.get("txnid");
+
+        String html = """
+            <html>
+            <h6>redirecting to bookings</h6>
+                <body>
+                    <script>
+                        window.location.href = "http://localhost:5173/payment/failure?txnid=%s";
+                    </script>
+                </body>
+            </html>
+        """.formatted(txnid);
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(html);
     }
 
     @PostMapping("/payu-webhook")
