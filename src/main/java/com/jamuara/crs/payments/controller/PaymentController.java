@@ -60,7 +60,7 @@ public class PaymentController {
     }
 
     @PostMapping("/failure")
-    public ResponseEntity<?> failureUrl(Map<String, String> req) {
+    public ResponseEntity<?> failureUrl(@RequestBody Map<String, String> req) {
         log.info("failure url req body: " + req.toString());
 
         String txnid = req.get("txnid");

@@ -1,6 +1,8 @@
 package com.jamuara.crs.flight.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
+import com.jamuara.crs.admin.priceChanges.DynamicPricingService;
+import com.jamuara.crs.admin.priceChanges.PriceRule;
 import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.common.service.EmailService;
 import com.jamuara.crs.common.service.PdfService;
@@ -20,6 +22,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -31,6 +34,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 @Service
+@EnableCaching
 @Slf4j
 public class TboFlightService {
     RestService restService;
@@ -60,6 +64,10 @@ public class TboFlightService {
     private Helper helper;
 
     private final String TBO_FLIGHT_URL = "http://api.tektravels.com/BookingEngineService_Air/AirService.svc/rest";
+
+    @Autowired
+    private DynamicPricingService dynamicPricingService;
+
 
     public TboFlightService(
             RestService restService,
@@ -100,7 +108,20 @@ public class TboFlightService {
             throw new Exception(response.getBody().getResponse().getError().getErrorMessage());
         }
 
-        return tboFlightSearchResponseMapper.mapToFlightSearchResponse(response.getBody().getResponse());
+
+        FlightSearchResponse responseNew=tboFlightSearchResponseMapper.mapToFlightSearchResponse(response.getBody().getResponse());
+        dynamicPricingService.applyMarkupOnSearch(responseNew, searchRequest);
+
+/*
+        //  STORE TRIP TYPE USING TRACE ID
+        PriceRule.TripType tripType =
+                dynamicPricingService.getTripType(
+                        searchRequest.getOriginLocationCode(),
+                        searchRequest.getDestinationLocationCode()
+                );
+*/
+
+        return responseNew;
     }
 
     public FlightSearchResponse flightMulticitySearch(FlightSearchMulticityRequest searchMulticityRequest) throws Exception {
@@ -117,7 +138,22 @@ public class TboFlightService {
         if(!Objects.equals(response.getBody().getResponse().getError().getErrorMessage(), "")) {
             throw new Exception(response.getBody().getResponse().getError().getErrorMessage());
         }
-        return tboFlightSearchResponseMapper.mapToFlightSearchResponse(response.getBody().getResponse());
+
+
+        //  MAP RESPONSE
+        FlightSearchResponse responseNew =
+                tboFlightSearchResponseMapper.mapToFlightSearchResponse(
+                        response.getBody().getResponse()
+                );
+
+
+        //  APPLY MARKUP FOR MULTICITY
+        dynamicPricingService.applyMarkupOnMulticitySearch(
+                responseNew, searchMulticityRequest
+        );
+
+
+        return responseNew;
     }
 
     public List<Map<String, FlightFareRuleResponse>> flightFareRules(FlightFareRulesCumQuoteRequest request) throws Exception {
@@ -190,6 +226,13 @@ public class TboFlightService {
         }
 
         FlightFareQuoteResponse outboundFareQuote =  tboFlightFareQuoteResponseMapper.mapToFlightFareQuoteResponse(outboundResponse.getBody().getResponse());
+
+        //  Apply markup using outbound resultIndex
+        dynamicPricingService.applyMarkupByResultIndex(
+                outboundFareQuote,
+                request.getResultIndexOutbound()
+        );
+
         String traceId = outboundFareQuote.getTraceId();
         var outboundFlightDetails = outboundFareQuote.getFlightsAvailable()
                 .get("flight")
@@ -215,6 +258,13 @@ public class TboFlightService {
 
         if(inboundResponse != null) {
             inboundFareQuote = tboFlightFareQuoteResponseMapper.mapToFlightFareQuoteResponse(inboundResponse.getBody().getResponse());
+
+            //  Apply markup using inbound resultIndex
+            dynamicPricingService.applyMarkupByResultIndex(
+                    inboundFareQuote,
+                    request.getResultIndexInbound()
+            );
+
             inboundFlightDetails = inboundFareQuote.getFlightsAvailable()
                 .get("flight")
                 .get(0);
@@ -502,6 +552,9 @@ public class TboFlightService {
 //        return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
         saveBookingToDb(fetchedFlight, bookingRequest, response.getBody());
 
+        //  APPLY MARKUP HERE
+        dynamicPricingService.applyMarkupOnFetchBooking(fetchedFlight);
+
         return fetchedFlight;
     }
 
@@ -531,7 +584,18 @@ public class TboFlightService {
 
         log.info("fetch booking response: {}", wrapper != null && wrapper.getError() != null ? wrapper.getError() : response.getBody().toString());
 
-        return tboFetchFlightBookingResponseMapper.toFetchFlightBookingResponse(response.getBody());
+       // return tboFetchFlightBookingResponseMapper.toFetchFlightBookingResponse(response.getBody());
+
+        //  1. MAP RESPONSE
+        FetchFlightBookingResponse fetchedFlight =
+                tboFetchFlightBookingResponseMapper
+                        .toFetchFlightBookingResponse(response.getBody());
+
+        //  2. APPLY MARKUP ON FINAL FARE (SAFE & CONDITIONAL)
+        dynamicPricingService.applyMarkupOnFetchBooking(fetchedFlight);
+
+        //  3. RETURN UPDATED RESPONSE
+        return fetchedFlight;
     }
 
    /* public  List<Reservation> getAllBookings(Reservation.BookingStatus status) {
@@ -627,6 +691,6 @@ public class TboFlightService {
 
         String body = helper.getHtmlBody("ticket-booking", context);
         String receiverEmail = bookings.get(0).getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail();
-        emailService.sendEmail(receiverEmail.contains("test") ? receiverEmail : "rthakur.0211@gmail.com", "Ticket confirmation", body, ticketPdfs);
+        emailService.sendEmail(!receiverEmail.contains("test") ? receiverEmail : "rthakur.0211@gmail.com", "Ticket confirmation", body, ticketPdfs);
     }
 }

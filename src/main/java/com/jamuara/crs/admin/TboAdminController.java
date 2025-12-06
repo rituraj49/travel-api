@@ -1,19 +1,16 @@
-package com.jamuara.crs.flight.controller;
+package com.jamuara.crs.admin;
 
 import com.jamuara.crs.common.service.ReservationService;
 import com.jamuara.crs.flight.dto.tbo.ReservationStatusUpdateDto;
 import com.jamuara.crs.flight.service.TboFlightService;
 import com.jamuara.crs.model.Reservation;
-import jakarta.ws.rs.QueryParam;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 
 @RestController
