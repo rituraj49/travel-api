@@ -1,5 +1,7 @@
 package com.jamuara.crs.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jamuara.crs.enums.Gender;
 import com.jamuara.crs.enums.TravelerType;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
@@ -43,5 +45,6 @@ public class Traveler {
     @JoinColumn(name = "reservation_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private Reservation reservation;
 }

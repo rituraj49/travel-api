@@ -1,5 +1,7 @@
 package com.jamuara.crs.model;
 
+import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jamuara.crs.enums.TravelClass;
 import com.jamuara.crs.enums.TripType;
 import jakarta.persistence.*;
@@ -46,5 +48,6 @@ public class FlightLeg {
     @JoinColumn(name = "reservation_id")
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private Reservation reservation;
 }

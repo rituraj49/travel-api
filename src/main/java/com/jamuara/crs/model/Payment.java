@@ -1,5 +1,6 @@
 package com.jamuara.crs.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.jamuara.crs.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -32,5 +33,6 @@ public class Payment {
     @OneToMany(mappedBy = "payment", cascade = CascadeType.ALL)
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
+    @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
 }

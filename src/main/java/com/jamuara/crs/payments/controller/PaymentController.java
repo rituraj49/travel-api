@@ -48,7 +48,7 @@ public class PaymentController {
             <html>
                 <body>
                     <script>
-                        window.location.href = "http://localhost:5173/payment/return?txnid=%s";
+                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com/payment/return?txnid=%s";
                     </script>
                 </body>
             </html>
@@ -70,7 +70,7 @@ public class PaymentController {
             <h6>redirecting to bookings</h6>
                 <body>
                     <script>
-                        window.location.href = "http://localhost:5173/payment/failure?txnid=%s";
+                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com/payment/failure?txnid=%s";
                     </script>
                 </body>
             </html>
@@ -95,7 +95,7 @@ public class PaymentController {
             <html>
                 <body>
                     <script>
-                        window.location.href = "http://localhost:5173/payment/return?txnid=%s";
+                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com//payment/return?txnid=%s";
                     </script>
                 </body>
             </html>
@@ -117,7 +117,7 @@ public class PaymentController {
             <h6>redirecting to bookings</h6>
                 <body>
                     <script>
-                        window.location.href = "http://localhost:5173/payment/failure?txnid=%s";
+                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com/payment/failure?txnid=%s";
                     </script>
                 </body>
             </html>

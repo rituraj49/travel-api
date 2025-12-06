@@ -1,6 +1,7 @@
 package com.jamuara.crs.model;
 
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import lombok.*;
@@ -69,7 +70,6 @@ public class Reservation {
     @ToString.Exclude
     @EqualsAndHashCode.Exclude
     private Payment payment;
-
 
     @CreationTimestamp
     @Column(nullable = false, updatable = false)

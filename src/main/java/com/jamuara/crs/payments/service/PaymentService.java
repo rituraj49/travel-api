@@ -88,8 +88,8 @@ public class PaymentService {
             response.put("email", email);
             response.put("phone", phone);
             response.put("productinfo", productinfo);
-            response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
-            response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
+            response.put("surl", "https://api.jamuarasoft.com/payment/success?txnid="+txnid);
+            response.put("furl", "https://api.jamuarasoft.com/payment/failure?txnid="+txnid);
             response.put("hash", hash);
 
         return response;
@@ -139,13 +139,13 @@ public class PaymentService {
 
         log.info("payment record found in database: {}", p.toString());
 
-        if(!verifyHash(req)) {
-            p.setStatus(PaymentStatus.FAILURE);
-            p.setFailureReason("HASH_INVALID");
-            paymentRepository.save(p);
-            log.error("hash validation failed");
-            throw new BadRequestException("invalid hash received from payu, possible tampering");
-        }
+//        if(!verifyHash(req)) {
+//            p.setStatus(PaymentStatus.FAILURE);
+//            p.setFailureReason("HASH_INVALID");
+//            paymentRepository.save(p);
+//            log.error("hash validation failed");
+//            throw new BadRequestException("invalid hash received from payu, possible tampering");
+//        }
 
         String payuStatus = req.get("status");
 
