@@ -1,11 +1,17 @@
 package com.jamuara.crs.hotel.controller;
 
 import com.amadeus.exceptions.ResponseException;
+import com.amadeus.resources.HotelOfferSearch;
+import com.amadeus.resources.HotelOrder;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.jamuara.crs.hotel.dto.HotelSearchRequestDto;
+import com.jamuara.crs.hotel.model.HotelOfferResponse;
 import com.jamuara.crs.hotel.model.HotelSearchResponse;
 import com.jamuara.crs.hotel.service.HotelService;
 import com.jamuara.crs.hotel.service.IHotelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import jakarta.ws.rs.QueryParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -111,18 +117,46 @@ public class HotelController {
         }
     }
 
-    @PostMapping("/book")
-    public ResponseEntity<?> bookHotelV2(@RequestBody String body) {
+    @PostMapping("/offers")
+    public ResponseEntity<?> hotelOffersSearch(@RequestBody HotelSearchRequestDto requestDto) {
         try {
-            String response = hotelService.bookHotel(body);
+            List<HotelOfferResponse> hotelOffers = hotelService.getHotelOffers(requestDto);
+            return ResponseEntity.ok(hotelOffers);
+        } catch (ResponseException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("amadeus exception: " + e.getDescription());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong");
+        }
+    }
+
+    @GetMapping("/offer-details")
+    public ResponseEntity<?> hotelOfferDetailsSearch(@QueryParam("offerId") String offerId) {
+        try {
+            HotelOfferResponse hotelOfferResponse = hotelService.getHotelOfferDetails(offerId);
+            return ResponseEntity.ok(hotelOfferResponse);
+        } catch (ResponseException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("amadeus exception: " + e.getDescription());
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("something went wrong");
+        }
+    }
+
+    @PostMapping("/book")
+    public ResponseEntity<?> bookHotelV2(@RequestBody Map<String, Object> body) {
+        try {
+            JsonNode response = hotelService.bookHotel(body);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(response);
         } catch (ResponseException e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return ResponseEntity.status(400).body(e.getDescription());
         } catch (Exception e) {
-//            e.printStackTrace();
+            e.printStackTrace();
             return ResponseEntity.status(500).body("Unexpected error: " + e.getMessage());
         }
     }

@@ -13,7 +13,7 @@ public class CronJobScheduler {
     @Autowired
     private TboAuthService tboAuthService;
 
-    @Scheduled(cron = "0 31 5  * * *")
+    @Scheduled(cron = "0 31 18 * * *")
 //    @Scheduled(cron = "10 *  * * * *")
     public void tboAuthToken() {
         tboAuthService.authenticate();

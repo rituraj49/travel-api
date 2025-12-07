@@ -4,8 +4,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/api/admin/pricing")
-@CrossOrigin("*")
+@RequestMapping("/admin/pricing")
 public class PriceRuleController {
 
     private final PriceRuleRepository repository;
