@@ -90,7 +90,14 @@ public class PaymentService {
             response.put("productinfo", productinfo);
             response.put("surl", "https://api.jamuarasoft.com/payment/success?txnid="+txnid);
             response.put("furl", "https://api.jamuarasoft.com/payment/failure?txnid="+txnid);
-            response.put("hash", hash);
+        //response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
+        //response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
+       // response.put("surl", "https://api.jamuarasoft.com/payment/test/success?txnid="+txnid);
+       // response.put("furl", "https://api.jamuarasoft.com/payment/test/failure?txnid="+txnid);
+         //response.put("surl", "https://localhost:8080/payment/test/success?txnid="+txnid);
+         //response.put("furl", "https://localhost:8080/payment/test/failure?txnid="+txnid);
+
+        response.put("hash", hash);
 
         return response;
     }

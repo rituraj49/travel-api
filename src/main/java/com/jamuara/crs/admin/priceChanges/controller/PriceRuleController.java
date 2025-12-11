@@ -1,4 +1,6 @@
-package com.jamuara.crs.admin.priceChanges;
+package com.jamuara.crs.admin.priceChanges.controller;
+import com.jamuara.crs.admin.priceChanges.model.PriceRule;
+import com.jamuara.crs.admin.priceChanges.repository.PriceRuleRepository;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

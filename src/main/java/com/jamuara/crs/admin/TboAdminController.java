@@ -6,10 +6,15 @@ import com.jamuara.crs.flight.service.TboFlightService;
 import com.jamuara.crs.model.Reservation;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -61,5 +66,34 @@ public class TboAdminController {
             e.printStackTrace();
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("status update failed: " + e.getMessage());
         }
+    }
+
+
+    @GetMapping("/filter")
+    public ResponseEntity<?> filterReservations(
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime from,
+            @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime to,
+            @RequestParam Reservation.BookingStatus status,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size
+    ) {
+
+        Pageable pageable = PageRequest.of(
+                page, size, Sort.by("createdAt").descending()
+        );
+
+        Page<Reservation> reservationsPage =
+                tboFlightService.filterReservations(from, to, status, pageable);
+
+        //  Build response map
+        Map<String, Object> response = new HashMap<>();
+        response.put("content", reservationsPage.getContent());
+        response.put("pageNumber", reservationsPage.getNumber());
+        response.put("pageSize", reservationsPage.getSize());
+        response.put("totalElements", reservationsPage.getTotalElements());
+        response.put("totalPages", reservationsPage.getTotalPages());
+        response.put("isLastPage", reservationsPage.isLast());
+
+        return ResponseEntity.ok(response);
     }
 }

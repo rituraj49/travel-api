@@ -1,18 +1,25 @@
-package com.jamuara.crs.admin.priceChanges;
+package com.jamuara.crs.admin.priceChanges.service;
 
+import com.jamuara.crs.admin.priceChanges.model.PriceRule;
+import com.jamuara.crs.admin.priceChanges.repository.PriceRuleRepository;
 import com.jamuara.crs.flight.dto.tbo.FlightFareQuoteResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchMulticityRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchRequest;
 import com.jamuara.crs.flight.dto.tbo.search.FlightSearchResponse;
+import lombok.extern.slf4j.Slf4j;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 import java.util.List;
 
+@Slf4j
 @Service
 public class DynamicPricingService {
 
+    private static final Logger log = LoggerFactory.getLogger(DynamicPricingService.class);
     private final PriceRuleRepository priceRuleRepository;
 
     public DynamicPricingService(PriceRuleRepository priceRuleRepository) {
@@ -20,13 +27,10 @@ public class DynamicPricingService {
     }
 
     // MAIN PRICE LOGIC
-    public double applyDynamicPrice(double basePrice,
-                                    PriceRule.TripType tripType) {
+    public double applyDynamicPrice(double basePrice) {
 
         List<PriceRule> rules =
-                priceRuleRepository.findActiveRules(
-                        tripType, LocalDate.now()
-                );
+                priceRuleRepository.findActiveRules(LocalDate.now());
 
         double finalPrice = basePrice;
 
@@ -38,61 +42,30 @@ public class DynamicPricingService {
         return Math.round(finalPrice * 100.0) / 100.0;
     }
 
-    //  APPLY ON SEARCH
 
+
+    //  APPLY ON SEARCH
     public void applyMarkupOnSearch(FlightSearchResponse response,
                                     FlightSearchRequest request) {
 
-        System.out.println(" APPLY MARKUP METHOD CALLED");
-
         if (response.getFlightsAvailable() == null) return;
-
-        PriceRule.TripType tripType =
-                getTripType(
-                        request.getOriginLocationCode(),
-                        request.getDestinationLocationCode()
-                );
 
         response.getFlightsAvailable().forEach((key, flightList) -> {
 
             flightList.forEach(flight -> {
 
-
                 double baseFare = Double.parseDouble(
-                        flight.getPublishedFare()//.replaceAll("[^0-9.]", "")
+                        flight.getPublishedFare()
                 );
 
-                System.out.println(baseFare +"   "+tripType);
-                double finalFare =
-                        applyDynamicPrice(baseFare, tripType);
-
-
-                System.out.println(
-                        "BEFORE: " + baseFare + " | AFTER: " + finalFare
-                );
+                double finalFare = applyDynamicPrice(baseFare);
 
                 flight.setPublishedFare(String.valueOf(finalFare));
+                log.info("Base Fare : {}, Final Fare : {}", baseFare,finalFare);
+
             });
         });
     }
-
-
-
-
-
-    //  DOMESTIC / INTERNATIONAL DETECTION
-    public PriceRule.TripType getTripType(String origin,
-                                           String destination) {
-
-        boolean isDomestic =
-                origin.substring(0, 2)
-                        .equalsIgnoreCase(destination.substring(0, 2));
-
-        return isDomestic
-                ? PriceRule.TripType.DOMESTIC
-                : PriceRule.TripType.INTERNATIONAL;
-    }
-
 
 
     public void applyMarkupByResultIndex(
@@ -123,47 +96,25 @@ public class DynamicPricingService {
 
 
 
-
     public void applyMarkupOnMulticitySearch(
             FlightSearchResponse response,
             FlightSearchMulticityRequest request) {
 
         if (response.getFlightsAvailable() == null) return;
-        if (request.getTripDetails() == null || request.getTripDetails().isEmpty()) return;
 
-        //  Take FIRST LEG only
-        FlightSearchMulticityRequest.TripDetailsDto firstTrip =
-                request.getTripDetails().get(0);
-
-        PriceRule.TripType tripType = getTripType(
-                firstTrip.getOriginLocationCode(),
-                firstTrip.getDestinationLocationCode()
-        );
-
-        //  FETCH ACTIVE MARKUP RULES
         List<PriceRule> rules =
-                priceRuleRepository.findActiveRules(tripType, LocalDate.now());
+                priceRuleRepository.findActiveRules(LocalDate.now());
 
-        //  NO MARKUP FOUND → RETURN SAME RESPONSE
-        if (rules == null || rules.isEmpty()) {
-            System.out.println("NO MULTICITY MARKUP FOUND FOR: " + tripType);
-            return;
-        }
-
-        System.out.println("APPLY MULTICITY MARKUP CALLED");
+        if (rules == null || rules.isEmpty()) return;
 
         response.getFlightsAvailable().forEach((key, flightList) -> {
             flightList.forEach(flight -> {
 
                 if (flight.getPublishedFare() == null) return;
 
-                double baseFare = Double.parseDouble(
-                        flight.getPublishedFare()//.replaceAll("[^0-9.]", "")
-                );
-
+                double baseFare = Double.parseDouble(flight.getPublishedFare());
                 double finalFare = baseFare;
 
-                //  APPLY ALL ACTIVE RULES
                 for (PriceRule rule : rules) {
                     double change = (finalFare * rule.getPercentage()) / 100;
                     finalFare += change;
@@ -172,19 +123,11 @@ public class DynamicPricingService {
                 finalFare = Math.round(finalFare * 100.0) / 100.0;
                 flight.setPublishedFare(String.valueOf(finalFare));
 
-                System.out.println(
-                        "BASE FARE : " + baseFare + "   FINAL FARE : " + finalFare
-                );
+                log.info("Multi City | Base Fare : {}, Final Fare : {}", baseFare,finalFare);
+
             });
         });
     }
-
-
-
-
-
-
-
 
 
 
@@ -201,18 +144,11 @@ public class DynamicPricingService {
         FetchFlightBookingResponse.TicketBookFlightDetails flightDetails =
                 response.getTicketBookingDetails().getFlightDetails();
 
-        //  CONVERT ENUM TYPE SAFELY
-        com.jamuara.crs.enums.TripType apiTripType = flightDetails.getTripType();
-
-        PriceRule.TripType tripType =
-                PriceRule.TripType.valueOf(apiTripType.name());  //  FIX
-
-        //  FETCH ACTIVE MARKUP RULE
         List<PriceRule> rules =
-                priceRuleRepository.findActiveRules(tripType, LocalDate.now());
+                priceRuleRepository.findActiveRules(LocalDate.now());
 
         if (rules == null || rules.isEmpty()) {
-            System.out.println("NO BOOKING MARKUP FOUND FOR: " + tripType);
+            log.info("NO BOOKING MARKUP FOUND");
             return;
         }
 
@@ -221,10 +157,7 @@ public class DynamicPricingService {
 
         if (fare.getPublishedFare() == null) return;
 
-        double baseFare = Double.parseDouble(
-                fare.getPublishedFare()//.replaceAll("[^0-9.]", "")
-        );
-
+        double baseFare = Double.parseDouble(fare.getPublishedFare());
         double finalFare = baseFare;
 
         for (PriceRule rule : rules) {
@@ -233,12 +166,10 @@ public class DynamicPricingService {
         }
 
         finalFare = Math.round(finalFare * 100.0) / 100.0;
-
         fare.setPublishedFare(String.valueOf(finalFare));
 
-        System.out.println(
-                "BOOKING MARKUP APPLIED | BASE: " + baseFare + " | FINAL: " + finalFare
-        );
+        log.info("BOOKING MARKUP APPLIED | Base Fare : {}, Final Fare : {}", baseFare,finalFare);
+
     }
 
 

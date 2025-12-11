@@ -53,6 +53,19 @@ public class PaymentController {
                 </body>
             </html>
         """.formatted(txnidFinal);
+/*
+
+        String html = """
+            <html>
+                <body>
+                    <script>
+                        window.location.href = "http://localhost:5173/payment/return?txnid=%s";
+                    </script>
+                </body>
+            </html>
+        """.formatted(txnidFinal);
+*/
+
             return ResponseEntity
                     .ok()
                     .contentType(MediaType.TEXT_HTML)
