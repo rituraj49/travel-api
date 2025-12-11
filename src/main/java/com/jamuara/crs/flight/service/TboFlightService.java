@@ -1,9 +1,9 @@
 package com.jamuara.crs.flight.service;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
-import com.jamuara.crs.admin.priceChanges.DynamicPricingService;
-import com.jamuara.crs.admin.priceChanges.PriceRule;
+import com.jamuara.crs.admin.priceChanges.service.DynamicPricingService;
 import com.jamuara.crs.common.Helper;
+import com.jamuara.crs.common.repository.ReservationRepository;
 import com.jamuara.crs.common.service.EmailService;
 import com.jamuara.crs.common.service.PdfService;
 import com.jamuara.crs.common.service.ReservationService;
@@ -24,11 +24,14 @@ import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.thymeleaf.context.Context;
 
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -53,6 +56,9 @@ public class TboFlightService {
 
     @Autowired(required = false)
     ReservationService reservationService;
+
+    @Autowired
+    ReservationRepository reservationRepository;
 
     CacheManager cacheManager;
 
@@ -693,4 +699,18 @@ public class TboFlightService {
         String receiverEmail = bookings.get(0).getTicketBookingDetails().getFlightDetails().getTravelers().get(0).getEmail();
         emailService.sendEmail(!receiverEmail.contains("test") ? receiverEmail : "rthakur.0211@gmail.com", "Ticket confirmation", body, ticketPdfs);
     }
+
+
+
+    public Page<Reservation> filterReservations(
+            LocalDateTime from,
+            LocalDateTime to,
+            Reservation.BookingStatus status,
+            Pageable pageable
+    ) {
+        return reservationRepository.findByCreatedAtBetweenAndBookingStatus(
+                from, to, status, pageable
+        );
+    }
+
 }

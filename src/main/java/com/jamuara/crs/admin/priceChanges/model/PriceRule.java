@@ -1,4 +1,4 @@
-package com.jamuara.crs.admin.priceChanges;
+package com.jamuara.crs.admin.priceChanges.model;
 
 import jakarta.persistence.*;
 import lombok.Data;
@@ -16,16 +16,9 @@ public class PriceRule {
     private String reason;        // Weekend, Rainy, Festival
     private Double percentage;    // 10, 5, -5 (increase or discount)
 
-    @Enumerated(EnumType.STRING)
-    private TripType tripType;    // DOMESTIC / INTERNATIONAL
-
     private LocalDate startDate;
     private LocalDate endDate;
 
     private boolean active;
 
-    public enum TripType {
-        DOMESTIC,
-        INTERNATIONAL
-    }
 }
