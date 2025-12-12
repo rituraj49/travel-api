@@ -6,11 +6,15 @@ import com.jamuara.crs.common.location.dto.LocationResponse;
 import com.jamuara.crs.enums.LocationType;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import org.thymeleaf.TemplateEngine;
 import org.thymeleaf.context.Context;
 
@@ -168,5 +172,21 @@ public class Helper {
 
         return authentication != null && authentication.isAuthenticated() &&
                 !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+    public static String getApplicationUrl() {
+        ServletRequestAttributes attrs = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+
+        if(attrs == null) {
+            return "https://api.jamuarasoft.com";
+        }
+
+        HttpServletRequest request = attrs.getRequest();
+
+        return ServletUriComponentsBuilder
+                .fromRequestUri(request)
+                .replacePath(null)
+                .build()
+                .toUriString();
     }
 }

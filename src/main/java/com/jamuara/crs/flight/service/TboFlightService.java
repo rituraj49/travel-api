@@ -116,7 +116,7 @@ public class TboFlightService {
 
 
         FlightSearchResponse responseNew=tboFlightSearchResponseMapper.mapToFlightSearchResponse(response.getBody().getResponse());
-        dynamicPricingService.applyMarkupOnSearch(responseNew, searchRequest);
+        dynamicPricingService.applyMarkupOnSearch(responseNew);
 
 /*
         //  STORE TRIP TYPE USING TRACE ID

@@ -6,6 +6,7 @@ import com.jamuara.crs.payments.service.PaymentService;
 import jakarta.ws.rs.QueryParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -22,6 +23,9 @@ public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
+    
+    @Value("${frontend.host.url}")
+    String frontendUrl;
 
     @PostMapping("/initiate")
     public ResponseEntity<?> initiatePayment(@RequestBody InitiatePaymentRequestDto requestDto) {
@@ -35,7 +39,7 @@ public class PaymentController {
         }
     }
 
-    @PostMapping("/success")
+    @PostMapping("/success-redirect")
     public ResponseEntity<?> successUrl(@RequestParam("txnid") String txnid) {
 //        log.info("success url req body: " + req.toString());
         log.info("param txnid: " + txnid);
@@ -48,11 +52,11 @@ public class PaymentController {
             <html>
                 <body>
                     <script>
-                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com/payment/return?txnid=%s";
+                        window.location.href = "%s/payment/return?txnid=%s";
                     </script>
                 </body>
             </html>
-        """.formatted(txnidFinal);
+        """.formatted(frontendUrl, txnidFinal);
 /*
 
         String html = """
@@ -72,7 +76,7 @@ public class PaymentController {
                     .body(html);
     }
 
-    @PostMapping("/failure")
+    @PostMapping("/failure-redirect")
     public ResponseEntity<?> failureUrl(@RequestBody Map<String, String> req) {
         log.info("failure url req body: " + req.toString());
 
@@ -83,11 +87,11 @@ public class PaymentController {
             <h6>redirecting to bookings</h6>
                 <body>
                     <script>
-                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com/payment/failure?txnid=%s";
+                        window.location.href = "%s/payment/failure?txnid=%s";
                     </script>
                 </body>
             </html>
-        """.formatted(txnid);
+        """.formatted(frontendUrl, txnid);
 
             return ResponseEntity
                     .ok()
@@ -95,55 +99,53 @@ public class PaymentController {
                     .body(html);
     }
 
-    @PostMapping("/test/success")
-    public ResponseEntity<?> successUrlTest(@RequestParam("txnid") String txnid) {
-//        log.info("success url req body: " + req.toString());
-        log.info("param txnid: " + txnid);
-//        String txnid = req.get("txnid");
-        String txnidFinal = "";
-        if(txnid.contains(",")) {
-            txnidFinal = txnid.split(",")[0];
+    @PostMapping("/success")
+    public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> requestBody) {
+    log.info("webhook request body received: {}", requestBody.toString());
+        try {
+            paymentService.processPayment(requestBody);
+//        paymentService.bookFlightAfterSuccessfulPayment();
+            return ResponseEntity.ok("payment processed successfully!");
+        } catch(Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("something went wrong while processing payment: " + e.getMessage());
         }
-        String html = """
-            <html>
-                <body>
-                    <script>
-                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com//payment/return?txnid=%s";
-                    </script>
-                </body>
-            </html>
-        """.formatted(txnidFinal);
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(html);
+    }
+
+    @PostMapping("/failure")
+    public ResponseEntity<?> paymentFailure(@RequestBody Map<String, String> requestBody) {
+    log.info("webhook request body received: {}", requestBody.toString());
+        try {
+            paymentService.processPayment(requestBody);
+//        paymentService.bookFlightAfterSuccessfulPayment();
+            return ResponseEntity.ok("payment processed successfully!");
+        } catch(Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("something went wrong while processing payment: " + e.getMessage());
+        }
+    }
+
+    @PostMapping("/test/success")
+    public ResponseEntity<?> paymentSuccessTest(@RequestBody Map<String, String> requestBody) {
+    log.info("webhook request body received: {}", requestBody.toString());
+        try {
+            paymentService.processPayment(requestBody);
+//        paymentService.bookFlightAfterSuccessfulPayment();
+            return ResponseEntity.ok("payment processed successfully!");
+        } catch(Exception e) {
+            e.printStackTrace();
+            return ResponseEntity
+            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+            .body("something went wrong while processing payment: " + e.getMessage());
+        }
     }
 
     @PostMapping("/test/failure")
-    public ResponseEntity<?> failureUrlTest(Map<String, String> req) {
-        log.info("failure url req body: " + req.toString());
-
-        String txnid = req.get("txnid");
-
-        String html = """
-            <html>
-            <h6>redirecting to bookings</h6>
-                <body>
-                    <script>
-                        window.location.href = "http://zenathdemo.s3-website-us-east-1.amazonaws.com/payment/failure?txnid=%s";
-                    </script>
-                </body>
-            </html>
-        """.formatted(txnid);
-
-        return ResponseEntity
-                .ok()
-                .contentType(MediaType.TEXT_HTML)
-                .body(html);
-    }
-
-    @PostMapping("/payu-webhook")
-    public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> requestBody) {
+    public ResponseEntity<?> paymentFailureTest(@RequestBody Map<String, String> requestBody) {
     log.info("webhook request body received: {}", requestBody.toString());
         try {
             paymentService.processPayment(requestBody);
