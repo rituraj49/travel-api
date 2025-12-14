@@ -6,7 +6,12 @@ import jakarta.persistence.*;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.ToString;
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.annotations.UpdateTimestamp;
+import org.hibernate.type.SqlTypes;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,9 +29,18 @@ public class Payment {
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;
 
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private String payuResponse;
+
     private String failureReason;
 
     private String amount;
+
+    @Enumerated(EnumType.STRING)
+    private PaymentBookingStatus bookingStatus;
+
+    private String bookingFailureReason;
 //
 //    private String hash;
 
@@ -35,4 +49,19 @@ public class Payment {
     @EqualsAndHashCode.Exclude
     @JsonIgnore
     private List<Reservation> reservations = new ArrayList<>();
+
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    @UpdateTimestamp
+    @Column(nullable = false)
+    private LocalDateTime updatedAt;
+
+    public static enum PaymentBookingStatus{
+        SUCCESS,
+        PENDING,
+        FAILURE,
+        IN_PROGRESS
+    }
 }

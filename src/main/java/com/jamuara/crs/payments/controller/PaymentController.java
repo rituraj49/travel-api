@@ -1,6 +1,8 @@
 package com.jamuara.crs.payments.controller;
 
+import com.jamuara.crs.enums.CallbackResult;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
+import com.jamuara.crs.flight.service.FlightBookingAsyncService;
 import com.jamuara.crs.payments.dto.InitiatePaymentRequestDto;
 import com.jamuara.crs.payments.service.PaymentService;
 import jakarta.ws.rs.QueryParam;
@@ -23,7 +25,10 @@ public class PaymentController {
 
     @Autowired
     private PaymentService paymentService;
-    
+
+    @Autowired
+    FlightBookingAsyncService flightBookingAsyncService;
+
     @Value("${frontend.host.url}")
     String frontendUrl;
 
@@ -65,7 +70,7 @@ public class PaymentController {
                     <script>
                         window.location.href = "http://localhost:5173/payment/return?txnid=%s";
                     </script>
-                </body>
+                </body>estonian to english
             </html>
         """.formatted(txnidFinal);
 */
@@ -100,63 +105,115 @@ public class PaymentController {
     }
 
     @PostMapping("/success")
-    public ResponseEntity<?> paymentSuccess(@RequestBody Map<String, String> requestBody) {
-    log.info("webhook request body received: {}", requestBody.toString());
-        try {
-            paymentService.processPayment(requestBody);
-//        paymentService.bookFlightAfterSuccessfulPayment();
+    public ResponseEntity<?> paymentSuccess(@RequestParam Map<String, String> requestBody) {
+    log.info("webhook success request body received: {}", requestBody.toString());
+        CallbackResult response = paymentService.processPayment(requestBody);
+        if(response == CallbackResult.SUCCESS) {
+            flightBookingAsyncService.triggerFlightBookingAsync(requestBody.get("txnid"));
             return ResponseEntity.ok("payment processed successfully!");
-        } catch(Exception e) {
-            e.printStackTrace();
-            return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("something went wrong while processing payment: " + e.getMessage());
         }
+
+        if(response == CallbackResult.ALREADY_PROCESSED) {
+//            return ResponseEntity.ok("payment processed already!");
+            return ResponseEntity.ok("ignored");
+        }
+
+        if(response == CallbackResult.INVALID_HASH) {
+            return ResponseEntity.badRequest().body("invalid hash");
+        }
+
+        if(response == CallbackResult.ERROR) {
+            return ResponseEntity.ok().body("ok");
+        }
+
+        return ResponseEntity.ok("ok");
+//        try {
+//            paymentService.processPayment(requestBody);
+////        paymentService.bookFlightAfterSuccessfulPayment();
+//            return ResponseEntity.ok("payment processed successfully!");
+//        } catch(Exception e) {
+//            e.printStackTrace();
+//            return ResponseEntity
+//            .status(HttpStatus.INTERNAL_SERVER_ERROR)
+//            .body("something went wrong while processing payment: " + e.getMessage());
+//        }
     }
 
     @PostMapping("/failure")
-    public ResponseEntity<?> paymentFailure(@RequestBody Map<String, String> requestBody) {
-    log.info("webhook request body received: {}", requestBody.toString());
-        try {
-            paymentService.processPayment(requestBody);
-//        paymentService.bookFlightAfterSuccessfulPayment();
+    public ResponseEntity<?> paymentFailure(@RequestParam Map<String, String> requestBody) {
+        log.info("webhook failure request body received: {}", requestBody.toString());
+
+        CallbackResult response = paymentService.processPayment(requestBody);
+        if(response == CallbackResult.SUCCESS) {
             return ResponseEntity.ok("payment processed successfully!");
-        } catch(Exception e) {
-            e.printStackTrace();
-            return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("something went wrong while processing payment: " + e.getMessage());
         }
+
+        if(response == CallbackResult.ALREADY_PROCESSED) {
+//            return ResponseEntity.ok("payment processed already!");
+            return ResponseEntity.ok("ignored");
+        }
+
+        if(response == CallbackResult.INVALID_HASH) {
+            return ResponseEntity.badRequest().body("invalid hash");
+        }
+
+        if(response == CallbackResult.ERROR) {
+            return ResponseEntity.ok().body("ok");
+        }
+
+        return ResponseEntity.ok("ok");
     }
 
     @PostMapping("/test/success")
-    public ResponseEntity<?> paymentSuccessTest(@RequestBody Map<String, String> requestBody) {
-    log.info("webhook request body received: {}", requestBody.toString());
-        try {
-            paymentService.processPayment(requestBody);
-//        paymentService.bookFlightAfterSuccessfulPayment();
+    public ResponseEntity<?> paymentSuccessTest(@RequestParam Map<String, String> requestBody) {
+    log.info("test webhook success request body received: {}", requestBody.toString());
+//        try {
+
+        CallbackResult response = paymentService.processPayment(requestBody);
+        if(response == CallbackResult.SUCCESS) {
+            flightBookingAsyncService.triggerFlightBookingAsync(requestBody.get("txnid"));
             return ResponseEntity.ok("payment processed successfully!");
-        } catch(Exception e) {
-            e.printStackTrace();
-            return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("something went wrong while processing payment: " + e.getMessage());
         }
+
+        if(response == CallbackResult.ALREADY_PROCESSED) {
+//            return ResponseEntity.ok("payment processed already!");
+            return ResponseEntity.ok("ignored");
+        }
+
+        if(response == CallbackResult.INVALID_HASH) {
+            return ResponseEntity.badRequest().body("invalid hash");
+        }
+
+        if(response == CallbackResult.ERROR) {
+            return ResponseEntity.ok().body("ok");
+        }
+
+        return ResponseEntity.ok("ok");
     }
 
     @PostMapping("/test/failure")
-    public ResponseEntity<?> paymentFailureTest(@RequestBody Map<String, String> requestBody) {
-    log.info("webhook request body received: {}", requestBody.toString());
-        try {
-            paymentService.processPayment(requestBody);
-//        paymentService.bookFlightAfterSuccessfulPayment();
+    public ResponseEntity<?> paymentFailureTest(@RequestParam Map<String, String> requestBody) {
+        log.info("test webhook failure request body received: {}", requestBody.toString());
+
+        CallbackResult response = paymentService.processPayment(requestBody);
+        if(response == CallbackResult.SUCCESS) {
             return ResponseEntity.ok("payment processed successfully!");
-        } catch(Exception e) {
-            e.printStackTrace();
-            return ResponseEntity
-            .status(HttpStatus.INTERNAL_SERVER_ERROR)
-            .body("something went wrong while processing payment: " + e.getMessage());
         }
+
+        if(response == CallbackResult.ALREADY_PROCESSED) {
+//            return ResponseEntity.ok("payment processed already!");
+            return ResponseEntity.ok("ignored");
+        }
+
+        if(response == CallbackResult.INVALID_HASH) {
+            return ResponseEntity.badRequest().body("invalid hash");
+        }
+
+        if(response == CallbackResult.ERROR) {
+            return ResponseEntity.ok().body("ok");
+        }
+
+        return ResponseEntity.ok("ok");
     }
 
     @GetMapping("/status")
@@ -180,7 +237,7 @@ public class PaymentController {
             log.info("found bookings: {}", bookings.size());
             return ResponseEntity.ok(bookings);
         } catch (Exception e) {
-            e.printStackTrace();
+//            e.printStackTrace();
             log.error("error while fetching bookings for txnid: {} - {}", txnid, e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("something went wrong while fetching bookings for txnid: " + e.getMessage());

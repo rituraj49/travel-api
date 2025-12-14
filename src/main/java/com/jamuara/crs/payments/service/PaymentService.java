@@ -1,12 +1,16 @@
 package com.jamuara.crs.payments.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.common.repository.PaymentRepository;
 import com.jamuara.crs.common.service.ReservationService;
+import com.jamuara.crs.enums.CallbackResult;
 import com.jamuara.crs.enums.PaymentStatus;
 import com.jamuara.crs.flight.dto.tbo.book.FetchBookingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
+import com.jamuara.crs.flight.service.FlightBookingAsyncService;
 import com.jamuara.crs.flight.service.TboFlightService;
 import com.jamuara.crs.model.Payment;
 import com.jamuara.crs.model.Reservation;
@@ -21,6 +25,7 @@ import org.springframework.cache.CacheManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -48,6 +53,9 @@ public class PaymentService {
 
     @Autowired
     private CacheManager cacheManager;
+
+    @Autowired
+    private ObjectMapper objectMapper;
 
     public Map<String, Object> createPaymentIntent(InitiatePaymentRequestDto dto) {
         String email = "";
@@ -88,14 +96,14 @@ public class PaymentService {
             response.put("email", email);
             response.put("phone", phone);
             response.put("productinfo", productinfo);
-        response.put("surl", Helper.getApplicationUrl() + "/payment/success-redirect?txnid="+txnid);
-        response.put("furl", Helper.getApplicationUrl() + "/payment/failure-redirect?txnid="+txnid);
-        //response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
-        //response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
-       // response.put("surl", "https://api.jamuarasoft.com/payment/test/success?txnid="+txnid);
-       // response.put("furl", "https://api.jamuarasoft.com/payment/test/failure?txnid="+txnid);
-         //response.put("surl", "https://localhost:8080/payment/test/success?txnid="+txnid);
-         //response.put("furl", "https://localhost:8080/payment/test/failure?txnid="+txnid);
+            response.put("surl", Helper.getApplicationUrl() + "/payment/success-redirect?txnid="+txnid);
+            response.put("furl", Helper.getApplicationUrl() + "/payment/failure-redirect?txnid="+txnid);
+            //response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
+            //response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
+           // response.put("surl", "https://api.jamuarasoft.com/payment/test/success?txnid="+txnid);
+           // response.put("furl", "https://api.jamuarasoft.com/payment/test/failure?txnid="+txnid);
+             //response.put("surl", "https://localhost:8080/payment/test/success?txnid="+txnid);
+             //response.put("furl", "https://localhost:8080/payment/test/failure?txnid="+txnid);
 
         response.put("hash", hash);
 
@@ -117,7 +125,6 @@ public class PaymentService {
     }
 
     public boolean verifyHash(Map<String, String> request) {
-        String salt = request.get("salt");
         String key = request.get("key");
         String status = request.get("status");
         String udf5 = request.get("udf5");
@@ -141,71 +148,116 @@ public class PaymentService {
         return hash.equals(request.get("hash"));
     }
 
-    public void processPayment(Map<String, String> req) throws Exception {
+    @Transactional
+    public CallbackResult processPayment(Map<String, String> req) {
         Payment p = findPaymentByTxnid(req.get("txnid"));
-
         log.info("payment record found in database: {}", p.toString());
 
         if(!verifyHash(req)) {
-            p.setStatus(PaymentStatus.FAILURE);
-            p.setFailureReason("HASH_INVALID");
-            paymentRepository.save(p);
+//            p.setStatus(PaymentStatus.FAILURE);
+//            p.setFailureReason("HASH_INVALID");
+//            paymentRepository.save(p);
             log.error("hash validation failed");
-            throw new BadRequestException("invalid hash received from payu, possible tampering");
+            return CallbackResult.INVALID_HASH;
+//            throw new BadRequestException("invalid hash received from payu, possible tampering");
         }
 
         String payuStatus = req.get("status");
 
         if (!"success".equalsIgnoreCase(payuStatus)) {
-            p.setStatus(PaymentStatus.FAILURE);
-            p.setFailureReason("PAYU_STATUS_" + payuStatus);
-            paymentRepository.save(p);
-            return;
+            if(p.getStatus() != PaymentStatus.FAILURE) {
+                p.setStatus(PaymentStatus.FAILURE);
+                p.setFailureReason("PAYU_STATUS_" + payuStatus);
+                paymentRepository.save(p);
+            }
+            return CallbackResult.ERROR;
         }
 
-        if (p.getStatus() == PaymentStatus.SUCCESS && !p.getReservations().isEmpty()) {
-            log.info("payment exist already and reservations are successful, moving on");
-            return;
+        if (p.getStatus() == PaymentStatus.SUCCESS) {
+            log.info("payment exist already, moving on");
+            return CallbackResult.ALREADY_PROCESSED;
         }
 
         log.info("marking payment as successful");
         p.setStatus(PaymentStatus.SUCCESS);
         p.setPayuTxnid(req.get("mihpayid"));
-//        paymentRepository.save(p);
 
-        Cache cache = cacheManager.getCache("bookingIntent");
-
-        Cache.ValueWrapper wrapper = cache.get(p.getTxnid());
-
-        FlightBookingTicketingRequest bookingIntent =
-                wrapper != null ? (FlightBookingTicketingRequest) wrapper.get() : null;
-
-        if(bookingIntent == null) {
-            throw new IllegalStateException("Booking intent missing for txn id: " + p.getTxnid());
+        try {
+            p.setPayuResponse(objectMapper.writeValueAsString(req));
+        } catch (JsonProcessingException e) {
+            throw new RuntimeException(e);
         }
 
-        List<FetchFlightBookingResponse> bookings = tboFlightService.flightBookAndTicket(bookingIntent);
-        log.info("bookings created after successful payment");
-        List<Reservation> reservations = bookings.stream()
-                .map(b ->
-                        reservationService.findByBookingId(b.getTicketBookingDetails().getBookingId())).collect(Collectors.toList());
+        paymentRepository.save(p);
 
+        return CallbackResult.SUCCESS;
+    }
+
+//    public void processPayment(Map<String, String> req) throws Exception {
+//        Payment p = findPaymentByTxnid(req.get("txnid"));
+//
+//        log.info("payment record found in database: {}", p.toString());
+//
+////        if(!verifyHash(req)) {
+////            p.setStatus(PaymentStatus.FAILURE);
+////            p.setFailureReason("HASH_INVALID");
+////            paymentRepository.save(p);
+////            log.error("hash validation failed");
+////            throw new BadRequestException("invalid hash received from payu, possible tampering");
+////        }
+//
+//        String payuStatus = req.get("status");
+//
+//        if (!"success".equalsIgnoreCase(payuStatus)) {
+//            p.setStatus(PaymentStatus.FAILURE);
+//            p.setFailureReason("PAYU_STATUS_" + payuStatus);
+//            paymentRepository.save(p);
+//            return;
+//        }
+//
+//        if (p.getStatus() == PaymentStatus.SUCCESS && !p.getReservations().isEmpty()) {
+//            log.info("payment exist already and reservations are successful, moving on");
+//            return;
+//        }
+//
 //        log.info("marking payment as successful");
 //        p.setStatus(PaymentStatus.SUCCESS);
 //        p.setPayuTxnid(req.get("mihpayid"));
-
-        reservations.forEach(res -> {
-            if(p.getStatus().equals(PaymentStatus.SUCCESS)) {
-                log.info("setting payment into reservation");
-                res.setPayment(p);
-//                reservationService.saveReservation(res);
-            }
-        });
-
-        log.info("setting reservations into payment");
-        p.setReservations(reservations);
-        paymentRepository.save(p);
-    }
+////        paymentRepository.save(p);
+//
+//        Cache cache = cacheManager.getCache("bookingIntent");
+//
+//        Cache.ValueWrapper wrapper = cache.get(p.getTxnid());
+//
+//        FlightBookingTicketingRequest bookingIntent =
+//                wrapper != null ? (FlightBookingTicketingRequest) wrapper.get() : null;
+//
+//        if(bookingIntent == null) {
+//            throw new IllegalStateException("Booking intent missing for txn id: " + p.getTxnid());
+//        }
+//
+//        List<FetchFlightBookingResponse> bookings = tboFlightService.flightBookAndTicket(bookingIntent);
+//        log.info("bookings created after successful payment");
+//        List<Reservation> reservations = bookings.stream()
+//                .map(b ->
+//                        reservationService.findByBookingId(b.getTicketBookingDetails().getBookingId())).collect(Collectors.toList());
+//
+////        log.info("marking payment as successful");
+////        p.setStatus(PaymentStatus.SUCCESS);
+////        p.setPayuTxnid(req.get("mihpayid"));
+//
+//        reservations.forEach(res -> {
+//            if(p.getStatus().equals(PaymentStatus.SUCCESS)) {
+//                log.info("setting payment into reservation");
+//                res.setPayment(p);
+////                reservationService.saveReservation(res);
+//            }
+//        });
+//
+//        log.info("setting reservations into payment");
+//        p.setReservations(reservations);
+//        paymentRepository.save(p);
+//    }
 
     public PaymentStatus getpaymentStatus(String txnid) {
         Payment p = findPaymentByTxnid(txnid);
@@ -213,18 +265,25 @@ public class PaymentService {
         return p.getStatus();
     }
 
-    public List<FetchFlightBookingResponse> fetchBookingsByPayment(String txnid) {
+    public List<FetchFlightBookingResponse> fetchBookingsByPayment(String txnid) throws Exception {
         log.info("fetching reservations for txnid: {}", txnid);
         Payment p = findPaymentByTxnid(txnid);
-        List<Reservation> reservations = reservationService.findReservationsByPaymentId(p.getId());
-        System.out.println("found reservations: " + reservations.toString());
-        if(reservations.isEmpty()) {
-            log.info("no reservations found, returning empty list");
+        List<Reservation> reservations = new ArrayList<>();
+        if(p.getBookingStatus() == Payment.PaymentBookingStatus.SUCCESS) {
+            reservations = reservationService.findReservationsByPaymentId(p.getId());
+            System.out.println("found reservations: " + reservations.toString());
+            if(reservations.isEmpty()) {
+                log.info("no reservations found, returning empty list");
+                return Collections.emptyList();
+            }
+
+            return reservations.stream()
+                    .map(r -> fetchSingleBooking(r.getBookingId())).toList();
+        } else if (p.getBookingStatus() == Payment.PaymentBookingStatus.FAILURE) {
+            throw new Exception(p.getFailureReason());
+        } else {
             return Collections.emptyList();
         }
-
-        return reservations.stream()
-            .map(r -> fetchSingleBooking(r.getBookingId())).toList();
     }
 
     public FetchFlightBookingResponse fetchSingleBooking(String bookingId) {
@@ -247,6 +306,7 @@ public class PaymentService {
         p.setAmount(amount);
         p.setStatus(PaymentStatus.PENDING);
         p.setTxnid(txnid);
+        p.setBookingStatus(Payment.PaymentBookingStatus.PENDING);
 
         paymentRepository.save(p);
     }

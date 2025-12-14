@@ -1,7 +1,6 @@
 package com.jamuara.crs.model;
 
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import lombok.*;
@@ -43,6 +42,8 @@ public class Reservation {
 
     @Enumerated(EnumType.STRING)
     private BookingStatus bookingStatus;
+
+    private String txnid;
 
 //    @Lob
     @Column(columnDefinition = "jsonb")
