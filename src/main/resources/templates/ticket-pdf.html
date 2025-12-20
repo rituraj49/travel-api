@@ -2,115 +2,254 @@
 <html xmlns:th="http://www.thymeleaf.org" lang="en">
 <head>
     <meta charset="UTF-8"/>
+    <title>Flight Ticket</title>
+
     <style>
         body {
-            font-family: Arial, sans-serif;
+            font-family: "Segoe UI", Arial, sans-serif;
             font-size: 12px;
-            color: #333;
+            background: #f3f4f6;
+            color: #111827;
+            padding: 32px;
         }
 
-        h2, h3 {
+        .ticket {
+            max-width: 1100px;
+            margin: auto;
+            background: #ffffff;
+            border-radius: 16px;
+            border: 1px solid #e5e7eb;
+            padding: 32px;
+        }
+
+        /* HEADER */
+        .header {
+            text-align: center;
+            border-bottom: 1px solid #111827;
+            padding-bottom: 16px;
+            margin-bottom: 30px;
+        }
+
+        .header h2 {
+            margin: 0;
+            font-size: 26px;
+            letter-spacing: 2px;
+        }
+
+        /* ROUTE */
+        .route {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 24px;
+            margin: 34px 0;
+        }
+
+        .route .city {
+            font-size: 28px;
+            font-weight: 600;
+            letter-spacing: 5px;
+        }
+
+        .route .arrow {
+            font-size: 18px;
+            color: #9ca3af;
+        }
+
+        /* GOLD STRIP */
+        .strip {
+            background: linear-gradient(90deg, #d4af37, #f5e6a8);
+            border-radius: 12px;
+            padding: 18px 12px;
+            margin-bottom: 34px;
+        }
+
+        .strip-table {
+            width: 100%;
+            table-layout: fixed;
+        }
+
+        .strip td {
+            text-align: center;
+        }
+
+        .strip .label {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 2px;
+            color: #374151;
             margin-bottom: 4px;
         }
 
+        .strip .value {
+            display: block;
+            font-size: 16px;
+            font-weight: 700;
+        }
+
+        /* SECTIONS */
         .section {
-            margin-bottom: 20px;
-            padding: 10px;
-            border: 1px solid #aaa;
-            border-radius: 4px;
+            margin-bottom: 34px;
+        }
+
+        .section h3 {
+            font-size: 12px;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            margin-bottom: 14px;
+            display: flex;
+            align-items: center;
+        }
+
+        .section h3:after {
+            content: "";
+            flex: 1;
+            height: 1px;
+            margin-left: 16px;
+            background: linear-gradient(90deg, #d4af37, transparent);
         }
 
         table {
             width: 100%;
             border-collapse: collapse;
-            margin-top: 6px;
-        }
-
-        th, td {
-            border: 1px solid #ccc;
-            padding: 6px;
-            font-size: 12px;
         }
 
         th {
-            background: #f2f2f2;
+            font-size: 10px;
+            letter-spacing: 1.8px;
+            color: #6b7280;
+            text-transform: uppercase;
+            border-bottom: 1px solid #e5e7eb;
+            padding: 12px 6px;
+            text-align: center;
+        }
+
+        td {
+            padding: 12px 6px;
+            border-bottom: 1px solid #f1f5f9;
+            text-align: center;
+        }
+
+        /* FOOTER */
+        .footer {
+            margin-top: 36px;
+            text-align: center;
+            font-size: 11px;
+            letter-spacing: 1.2px;
+            color: #6b7280;
+        }
+
+        .footer span {
+            color: #111827;
+            font-weight: 600;
         }
     </style>
-    <title>Ticket pdf</title>
 </head>
+
 <body>
-<h2>Flight Ticket</h2>
 
-<div class="section">
-    <h3>Reservation Details</h3>
-    <p><b>Booking ID:</b> <span th:text="${booking.bookingId}"></span></p>
-    <p><b>PNR:</b> <span th:text="${booking.pnr}"></span></p>
-    <p><b>Route:</b>
-        <span th:text="${booking.origin}"></span> →
-        <span th:text="${booking.destination}"></span>
-    </p>
-    <p><b>Total Fare:</b>
-        <span th:text="${booking.currencyCode} + ' ' + ${booking.price}"></span>
-    </p>
-    <p><b>Last Ticket Date:</b> <span th:text="${booking.lastTicketDate}"></span></p>
+<div class="ticket">
+
+    <!-- HEADER -->
+    <div class="header">
+        <h2>FLIGHT TICKET</h2>
+    </div>
+
+    <!-- ROUTE -->
+    <div class="route">
+        <span class="city" th:text="${booking.origin}"></span>
+        <span class="arrow">✈</span>
+        <span class="city" th:text="${booking.destination}"></span>
+    </div>
+
+    <!-- STRIP -->
+    <div class="strip">
+        <table class="strip-table">
+            <tr>
+                <td>
+                    <span class="label">BOOKING ID</span>
+                    <span class="value" th:text="${booking.bookingId}"></span>
+                </td>
+                <td>
+                    <span class="label">PNR</span>
+                    <span class="value" th:text="${booking.pnr}"></span>
+                </td>
+                <td>
+                    <span class="label">TOTAL FARE</span>
+                    <span class="value"
+                          th:text="${booking.currencyCode} + ' ' + ${booking.price}"></span>
+                </td>
+                <td>
+                    <span class="label">LAST TICKET DATE</span>
+                    <span class="value" th:text="${booking.lastTicketDate}"></span>
+                </td>
+            </tr>
+        </table>
+    </div>
+
+    <!-- PASSENGERS -->
+    <div class="section">
+        <h3>Passenger Details</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Name</th>
+                <th>Gender</th>
+                <th>Type</th>
+                <th>DOB</th>
+                <th>Lead</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="t : ${booking.travelers}">
+                <td th:text="${t.firstName} + ' ' + ${t.lastName}"></td>
+                <td th:text="${t.gender}"></td>
+                <td th:text="${t.travelerType}"></td>
+                <td th:text="${t.dateOfBirth}"></td>
+                <td th:text="${t.leadTraveler} ? 'Yes' : 'No'"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- ITINERARY -->
+    <div class="section">
+        <h3>Flight Itinerary</h3>
+        <table>
+            <thead>
+            <tr>
+                <th>Leg</th>
+                <th>Carrier</th>
+                <th>Flight</th>
+                <th>From</th>
+                <th>To</th>
+                <th>Departure</th>
+                <th>Arrival</th>
+                <th>Duration</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="leg : ${booking.flightLegs}">
+                <td th:text="${leg.legNo}"></td>
+                <td th:text="${leg.carrierName} + ' (' + ${leg.carrierCode} + ')'"></td>
+                <td th:text="${leg.flightNumber}"></td>
+                <td th:text="${leg.departureAirport}"></td>
+                <td th:text="${leg.arrivalAirport}"></td>
+                <td th:text="${leg.departureDateTime}"></td>
+                <td th:text="${leg.arrivalDateTime}"></td>
+                <td th:text="${leg.duration}"></td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <!-- FOOTER -->
+    <div class="footer">
+        Thank you for choosing us.<br/>
+        <span>We wish you a safe and pleasant journey</span>
+    </div>
+
 </div>
 
-<div class="section">
-    <h3>Passenger Details</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Name</th>
-            <th>Gender</th>
-            <th>Type</th>
-            <th>DOB</th>
-            <th>Lead?</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="t : ${booking.travelers}">
-            <td th:text="${t.firstName} + ' ' + ${t.lastName}"></td>
-            <td th:text="${t.gender}"></td>
-            <td th:text="${t.travelerType}"></td>
-            <td th:text="${t.dateOfBirth}"></td>
-            <td th:text="${t.leadTraveler} ? 'Yes' : 'No'"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<div class="section">
-    <h3>Flight Itinerary</h3>
-    <table>
-        <thead>
-        <tr>
-            <th>Leg</th>
-            <th>Carrier</th>
-            <th>Flight</th>
-            <th>From</th>
-            <th>To</th>
-            <th>Departure</th>
-            <th>Arrival</th>
-            <th>Duration</th>
-        </tr>
-        </thead>
-        <tbody>
-        <tr th:each="leg : ${booking.flightLegs}">
-            <td th:text="${leg.legNo}"></td>
-            <td th:text="${leg.carrierName} + ' (' + ${leg.carrierCode} + ')'"></td>
-            <td th:text="${leg.flightNumber}"></td>
-            <td th:text="${leg.departureAirport}"></td>
-            <td th:text="${leg.arrivalAirport}"></td>
-            <td th:text="${leg.departureDateTime}"></td>
-            <td th:text="${leg.arrivalDateTime}"></td>
-            <td th:text="${leg.duration}"></td>
-        </tr>
-        </tbody>
-    </table>
-</div>
-
-<p style="text-align: center; margin-top: 25px;">
-    Thank you for choosing us.
-</p>
 </body>
 </html>
