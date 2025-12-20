@@ -52,13 +52,20 @@ public class DynamicPricingService {
 
             flightList.forEach(flight -> {
 
-                double baseFare = Double.parseDouble(
+                double basePublishedFare = Double.parseDouble(
                         flight.getPublishedFare()
                 );
 
-                double finalFare = applyDynamicPrice(baseFare, activeRules);
+                double finalFare = applyDynamicPrice(basePublishedFare, activeRules);
+
+                double baseFare = Double.parseDouble(
+                        flight.getTotalBaseFareAmount()
+                );
+
+                double finalBaseFare = applyDynamicPrice(baseFare, activeRules);
 
                 flight.setPublishedFare(String.valueOf(finalFare));
+                flight.setTotalBaseFareAmount(String.valueOf(finalBaseFare));
                 log.info("Base Fare : {}, Final Fare : {}", baseFare,finalFare);
 
             });
@@ -79,15 +86,25 @@ public class DynamicPricingService {
                 //  Apply markup ONLY on matching ResultIndex
                 if (resultIndex.equals(flight.getResultIndex())) {
 
-                    double baseFare = Double.parseDouble(
+                    double basePublishedFare = Double.parseDouble(
                             flight.getPublishedFare()//.replaceAll("[^0-9.]", "")
                     );
 
                     //  Example: Flat 10% markup based on index
-//                    double finalFare = baseFare + (baseFare * 10 / 100);
-                    double finalFare = applyDynamicPrice(baseFare, activeRules);
+//                    double finalFare = basePublishedFare + (basePublishedFare * 10 / 100);
+                    double finalPublishedFare = applyDynamicPrice(basePublishedFare, activeRules);
 
-                    flight.setPublishedFare(String.valueOf(finalFare));
+                    flight.setPublishedFare(String.valueOf(finalPublishedFare));
+
+                    double baseFare = Double.parseDouble(
+                            flight.getTotalBaseFareAmount()//.replaceAll("[^0-9.]", "")
+                    );
+
+                    //  Example: Flat 10% markup based on index
+//                    double finalFare = baseFare + (baseFare * 10 / 100);
+                    double finalBaseFare = applyDynamicPrice(baseFare, activeRules);
+
+                      flight.setTotalBaseFareAmount(String.valueOf(finalBaseFare));
                 }
             });
         });
@@ -109,19 +126,15 @@ public class DynamicPricingService {
 
                 if (flight.getPublishedFare() == null) return;
 
-                double baseFare = Double.parseDouble(flight.getPublishedFare());
-                double finalFare = applyDynamicPrice(baseFare, rules);
-//
-//                for (PriceRule rule : rules) {
-//                    double change = (finalFare * rule.getPercentage()) / 100;
-//                    finalFare += change;
-//                }
-//
-//                finalFare = Math.round(finalFare * 100.0) / 100.0;
-                flight.setPublishedFare(String.valueOf(finalFare));
+                double basePublishedFare = Double.parseDouble(flight.getPublishedFare());
+                double finalPublishedFare = applyDynamicPrice(basePublishedFare, rules);
+                flight.setPublishedFare(String.valueOf(finalPublishedFare));
 
-                log.info("Multi City | Base Fare : {}, Final Fare : {}", baseFare,finalFare);
+                double baseFare = Double.parseDouble(flight.getTotalBaseFareAmount());
+                double finalBaseFare = applyDynamicPrice(baseFare, rules);
+                flight.setTotalBaseFareAmount(String.valueOf(finalBaseFare));
 
+                log.info("Multi City | Base Fare : {}, Final Fare : {}", baseFare,finalPublishedFare);
             });
         });
     }
@@ -151,16 +164,17 @@ public class DynamicPricingService {
 
         if (fare.getPublishedFare() == null) return;
 
+        double basePublishedFare = Double.parseDouble(fare.getPublishedFare());
+        double finalPublishedFare = applyDynamicPrice(basePublishedFare, rules);
+
+        fare.setPublishedFare(String.valueOf(finalPublishedFare));
+
         double baseFare = Double.parseDouble(fare.getPublishedFare());
         double finalFare = applyDynamicPrice(baseFare, rules);
 
-//        for (PriceRule rule : rules) {
-//            double change = (finalFare * rule.getPercentage()) / 100;
-//            finalFare += change;
-//        }
+        fare.setTotalBaseFareAmount(String.valueOf(finalFare));
 
-//        finalFare = Math.round(finalFare * 100.0) / 100.0;
-        fare.setPublishedFare(String.valueOf(finalFare));
+
         log.info("BOOKING MARKUP APPLIED | Base Fare : {}, Final Fare : {}", baseFare,finalFare);
     }
 }

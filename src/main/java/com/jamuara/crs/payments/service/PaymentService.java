@@ -5,22 +5,20 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.common.repository.PaymentRepository;
 import com.jamuara.crs.common.service.ReservationService;
+import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.enums.CallbackResult;
 import com.jamuara.crs.enums.PaymentStatus;
 import com.jamuara.crs.flight.dto.tbo.book.FetchBookingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
-import com.jamuara.crs.flight.service.FlightBookingAsyncService;
 import com.jamuara.crs.flight.service.TboFlightService;
 import com.jamuara.crs.model.Payment;
 import com.jamuara.crs.model.Reservation;
 import com.jamuara.crs.payments.dto.InitiatePaymentRequestDto;
-import jakarta.ws.rs.BadRequestException;
 import jakarta.ws.rs.NotFoundException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.oauth2.jwt.Jwt;
@@ -31,7 +29,6 @@ import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Service
 @Slf4j
@@ -68,7 +65,7 @@ public class PaymentService {
 
         String txnid = UUID.randomUUID().toString().replace("-", "").substring(0, 20);
         String amount = dto.getAmount();
-        String productinfo = "flight_ticket";
+        String productinfo = dto.getBookingType().toString();
         String firstname = dto.getFirstName();
         String phone = dto.getPhone();
         String udf1 = "";
@@ -84,9 +81,9 @@ public class PaymentService {
         String hash = generateHash(hashString);
 
 //        caching the booking request data to later book flight
-        cacheBookingIntent(dto.getBookingTicketingRequest(), txnid);
+        cacheBookingIntent(dto, txnid);
 
-        createPayment(amount, txnid);
+        createPayment(amount, txnid, dto.getBookingType());
 
         Map<String, Object> response = new HashMap<>();
             response.put("key", key);
@@ -160,6 +157,8 @@ public class PaymentService {
             log.error("hash validation failed");
             return CallbackResult.INVALID_HASH;
 //            throw new BadRequestException("invalid hash received from payu, possible tampering");
+        } else {
+            log.info("hash verified successfully");
         }
 
         String payuStatus = req.get("status");
@@ -170,17 +169,19 @@ public class PaymentService {
                 p.setFailureReason("PAYU_STATUS_" + payuStatus);
                 paymentRepository.save(p);
             }
+            log.error("payment failed from payu: {}", payuStatus);
             return CallbackResult.ERROR;
         }
 
         if (p.getStatus() == PaymentStatus.SUCCESS) {
-            log.info("payment exist already, moving on");
+            log.info("payment already exists, moving on");
             return CallbackResult.ALREADY_PROCESSED;
         }
 
         log.info("marking payment as successful");
         p.setStatus(PaymentStatus.SUCCESS);
         p.setPayuTxnid(req.get("mihpayid"));
+        p.setBookingStatus(Payment.PaymentBookingStatus.PENDING);
 
         try {
             p.setPayuResponse(objectMapper.writeValueAsString(req));
@@ -260,6 +261,7 @@ public class PaymentService {
 //    }
 
     public PaymentStatus getpaymentStatus(String txnid) {
+        log.info("fetching payment status for txnid: {}", txnid);
         Payment p = findPaymentByTxnid(txnid);
 
         return p.getStatus();
@@ -297,16 +299,26 @@ public class PaymentService {
             throw new RuntimeException(e);
         }
     }
-    public void cacheBookingIntent(FlightBookingTicketingRequest request, String txnid) {
-        cacheManager.getCache("bookingIntent").put(txnid, request);
+    public void cacheBookingIntent(InitiatePaymentRequestDto request, String txnid) {
+
+        if(request.getBookingType() == BookingType.FLIGHT) {
+            log.info("caching flight book request: {}", request.getBookingRequest());
+            FlightBookingTicketingRequest bookingRequest = (FlightBookingTicketingRequest) request.getBookingRequest();
+            cacheManager.getCache("bookingIntent").put(txnid, bookingRequest);
+        } else if(request.getBookingType() == BookingType.HOTEL) {
+            log.info("caching hotel book request: {}", request.getBookingRequest());
+            cacheManager.getCache("bookingIntent").put(txnid, request.getBookingRequest());
+        }
     }
 
-    public void createPayment(String amount, String txnid) {
+    public void createPayment(String amount, String txnid, BookingType bookingType) {
+        log.info("creating payment record in database for txnid: {}", txnid);
         Payment p = new Payment();
         p.setAmount(amount);
         p.setStatus(PaymentStatus.PENDING);
         p.setTxnid(txnid);
         p.setBookingStatus(Payment.PaymentBookingStatus.PENDING);
+        p.setBookingType(bookingType);
 
         paymentRepository.save(p);
     }

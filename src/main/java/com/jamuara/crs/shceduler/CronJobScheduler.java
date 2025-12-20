@@ -7,7 +7,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
-@Profile("ec2")
+//@Profile("ec2")
 public class CronJobScheduler {
 
     @Autowired

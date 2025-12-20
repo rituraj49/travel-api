@@ -131,7 +131,7 @@ public class HotelService implements IHotelService {
 //        HotelOrder response = amadeusClient.booking.hotelOrders.post(body);
 //        return response.getResponse().getBody();
         JsonObject jsonObject = gson.toJsonTree(body).getAsJsonObject();
-        System.out.println("body for booking: " + jsonObject);
+        log.info("hotel booking request body : {}", jsonObject);
         HotelOrder hotelOrder = amadeusClient.booking.hotelOrders.post(jsonObject);
 //        return hotelOrder;
         String gsonJson = gson.toJson(hotelOrder);

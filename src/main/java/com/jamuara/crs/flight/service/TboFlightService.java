@@ -561,10 +561,11 @@ public class TboFlightService {
         String arrTime = fetchedFlight.getTicketBookingDetails().getFlightDetails().getFlightLegs().get(0).getArrivalDateTime();
         String depTime = fetchedFlight.getTicketBookingDetails().getFlightDetails().getFlightLegs().get(0).getDepartureDateTime();
 //        return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
-        saveBookingToDb(fetchedFlight, bookingRequest, response.getBody());
 
         //  APPLY MARKUP HERE
         dynamicPricingService.applyMarkupOnFetchBooking(fetchedFlight);
+
+        saveBookingToDb(fetchedFlight, bookingRequest, response.getBody());
 
         return fetchedFlight;
     }
@@ -604,15 +605,25 @@ public class TboFlightService {
 
        // return tboFetchFlightBookingResponseMapper.toFetchFlightBookingResponse(response.getBody());
 
-        //  1. MAP RESPONSE
         FetchFlightBookingResponse fetchedFlight =
                 tboFetchFlightBookingResponseMapper
                         .toFetchFlightBookingResponse(response.getBody());
 
-        //  2. APPLY MARKUP ON FINAL FARE (SAFE & CONDITIONAL)
-        dynamicPricingService.applyMarkupOnFetchBooking(fetchedFlight);
+        Reservation reservation = reservationService.findByBookingId(fetchedFlight.getTicketBookingDetails().getBookingId());
+        FetchFlightBookingResponse.TicketFare ticketFare = fetchedFlight.getTicketBookingDetails().getFlightDetails().getTicketFare();
+        double totalBaseAmount = Double.parseDouble(ticketFare.getTotalBaseFareAmount()) + Double.parseDouble(ticketFare.getTotalTaxAmount());
 
-        //  3. RETURN UPDATED RESPONSE
+        if(Double.parseDouble(reservation.getPrice()) > totalBaseAmount) {
+            double newBaseFare = Double.parseDouble(reservation.getPrice()) - totalBaseAmount;
+            System.out.println("new base fare: " + newBaseFare);
+            fetchedFlight.getTicketBookingDetails()
+                    .getFlightDetails().getTicketFare()
+                    .setTotalBaseFareAmount(String.valueOf(newBaseFare));
+        }
+
+        fetchedFlight.getTicketBookingDetails().getFlightDetails().getTicketFare().setPublishedFare(reservation.getPrice());
+//        dynamicPricingService.applyMarkupOnFetchBooking(fetchedFlight);
+
         return fetchedFlight;
     }
 
@@ -638,18 +649,18 @@ public class TboFlightService {
         TboApiFlightTicketResponseDto ticketResponseDto = response.getBody();
         TboApiFlightTicketResponseDto.BookingResponseWrapper wrapper = ticketResponseDto.getResponse();
 
-        String errorMessage =
+        TboApiFlightTicketResponseDto.ErrorResponse error =
             Optional.ofNullable(wrapper)
                 .map(TboApiFlightTicketResponseDto.BookingResponseWrapper::getError)
-                .map(TboApiFlightTicketResponseDto.ErrorResponse::getErrorMessage)
+//                .map(TboApiFlightTicketResponseDto.ErrorResponse::getErrorMessage)
                     .orElse(null);
 //                .filter(msg -> !msg.isBlank())
 //                .ifPresent((msg) -> {
 //                    throw new RuntimeException(msg);
 //                });
 
-        if(errorMessage != null) {
-            throw new Exception("TBO_ERROR: " + errorMessage);
+        if(error != null && error.getErrorCode() != 0) {
+            throw new Exception("TBO_ERROR: [" + error.getErrorCode() + "]: " + error.getErrorMessage());
         }
 
          return tboFlightTicketMapper.toFlightTicketResponse(response.getBody());
@@ -660,12 +671,6 @@ public class TboFlightService {
 
         Reservation reservation = reservationService.findByBookingId(bookingId);
 
-//        Map<String, Object> reqBody = new HashMap<>();
-//        reqBody.put("EndUserIp", "192.168.97.10");
-//        reqBody.put("TokenId", TboAuthService.getToken());
-//        reqBody.put("PNR",  reservation.getPnr());
-//        reqBody.put("BookingId", reservation.getBookingId());
-
         FlightTicketRequestNonLcc reqBody = new FlightTicketRequestNonLcc();
         reqBody.setBookingId(reservation.getBookingId());
         reqBody.setPnr(reservation.getPnr());
@@ -675,9 +680,11 @@ public class TboFlightService {
         if(flight.getTicketBookingDetails().getTicketStatus() == TicketStatus.Successful) {
             reservation.setBookingStatus(status);
             reservationService.saveReservation(reservation);
+            log.info("reservation status successfully");
+        } else {
+            log.info("ticket status from tbo: {}", flight.getTicketBookingDetails().getTicketStatus());
         }
 
-        log.info("reservation status updated successfully");
     }
 
     public void emitFlightBookingEvent(List<FetchFlightBookingResponse> bookings) throws MessagingException, IOException {

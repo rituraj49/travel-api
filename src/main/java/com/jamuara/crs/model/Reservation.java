@@ -72,6 +72,10 @@ public class Reservation {
     @EqualsAndHashCode.Exclude
     private Payment payment;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_profile_id", nullable = true)
+    private UserProfile userProfile;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

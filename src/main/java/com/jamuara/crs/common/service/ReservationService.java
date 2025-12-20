@@ -8,6 +8,8 @@ import com.jamuara.crs.common.repository.ReservationRepository;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.TboApiFetchFlightBookingResponseDto;
 import com.jamuara.crs.model.Reservation;
+import com.jamuara.crs.model.UserProfile;
+import com.jamuara.crs.profile.repository.UserProfileRepository;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,6 +34,9 @@ import java.util.Optional;
 public class ReservationService {
     @Autowired
     private ReservationRepository reservationRepository;
+
+    @Autowired
+    private UserProfileRepository userProfileRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -77,9 +82,9 @@ public class ReservationService {
         Reservation res = reservationRepository.findReservationByBookingId(bookingId)
                 .orElseThrow(() -> new NotFoundException("Reservation not found"));
 
-        if(res == null) {
-            throw new NotFoundException("reservation not found");
-        }
+//        if(res == null) {
+//            throw new NotFoundException("reservation not found");
+//         }
 
         return res;
     }
@@ -105,15 +110,17 @@ public class ReservationService {
                 ? Reservation.BookingStatus.CONFIRM
                 : Reservation.BookingStatus.PENDING;
 
-        String userId = "";
+        String kcUserId = null;
+        UserProfile userProfile = null;
         if(Helper.isUserAuthenticated()) {
             Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-            if(jwt != null) userId = jwt.getClaim("sub");
+            if(jwt != null) kcUserId = jwt.getClaim("sub");
+            if(kcUserId != null) userProfile = userProfileRepository.findByKcUserId(kcUserId);
         }
 //        System.out.println(jwt.getClaims().toString());
 
-
-        res.setKcUserId(userId);
+        res.setUserProfile(userProfile);
+        res.setKcUserId(kcUserId);
         res.setBookingStatus(status);
         res.setBookingRequest(objectMapper.writeValueAsString(bookingRequest));
         res.setBookingResponse(objectMapper.writeValueAsString(rawResponse));

@@ -2,10 +2,9 @@ package com.jamuara.crs.payments.controller;
 
 import com.jamuara.crs.enums.CallbackResult;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
-import com.jamuara.crs.flight.service.FlightBookingAsyncService;
+import com.jamuara.crs.flight.service.BookingAsyncService;
 import com.jamuara.crs.payments.dto.InitiatePaymentRequestDto;
 import com.jamuara.crs.payments.service.PaymentService;
-import jakarta.ws.rs.QueryParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -27,7 +26,7 @@ public class PaymentController {
     private PaymentService paymentService;
 
     @Autowired
-    FlightBookingAsyncService flightBookingAsyncService;
+    BookingAsyncService bookingAsyncService;
 
     @Value("${frontend.host.url}")
     String frontendUrl;
@@ -109,7 +108,7 @@ public class PaymentController {
     log.info("webhook success request body received: {}", requestBody.toString());
         CallbackResult response = paymentService.processPayment(requestBody);
         if(response == CallbackResult.SUCCESS) {
-            flightBookingAsyncService.triggerFlightBookingAsync(requestBody.get("txnid"));
+            bookingAsyncService.triggerBookingAsync(requestBody.get("txnid"));
             return ResponseEntity.ok("payment processed successfully!");
         }
 
@@ -171,7 +170,7 @@ public class PaymentController {
 
         CallbackResult response = paymentService.processPayment(requestBody);
         if(response == CallbackResult.SUCCESS) {
-            flightBookingAsyncService.triggerFlightBookingAsync(requestBody.get("txnid"));
+            bookingAsyncService.triggerBookingAsync(requestBody.get("txnid"));
             return ResponseEntity.ok("payment processed successfully!");
         }
 

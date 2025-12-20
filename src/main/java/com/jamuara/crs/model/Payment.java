@@ -1,6 +1,7 @@
 package com.jamuara.crs.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.enums.PaymentStatus;
 import jakarta.persistence.*;
 import lombok.Data;
@@ -25,6 +26,8 @@ public class Payment {
     private String txnid;
 
     private String payuTxnid;
+
+    private BookingType bookingType;
 
     @Enumerated(EnumType.STRING)
     private PaymentStatus status;

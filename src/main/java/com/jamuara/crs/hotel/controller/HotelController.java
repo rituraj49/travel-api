@@ -146,7 +146,7 @@ public class HotelController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<?> bookHotelV2(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> bookHotel(@RequestBody Map<String, Object> body) {
         try {
             JsonNode response = hotelService.bookHotel(body);
             return ResponseEntity.ok()

@@ -1,10 +1,13 @@
 package com.jamuara.crs.flight.service;
 
+import com.amadeus.exceptions.ResponseException;
 import com.jamuara.crs.common.repository.PaymentRepository;
 import com.jamuara.crs.common.service.ReservationService;
+import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.enums.PaymentStatus;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
+import com.jamuara.crs.hotel.service.HotelService;
 import com.jamuara.crs.model.Payment;
 import com.jamuara.crs.model.Reservation;
 import com.jamuara.crs.payments.service.PaymentService;
@@ -17,11 +20,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
 @Slf4j
-public class FlightBookingAsyncService {
+public class BookingAsyncService {
     @Autowired
     private TboFlightService tboFlightService;
 
@@ -29,17 +33,21 @@ public class FlightBookingAsyncService {
     private PaymentService paymentService;
 
     @Autowired
-    private PaymentRepository paymentRepository;
+    private ReservationService reservationService;
 
     @Autowired
-    private ReservationService reservationService;
+    private HotelService hotelService;
+
+    @Autowired
+    private PaymentRepository paymentRepository;
+
 
     @Autowired
     private CacheManager cacheManager;
 
     @Async
     @Transactional
-    public void triggerFlightBookingAsync(String txnid) {
+    public void triggerBookingAsync(String txnid) {
         Payment p = paymentService.findPaymentByTxnid(txnid);
         p.setBookingStatus(Payment.PaymentBookingStatus.IN_PROGRESS);
         paymentRepository.save(p);
@@ -48,16 +56,26 @@ public class FlightBookingAsyncService {
 
         Cache.ValueWrapper wrapper = cache.get(txnid);
 
-        try {
+        if(p.getBookingType() == BookingType.FLIGHT) {
             FlightBookingTicketingRequest bookingIntent =
                     wrapper != null ? (FlightBookingTicketingRequest) wrapper.get() : null;
+            triggerFlightBooking(bookingIntent, p);
+        } else if(p.getBookingType() == BookingType.HOTEL) {
+            Map<String, Object> bookingIntent = wrapper != null ? (Map<String, Object>) wrapper.get() : null;
+            log.info("cached booking intent found: {}", wrapper.get().toString());
+            triggerHotelBooking(bookingIntent);
+        }
+    }
 
-            if(bookingIntent == null) {
-                throw new IllegalStateException("Booking intent missing for txn id: " + txnid);
+    public void triggerFlightBooking(FlightBookingTicketingRequest bookingTicketingRequest, Payment p) {
+        try {
+
+            if(bookingTicketingRequest == null) {
+                throw new IllegalStateException("Booking intent missing for txn id: " + p.getTxnid());
             }
 
             List<FetchFlightBookingResponse> bookings = null;
-                bookings = tboFlightService.flightBookAndTicket(bookingIntent);
+            bookings = tboFlightService.flightBookAndTicket(bookingTicketingRequest);
 
             log.info("bookings created after successful payment");
             p.setBookingStatus(Payment.PaymentBookingStatus.SUCCESS);
@@ -82,7 +100,16 @@ public class FlightBookingAsyncService {
 
                 paymentRepository.save(p);
             }
-            log.error("error while flight booking with txnid {} : {}", txnid, e.getMessage());
+            log.error("error while flight booking with txnid {} : {}", p.getTxnid(), e.getMessage());
+        }
+    }
+
+    public void triggerHotelBooking(Map<String, Object> hotelBookingRequest) {
+        try {
+            hotelService.bookHotel(hotelBookingRequest);
+        } catch(Exception e) {
+            e.printStackTrace();
+            log.error("error while booking hotel: {}", e.getMessage());
         }
     }
 }

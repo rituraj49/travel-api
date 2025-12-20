@@ -1,7 +1,10 @@
 package com.jamuara.crs.payments.dto;
 
+import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import lombok.Data;
+
+import java.util.Map;
 
 @Data
 public class InitiatePaymentRequestDto {
@@ -13,5 +16,7 @@ public class InitiatePaymentRequestDto {
 
     private String phone;
 
-    private FlightBookingTicketingRequest bookingTicketingRequest;
+    private BookingType bookingType;
+
+    private Map<String, Object> bookingRequest;
 }
