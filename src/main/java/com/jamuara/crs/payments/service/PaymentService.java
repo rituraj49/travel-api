@@ -8,6 +8,7 @@ import com.jamuara.crs.common.service.ReservationService;
 import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.enums.CallbackResult;
 import com.jamuara.crs.enums.PaymentStatus;
+import com.jamuara.crs.flight.dto.FlightBookingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FetchBookingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
@@ -303,7 +304,8 @@ public class PaymentService {
 
         if(request.getBookingType() == BookingType.FLIGHT) {
             log.info("caching flight book request: {}", request.getBookingRequest());
-            FlightBookingTicketingRequest bookingRequest = (FlightBookingTicketingRequest) request.getBookingRequest();
+//            FlightBookingTicketingRequest bookingRequest = (FlightBookingTicketingRequest) request.getBookingRequest();
+            FlightBookingRequest bookingRequest = (FlightBookingRequest) request.getBookingRequest();
             cacheManager.getCache("bookingIntent").put(txnid, bookingRequest);
         } else if(request.getBookingType() == BookingType.HOTEL) {
             log.info("caching hotel book request: {}", request.getBookingRequest());

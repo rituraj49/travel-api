@@ -5,6 +5,8 @@ import com.jamuara.crs.common.repository.PaymentRepository;
 import com.jamuara.crs.common.service.ReservationService;
 import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.enums.PaymentStatus;
+import com.jamuara.crs.flight.dto.FlightBookingRequest;
+import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import com.jamuara.crs.hotel.service.HotelService;
@@ -28,6 +30,9 @@ import java.util.stream.Collectors;
 public class BookingAsyncService {
     @Autowired
     private TboFlightService tboFlightService;
+
+    @Autowired
+    private AmadeusFlightService amadeusFlightService;
 
     @Autowired
     private PaymentService paymentService;
@@ -57,8 +62,10 @@ public class BookingAsyncService {
         Cache.ValueWrapper wrapper = cache.get(txnid);
 
         if(p.getBookingType() == BookingType.FLIGHT) {
-            FlightBookingTicketingRequest bookingIntent =
-                    wrapper != null ? (FlightBookingTicketingRequest) wrapper.get() : null;
+//            FlightBookingTicketingRequest bookingIntent =
+//                    wrapper != null ? (FlightBookingTicketingRequest) wrapper.get() : null;
+            FlightBookingRequest bookingIntent = wrapper != null ? (FlightBookingRequest) wrapper.get() : null;
+
             triggerFlightBooking(bookingIntent, p);
         } else if(p.getBookingType() == BookingType.HOTEL) {
             Map<String, Object> bookingIntent = wrapper != null ? (Map<String, Object>) wrapper.get() : null;
@@ -67,9 +74,8 @@ public class BookingAsyncService {
         }
     }
 
-    public void triggerFlightBooking(FlightBookingTicketingRequest bookingTicketingRequest, Payment p) {
+    public void triggerFlightBookingTbo(FlightBookingTicketingRequest bookingTicketingRequest, Payment p) {
         try {
-
             if(bookingTicketingRequest == null) {
                 throw new IllegalStateException("Booking intent missing for txn id: " + p.getTxnid());
             }
@@ -91,6 +97,41 @@ public class BookingAsyncService {
                     reservationService.saveReservation(res);
                 }
             });
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            if(e.getMessage().contains("TBO_ERROR")) {
+                p.setBookingStatus(Payment.PaymentBookingStatus.FAILURE);
+                p.setBookingFailureReason(e.getMessage());
+
+                paymentRepository.save(p);
+            }
+            log.error("error while flight booking with txnid {} : {}", p.getTxnid(), e.getMessage());
+        }
+    }
+
+    public void triggerFlightBooking(FlightBookingRequest bookingTicketingRequest, Payment p) {
+        try {
+            if(bookingTicketingRequest == null) {
+                throw new IllegalStateException("Booking intent missing for txn id: " + p.getTxnid());
+            }
+
+            FlightBookingResponse booking = null;
+            booking = amadeusFlightService.createFlightOrder(bookingTicketingRequest);
+
+            log.info("bookings created after successful payment");
+            p.setBookingStatus(Payment.PaymentBookingStatus.SUCCESS);
+            Reservation reservation = reservationService
+                    .findByBookingId(booking.getOrderId());
+
+//            reservations.forEach(res -> {
+//                if(p.getStatus().equals(PaymentStatus.SUCCESS)) {
+                    log.info("setting payment into reservation");
+                    reservation.setPayment(p);
+//                    p.getReservations().add(res);
+//                    reservationService.saveReservation(res);
+//                }
+//            });
 
         } catch (Exception e) {
             e.printStackTrace();

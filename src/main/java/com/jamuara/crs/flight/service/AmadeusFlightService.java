@@ -157,7 +157,7 @@ public class AmadeusFlightService implements IFlightService {
         bookingResponse.getFlightOffer().setPricingAdditionalInfo(null);
 //        emitFlightBookingEvent(bookingResponse);
 
-        reservationService.createReservation(bookingResponse);
+        reservationService.createReservation(bookingResponse, order, flightOrderRequest);
         userLogsService.createUserLogs(flightOrderRequest,bookingResponse);
         log.info("flight booking confirmed with id: {}", bookingResponse.getOrderId());
         return bookingResponse;

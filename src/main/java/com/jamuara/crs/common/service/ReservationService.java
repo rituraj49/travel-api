@@ -1,12 +1,15 @@
 package com.jamuara.crs.common.service;
 
+import com.amadeus.resources.FlightOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jamuara.crs.common.Helper;
+import com.jamuara.crs.flight.dto.FlightBookingRequest;
 import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.common.repository.ReservationRepository;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.TboApiFetchFlightBookingResponseDto;
+import com.jamuara.crs.flight.mapper.AmadeusFlightReservationMapper;
 import com.jamuara.crs.model.Reservation;
 import com.jamuara.crs.model.UserProfile;
 import com.jamuara.crs.profile.repository.UserProfileRepository;
@@ -44,34 +47,55 @@ public class ReservationService {
     @Autowired
     private ReservationMapper reservationMapper;
 
+    @Autowired
+    private AmadeusFlightReservationMapper amadeusFlightReservationMapper;
+
     public void saveReservation(String bookingId, String price, String currencyCode, String source, String destination, String traveler_name, String email, String phoneNo , Reservation.BookingStatus bookingStatus, String bookingResponseJson){
 //        Reservation reservation = new Reservation(bookingId,price,currencyCode,source,destination,traveler_name,email,phoneNo,bookingStatus,bookingResponseJson);
 //        reservationRepository.save(reservation);
     }
 
-    public void createReservation(FlightBookingResponse bookingResponse) throws JsonProcessingException {
-        String bookingId = bookingResponse.getOrderId();
-        bookingId = URLDecoder.decode(bookingId, StandardCharsets.UTF_8);
-        String price = bookingResponse.getFlightOffer().getTotalPrice();
-        String currencyCode = bookingResponse.getFlightOffer().getCurrencyCode();
-        String source = bookingResponse.getFlightOffer().getTrips().get(0).getFrom();
+    public void createReservation(FlightBookingResponse bookingResponse, FlightOrder order, FlightBookingRequest request) throws JsonProcessingException {
+        Reservation res = amadeusFlightReservationMapper.toReservation(bookingResponse, bookingResponse.getFlightOffer(), bookingResponse.getFlightOffer().getTrips().get(0));
+
+        Reservation.BookingStatus status = Reservation.BookingStatus.CONFIRM;
+
+        String kcUserId = null;
+        UserProfile userProfile = null;
+        if(Helper.isUserAuthenticated()) {
+            Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(jwt != null) kcUserId = jwt.getClaim("sub");
+            if(kcUserId != null) userProfile = userProfileRepository.findByKcUserId(kcUserId);
+        }
+//        System.out.println(jwt.getClaims().toString());
+
+        res.setUserProfile(userProfile);
+        res.setKcUserId(kcUserId);
+        res.setBookingStatus(status);
+        res.setBookingRequest(objectMapper.writeValueAsString(request));
+        res.setBookingResponse(objectMapper.writeValueAsString(order));
+
+//        String bookingId = bookingResponse.getOrderId();
+////        bookingId = URLDecoder.decode(bookingId, StandardCharsets.UTF_8);
+//        String price = bookingResponse.getFlightOffer().getTotalPrice();
+//        String currencyCode = bookingResponse.getFlightOffer().getCurrencyCode();
+//        String source = bookingResponse.getFlightOffer().getTrips().get(0).getFrom();
 
         //for multi city search
-        int legs = bookingResponse.getFlightOffer().getTrips().size();
+//        int legs = bookingResponse.getFlightOffer().getTrips().size();
 
-        String destination=null;
-        if(legs>1) {
-            destination=bookingResponse.getFlightOffer().getTrips().get(legs-1).getTo();
-        } else {
-            destination=bookingResponse.getFlightOffer().getTrips().get(0).getTo();
-        }
+//        String destination=null;
+//        if(legs>1) {
+//            destination=bookingResponse.getFlightOffer().getTrips().get(legs-1).getTo();
+//        } else {
+//            destination=bookingResponse.getFlightOffer().getTrips().get(0).getTo();
+//        }
         //String destination=bookingResponse.getFlightOffer().getTrips().get(0).getTo();
-        String travelerName = bookingResponse.getTravelers().get(0).getFirstName()+" "+bookingResponse.getTravelers().get(0).getLastName();
-        String email = bookingResponse.getTravelers().get(0).getEmail();
-        String phoneNo = bookingResponse.getTravelers().get(0).getPhones().get(0).getNumber();
-        Reservation.BookingStatus bookingStatus = Reservation.BookingStatus.CONFIRM;
-        String bookingResponseJson = objectMapper.writeValueAsString(bookingResponse);
-        saveReservation(bookingId,price,currencyCode,source,destination,travelerName,email,phoneNo,bookingStatus,bookingResponseJson);
+//        String travelerName = bookingResponse.getTravelers().get(0).getFirstName()+" "+bookingResponse.getTravelers().get(0).getLastName();
+//        String email = bookingResponse.getTravelers().get(0).getEmail();
+//        String phoneNo = bookingResponse.getTravelers().get(0).getPhones().get(0).getNumber();
+//        Reservation.BookingStatus bookingStatus = Reservation.BookingStatus.CONFIRM;
+//        String bookingResponseJson = objectMapper.writeValueAsString(bookingResponse);
     }
 //
 //    public List<Reservation> findAllReservationByName(String name) {
@@ -84,7 +108,7 @@ public class ReservationService {
 
 //        if(res == null) {
 //            throw new NotFoundException("reservation not found");
-//         }
+//        }
 
         return res;
     }
