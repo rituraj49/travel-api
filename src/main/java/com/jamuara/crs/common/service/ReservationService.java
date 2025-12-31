@@ -13,6 +13,7 @@ import com.jamuara.crs.flight.mapper.AmadeusFlightReservationMapper;
 import com.jamuara.crs.model.Reservation;
 import com.jamuara.crs.model.UserProfile;
 import com.jamuara.crs.profile.repository.UserProfileRepository;
+import com.jamuara.crs.profile.service.UserProfileService;
 import jakarta.transaction.Transactional;
 import jakarta.ws.rs.NotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -39,7 +40,7 @@ public class ReservationService {
     private ReservationRepository reservationRepository;
 
     @Autowired
-    private UserProfileRepository userProfileRepository;
+    private UserProfileService userProfileService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -65,7 +66,7 @@ public class ReservationService {
         if(Helper.isUserAuthenticated()) {
             Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if(jwt != null) kcUserId = jwt.getClaim("sub");
-            if(kcUserId != null) userProfile = userProfileRepository.findByKcUserId(kcUserId);
+            if(kcUserId != null) userProfile = userProfileService.findUserByKcUserId(kcUserId);
         }
 //        System.out.println(jwt.getClaims().toString());
 
@@ -139,7 +140,7 @@ public class ReservationService {
         if(Helper.isUserAuthenticated()) {
             Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
             if(jwt != null) kcUserId = jwt.getClaim("sub");
-            if(kcUserId != null) userProfile = userProfileRepository.findByKcUserId(kcUserId);
+            if(kcUserId != null) userProfile = userProfileService.findUserByKcUserId(kcUserId);
         }
 //        System.out.println(jwt.getClaims().toString());
 

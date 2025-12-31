@@ -109,7 +109,7 @@ public class HotelService implements IHotelService {
 
         log.info("searching for hotel offers: {}", offerParams);
         HotelOfferSearch[] hotelOffers = amadeusClient.shopping.hotelOffersSearch.get(offerParams);
-        log.info("found hotel offers: {}", Arrays.toString(hotelOffers));
+        log.info("{} found hotel offers", hotelOffers.length);
 
         String json = gson.toJson(hotelOffers);
         HotelOfferResponse[] hotelOfferResponses = gson.fromJson(json, HotelOfferResponse[].class);

@@ -3,6 +3,7 @@ package com.jamuara.crs.profile.repository;
 import com.jamuara.crs.model.Payment;
 import com.jamuara.crs.model.UserProfile;
 import org.springframework.context.annotation.Profile;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -16,5 +17,20 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
             FROM UserProfile u
             WHERE u.kcUserId=:kcUserId
             """)
-    UserProfile findByKcUserId(@Param("kcUserId") String kcUserId);
+    Optional<UserProfile> findByKcUserId(@Param("kcUserId") String kcUserId);
+
+//    @Query("""
+//            SELECT DISTINCT u
+//            FROM UserProfile u
+//            LEFT JOIN FETCH u.reservations
+//            WHERE u.kcUserId=:kcUserId
+//            """)
+    @EntityGraph(attributePaths = {
+            "reservations"
+//            "reservations.travelers",
+//            "reservations.flightLegs",
+//            "reservations.payment"
+    })
+    @Query("select u from UserProfile u where u.kcUserId = :kcUserId")
+    Optional<UserProfile> findByKcUserIdWithAllRelations(String kcUserId);
 }

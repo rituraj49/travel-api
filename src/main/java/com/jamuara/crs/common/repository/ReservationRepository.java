@@ -28,7 +28,7 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
     Optional<Reservation> findReservationByBookingId(String id);
 
     @Query("""
-            SELECT DISTINCT r 
+            SELECT DISTINCT r
             FROM Reservation r
             LEFT JOIN FETCH r.travelers
             LEFT JOIN FETCH r.flightLegs

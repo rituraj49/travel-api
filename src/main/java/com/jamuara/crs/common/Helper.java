@@ -4,6 +4,8 @@ import com.jamuara.crs.common.location.dto.CityGroup;
 import com.jamuara.crs.common.location.dto.Location;
 import com.jamuara.crs.common.location.dto.LocationResponse;
 import com.jamuara.crs.enums.LocationType;
+import com.jamuara.crs.exceptions.UnauthorizedException;
+import com.jamuara.crs.model.UserProfile;
 import com.opencsv.bean.CsvToBean;
 import com.opencsv.bean.CsvToBeanBuilder;
 import jakarta.servlet.http.HttpServletRequest;
@@ -11,6 +13,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
@@ -172,6 +175,15 @@ public class Helper {
 
         return authentication != null && authentication.isAuthenticated() &&
                 !(authentication instanceof AnonymousAuthenticationToken);
+    }
+
+    public static String getAuthenticatedUserId() throws UnauthorizedException {
+        Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+        if(jwt != null) {
+            return jwt.getClaim("sub");
+        } else {
+            throw new UnauthorizedException("user not authorized");
+        }
     }
 
     public static String getApplicationUrl() {
