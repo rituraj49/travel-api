@@ -58,13 +58,21 @@ public class UserProfileService {
         userProfileDto.setEmail(userRep.getEmail());
         userProfileDto.setPhone(attrs.get("phone").get(0));
 
-        UserProfileDto.AddressDto addressDto = new UserProfileDto.AddressDto();
-        addressDto.setLine1(attrs.get("address.line1").get(0));
-        addressDto.setLine2(attrs.get("address.line2").get(0));
-        addressDto.setCity(attrs.get("address.city").get(0));
-        addressDto.setState(attrs.get("address.state").get(0));
-        addressDto.setCountry(attrs.get("address.country").get(0));
+//        UserProfileDto.AddressDto addressDto = new UserProfileDto.AddressDto();
+//        addressDto.setLine1(attrs.get("address.line1").get(0));
+//        addressDto.setLine2(attrs.get("address.line2").get(0));
+//        addressDto.setCity(attrs.get("address.city").get(0));
+//        addressDto.setState(attrs.get("address.state").get(0));
+//        addressDto.setCountry(attrs.get("address.country").get(0));
 //        addressDto.setZipCode(attrs.get("address.zip").get(0));
+
+        UserProfileDto.AddressDto addressDto = new UserProfileDto.AddressDto();
+        addressDto.setLine1(userProfile.getAddress().getLine1());
+        addressDto.setLine2(userProfile.getAddress().getLine2());
+        addressDto.setCity(userProfile.getAddress().getCity());
+        addressDto.setState(userProfile.getAddress().getState());
+        addressDto.setCountry(userProfile.getAddress().getCountry());
+        addressDto.setZipCode(userProfile.getAddress().getZipCode());
 
         userProfileDto.setAddress(addressDto);
 
