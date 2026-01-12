@@ -1,5 +1,6 @@
 package com.jamuara.crs.payments.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
 import lombok.Data;
@@ -18,5 +19,5 @@ public class InitiatePaymentRequestDto {
 
     private BookingType bookingType;
 
-    private Map<String, Object> bookingRequest;
+    private JsonNode bookingRequest;
 }

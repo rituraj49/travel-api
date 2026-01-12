@@ -3,6 +3,7 @@ package com.jamuara.crs.common.service;
 import com.amadeus.resources.FlightOrder;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.Gson;
 import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.flight.dto.FlightBookingRequest;
 import com.jamuara.crs.flight.dto.FlightBookingResponse;
@@ -73,9 +74,14 @@ public class ReservationService {
         res.setUserProfile(userProfile);
         res.setKcUserId(kcUserId);
         res.setBookingStatus(status);
-        res.setBookingRequest(objectMapper.writeValueAsString(request));
-        res.setBookingResponse(objectMapper.writeValueAsString(order));
+//        res.setBookingRequest(objectMapper.writeValueAsString(request));
+//        res.setBookingResponse(objectMapper.writeValueAsString(order));
 
+        Gson gson = new Gson();
+        res.setBookingRequest(gson.toJson(request));
+        res.setBookingResponse(gson.toJson(order));
+
+        reservationRepository.save(res);
 //        String bookingId = bookingResponse.getOrderId();
 ////        bookingId = URLDecoder.decode(bookingId, StandardCharsets.UTF_8);
 //        String price = bookingResponse.getFlightOffer().getTotalPrice();

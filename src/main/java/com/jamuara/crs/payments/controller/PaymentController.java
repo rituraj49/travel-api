@@ -1,6 +1,7 @@
 package com.jamuara.crs.payments.controller;
 
 import com.jamuara.crs.enums.CallbackResult;
+import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.service.BookingAsyncService;
 import com.jamuara.crs.payments.dto.InitiatePaymentRequestDto;
@@ -52,7 +53,7 @@ public class PaymentController {
         if(txnid.contains(",")) {
             txnidFinal = txnid.split(",")[0];
         }
-            String html = """
+        String html = """
             <html>
                 <body>
                     <script>
@@ -74,10 +75,10 @@ public class PaymentController {
         """.formatted(txnidFinal);
 */
 
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.TEXT_HTML)
-                    .body(html);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(html);
     }
 
     @PostMapping("/failure-redirect")
@@ -86,7 +87,7 @@ public class PaymentController {
 
         String txnid = req.get("txnid");
 
-            String html = """
+        String html = """
             <html>
             <h6>redirecting to bookings</h6>
                 <body>
@@ -97,15 +98,15 @@ public class PaymentController {
             </html>
         """.formatted(frontendUrl, txnid);
 
-            return ResponseEntity
-                    .ok()
-                    .contentType(MediaType.TEXT_HTML)
-                    .body(html);
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.TEXT_HTML)
+                .body(html);
     }
 
     @PostMapping("/success")
     public ResponseEntity<?> paymentSuccess(@RequestParam Map<String, String> requestBody) {
-    log.info("webhook success request body received: {}", requestBody.toString());
+        log.info("webhook success request body received: {}", requestBody.toString());
         CallbackResult response = paymentService.processPayment(requestBody);
         if(response == CallbackResult.SUCCESS) {
             bookingAsyncService.triggerBookingAsync(requestBody.get("txnid"));
@@ -165,7 +166,7 @@ public class PaymentController {
 
     @PostMapping("/test/success")
     public ResponseEntity<?> paymentSuccessTest(@RequestParam Map<String, String> requestBody) {
-    log.info("test webhook success request body received: {}", requestBody.toString());
+        log.info("test webhook success request body received: {}", requestBody.toString());
 //        try {
 
         CallbackResult response = paymentService.processPayment(requestBody);
@@ -232,7 +233,7 @@ public class PaymentController {
     @GetMapping("/bookings/{txnid}")
     public ResponseEntity<?> fetchBookingsByPayment(@PathVariable String txnid) {
         try {
-            List<FetchFlightBookingResponse> bookings = paymentService.fetchBookingsByPayment(txnid);
+            List<FlightBookingResponse> bookings = paymentService.fetchBookingsByPayment(txnid);
             log.info("found bookings: {}", bookings.size());
             return ResponseEntity.ok(bookings);
         } catch (Exception e) {

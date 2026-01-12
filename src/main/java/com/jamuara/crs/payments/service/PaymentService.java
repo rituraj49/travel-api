@@ -1,5 +1,6 @@
 package com.jamuara.crs.payments.service;
 
+import com.amadeus.exceptions.ResponseException;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.jamuara.crs.common.Helper;
@@ -9,9 +10,11 @@ import com.jamuara.crs.enums.BookingType;
 import com.jamuara.crs.enums.CallbackResult;
 import com.jamuara.crs.enums.PaymentStatus;
 import com.jamuara.crs.flight.dto.FlightBookingRequest;
+import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FetchBookingRequest;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
+import com.jamuara.crs.flight.service.AmadeusFlightService;
 import com.jamuara.crs.flight.service.TboFlightService;
 import com.jamuara.crs.model.Payment;
 import com.jamuara.crs.model.Reservation;
@@ -44,6 +47,9 @@ public class PaymentService {
     private TboFlightService tboFlightService;
 
     @Autowired
+    private AmadeusFlightService amadeusFlightService;
+
+    @Autowired
     private ReservationService reservationService;
 
     @Autowired
@@ -55,7 +61,7 @@ public class PaymentService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public Map<String, Object> createPaymentIntent(InitiatePaymentRequestDto dto) {
+    public Map<String, Object> createPaymentIntent(InitiatePaymentRequestDto dto) throws JsonProcessingException {
         String email = "";
         if(Helper.isUserAuthenticated()) {
             Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
@@ -87,21 +93,21 @@ public class PaymentService {
         createPayment(amount, txnid, dto.getBookingType());
 
         Map<String, Object> response = new HashMap<>();
-            response.put("key", key);
-            response.put("txnid", txnid);
-            response.put("amount", amount);
-            response.put("firstname", firstname);
-            response.put("email", email);
-            response.put("phone", phone);
-            response.put("productinfo", productinfo);
-            response.put("surl", Helper.getApplicationUrl() + "/payment/success-redirect?txnid="+txnid);
-            response.put("furl", Helper.getApplicationUrl() + "/payment/failure-redirect?txnid="+txnid);
-            //response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
-            //response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
-           // response.put("surl", "https://api.jamuarasoft.com/payment/test/success?txnid="+txnid);
-           // response.put("furl", "https://api.jamuarasoft.com/payment/test/failure?txnid="+txnid);
-             //response.put("surl", "https://localhost:8080/payment/test/success?txnid="+txnid);
-             //response.put("furl", "https://localhost:8080/payment/test/failure?txnid="+txnid);
+        response.put("key", key);
+        response.put("txnid", txnid);
+        response.put("amount", amount);
+        response.put("firstname", firstname);
+        response.put("email", email);
+        response.put("phone", phone);
+        response.put("productinfo", productinfo);
+        response.put("surl", Helper.getApplicationUrl() + "/payment/success-redirect?txnid="+txnid);
+        response.put("furl", Helper.getApplicationUrl() + "/payment/failure-redirect?txnid="+txnid);
+        //response.put("surl", "http://localhost:8080/payment/success?txnid="+txnid);
+        //response.put("furl", "http://localhost:8080/payment/failure?txnid="+txnid);
+        // response.put("surl", "https://api.jamuarasoft.com/payment/test/success?txnid="+txnid);
+        // response.put("furl", "https://api.jamuarasoft.com/payment/test/failure?txnid="+txnid);
+        //response.put("surl", "https://localhost:8080/payment/test/success?txnid="+txnid);
+        //response.put("furl", "https://localhost:8080/payment/test/failure?txnid="+txnid);
 
         response.put("hash", hash);
 
@@ -252,7 +258,7 @@ public class PaymentService {
 //            if(p.getStatus().equals(PaymentStatus.SUCCESS)) {
 //                log.info("setting payment into reservation");
 //                res.setPayment(p);
-////                reservationService.saveReservation(res);
+    ////                reservationService.saveReservation(res);
 //            }
 //        });
 //
@@ -268,7 +274,28 @@ public class PaymentService {
         return p.getStatus();
     }
 
-    public List<FetchFlightBookingResponse> fetchBookingsByPayment(String txnid) throws Exception {
+//    public List<FetchFlightBookingResponse> fetchBookingsByPayment(String txnid) throws Exception {
+//        log.info("fetching reservations for txnid: {}", txnid);
+//        Payment p = findPaymentByTxnid(txnid);
+//        List<Reservation> reservations = new ArrayList<>();
+//        if(p.getBookingStatus() == Payment.PaymentBookingStatus.SUCCESS) {
+//            reservations = reservationService.findReservationsByPaymentId(p.getId());
+//            System.out.println("found reservations: " + reservations.toString());
+//            if(reservations.isEmpty()) {
+//                log.info("no reservations found, returning empty list");
+//                return Collections.emptyList();
+//            }
+//
+//            return reservations.stream()
+//                    .map(r -> fetchSingleBooking(r.getBookingId())).toList();
+//        } else if (p.getBookingStatus() == Payment.PaymentBookingStatus.FAILURE) {
+//            throw new Exception(p.getFailureReason());
+//        } else {
+//            return Collections.emptyList();
+//        }
+//    }
+
+    public List<FlightBookingResponse> fetchBookingsByPayment(String txnid) throws Exception {
         log.info("fetching reservations for txnid: {}", txnid);
         Payment p = findPaymentByTxnid(txnid);
         List<Reservation> reservations = new ArrayList<>();
@@ -280,8 +307,15 @@ public class PaymentService {
                 return Collections.emptyList();
             }
 
-            return reservations.stream()
-                    .map(r -> fetchSingleBooking(r.getBookingId())).toList();
+            return reservations.stream().map(r -> {
+                try {
+                    return amadeusFlightService.fetchFlightOrder(r.getBookingId());
+                } catch (ResponseException e) {
+                    throw new RuntimeException(e);
+                }
+            }).toList();
+//            return reservations.stream()
+//                    .map(r -> fetchSingleBooking(r.getBookingId())).toList();
         } else if (p.getBookingStatus() == Payment.PaymentBookingStatus.FAILURE) {
             throw new Exception(p.getFailureReason());
         } else {
@@ -300,12 +334,13 @@ public class PaymentService {
             throw new RuntimeException(e);
         }
     }
-    public void cacheBookingIntent(InitiatePaymentRequestDto request, String txnid) {
+    public void cacheBookingIntent(InitiatePaymentRequestDto request, String txnid) throws JsonProcessingException {
 
         if(request.getBookingType() == BookingType.FLIGHT) {
             log.info("caching flight book request: {}", request.getBookingRequest());
 //            FlightBookingTicketingRequest bookingRequest = (FlightBookingTicketingRequest) request.getBookingRequest();
-            FlightBookingRequest bookingRequest = (FlightBookingRequest) request.getBookingRequest();
+//            FlightBookingRequest bookingRequest = (FlightBookingRequest) request.getBookingRequest();
+            FlightBookingRequest bookingRequest = objectMapper.treeToValue(request.getBookingRequest(), FlightBookingRequest.class);
             cacheManager.getCache("bookingIntent").put(txnid, bookingRequest);
         } else if(request.getBookingType() == BookingType.HOTEL) {
             log.info("caching hotel book request: {}", request.getBookingRequest());
