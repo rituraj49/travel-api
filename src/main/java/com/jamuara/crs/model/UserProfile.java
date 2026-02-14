@@ -3,14 +3,13 @@ package com.jamuara.crs.model;
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.jamuara.crs.profile.dto.UserProfileDto;
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.util.List;
 
+@Getter
+@Setter
 @Entity
-@Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class UserProfile {
@@ -26,8 +25,11 @@ public class UserProfile {
     @OneToMany(mappedBy = "userProfile", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private List<Reservation> reservations;
 
-    @Data
+    @Getter
+    @Setter
     @Embeddable
+    @AllArgsConstructor
+    @NoArgsConstructor
     public static class Address {
         private String line1;
         private String line2;
@@ -41,3 +43,4 @@ public class UserProfile {
         this.kcUserId = kcUserId;
     }
 }
+

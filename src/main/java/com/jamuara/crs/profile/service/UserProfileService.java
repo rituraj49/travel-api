@@ -48,7 +48,8 @@ public class UserProfileService {
         UserRepresentation userRep = existingUser.toRepresentation();
         UserProfile userProfile = fetchUserDetails(userId);
 
-        log.info("user attributes: {}", userRep.getAttributes().toString());
+        log.info("kc user id: {}", userId);
+//        log.info("user attributes: {}", userRep.getAttributes().toString());
         Map<String, List<String>> attrs = userRep.getAttributes();
 
         UserProfileDto userProfileDto = new UserProfileDto();

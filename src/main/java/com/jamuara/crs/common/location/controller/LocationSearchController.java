@@ -2,7 +2,9 @@ package com.jamuara.crs.common.location.controller;
 
 import com.amadeus.exceptions.ResponseException;
 import com.jamuara.crs.common.location.dto.LocationResponse;
+import com.jamuara.crs.common.location.dto.OSMLocationResponse;
 import com.jamuara.crs.common.location.service.ISearchService;
+import com.jamuara.crs.common.location.service.NominatimOpenStreetService;
 import com.jamuara.crs.es.ESService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -28,11 +30,14 @@ public class LocationSearchController {
 
     private final ESService esService;
 
+    private final NominatimOpenStreetService openStreetService;
+
 //    public LocationSearchController(@Qualifier("amadeusLocationService")ISearchService searchService, ESService esService) {
 //    public LocationSearchController(@Qualifier("amadeusOfflineService") ISearchService searchService, ESService esService) {
-    public LocationSearchController(ISearchService searchService, ESService esService) {
+    public LocationSearchController(ISearchService searchService, ESService esService, NominatimOpenStreetService openStreetService) {
         this.searchService = searchService;
         this.esService = esService;
+        this.openStreetService = openStreetService;
     }
 
     @Operation(summary = "Search for airports using in-memory Lucene index",
@@ -103,6 +108,18 @@ public class LocationSearchController {
             e.printStackTrace();
             log.error("Error occurred while searching locations: {}", e.getMessage());
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Failed to fetch data");
+        }
+    }
+
+    @GetMapping("osm/cities")
+    public ResponseEntity<?> searchCities(@RequestParam String keyword) {
+        try {
+            List<OSMLocationResponse> result = openStreetService.keywordSearch(keyword);
+            return ResponseEntity.status(HttpStatus.OK).body(result);
+        } catch (Exception e) {
+            e.printStackTrace();
+            log.error("Error occurred while searching open street maps nominatim api: {}", e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("failed to search city");
         }
     }
 }

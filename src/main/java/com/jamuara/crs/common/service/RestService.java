@@ -31,12 +31,15 @@ public class RestService {
             Object body,
             ParameterizedTypeReference<T> responseType
         ) {
-        log.info("Rest Template request body: " + body.toString());
+        if(body != null) {
+            log.info("Rest Template request body: {}", body.toString());
+        }
         HttpHeaders httpHeaders = new HttpHeaders();
 
         if(headers != null) {
             headers.forEach(httpHeaders::set);
         }
+//        httpHeaders.set("User-Agent", "Zenath App (dev8434@gmail.com)");
 
 //        if(username.isPresent() && password.isPresent()) {
 //            String auth = username + ":" + password;
@@ -48,7 +51,13 @@ public class RestService {
             httpHeaders.setContentType(MediaType.APPLICATION_JSON);
         }
 
-        HttpEntity<?> entity = new HttpEntity<>(body, httpHeaders);
+        HttpEntity<?> entity;
+
+        if(method == HttpMethod.GET) {
+            entity = new HttpEntity<>(httpHeaders);
+        } else {
+            entity = new HttpEntity<>(body, httpHeaders);
+        }
 
         try {
             ResponseEntity<T> res = restTemplate.exchange(url, method, entity, responseType);
