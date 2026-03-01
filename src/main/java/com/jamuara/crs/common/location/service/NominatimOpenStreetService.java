@@ -18,9 +18,9 @@ public class NominatimOpenStreetService {
         this.restService = restService;
     }
 
-    public List<OSMLocationResponse> keywordSearch(String keyword) {
+    public List<OSMLocationResponse> keywordSearch(String keyword, int limit) {
          org.springframework.http.ResponseEntity<List<OSMLocationResponse>> res = restService.sendRequest(
-                "https://nominatim.openstreetmap.org/search?format=json&q=" + keyword + "&limit=5",
+                "https://nominatim.openstreetmap.org/search?format=json&q=" + keyword + "&limit=" + limit,
                 HttpMethod.GET,
                 new HashMap<>(),
                 null,

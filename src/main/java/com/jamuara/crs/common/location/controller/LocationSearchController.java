@@ -111,10 +111,10 @@ public class LocationSearchController {
         }
     }
 
-    @GetMapping("osm/cities")
-    public ResponseEntity<?> searchCities(@RequestParam String keyword) {
+    @GetMapping("osm-search")
+    public ResponseEntity<?> searchCities(@RequestParam String keyword, @RequestParam(required = false, defaultValue = "5") int limit) {
         try {
-            List<OSMLocationResponse> result = openStreetService.keywordSearch(keyword);
+            List<OSMLocationResponse> result = openStreetService.keywordSearch(keyword, limit);
             return ResponseEntity.status(HttpStatus.OK).body(result);
         } catch (Exception e) {
             e.printStackTrace();

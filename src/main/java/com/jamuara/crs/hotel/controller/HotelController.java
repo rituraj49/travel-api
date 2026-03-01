@@ -11,6 +11,9 @@ import com.jamuara.crs.hotel.service.HotelService;
 import com.jamuara.crs.hotel.service.IHotelService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.media.Content;
+import io.swagger.v3.oas.annotations.media.Schema;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import jakarta.ws.rs.QueryParam;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -117,6 +120,19 @@ public class HotelController {
         }
     }
 
+    @Operation(
+            summary = "Search hotel offers",
+            description = "Returns hotel offers based on search criteria",
+            responses = {
+                    @ApiResponse(responseCode = "200",
+                            description = "Successful search",
+                            content = @Content(schema = @Schema(implementation = Object.class))),
+                    @ApiResponse(responseCode = "400",
+                            description = "Invalid request"),
+                    @ApiResponse(responseCode = "500",
+                            description = "Internal server error")
+            }
+    )
     @PostMapping("/offers")
     public ResponseEntity<?> hotelOffersSearch(@RequestBody HotelSearchRequestDto requestDto) {
         try {
