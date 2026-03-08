@@ -19,6 +19,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
@@ -94,27 +95,32 @@ public class HotelService implements IHotelService {
                 .limit(21)
                 .toArray(String[]::new);
 
-        Params offerParams = Params.with("hotelIds", Arrays.toString(hotelIds));
+        Params offerParams = Params.with("hotelIds", String.join(",",hotelIds));
         offerParams.and("adults", requestDto.getGuests());
         offerParams.and("checkInDate", requestDto.getCheckInDate());
         offerParams.and("checkOutDate", requestDto.getCheckOutDate());
         offerParams.and("countryOfResidence", requestDto.getResidenceCountry());
         offerParams.and("roomQuantity", requestDto.getRoomsQuantity());
         if(requestDto.getPriceRange() != null) {
-            offerParams.and("priceRange", requestDto.getRoomsQuantity());
+            offerParams.and("priceRange", requestDto.getPriceRange());
             offerParams.and("currency", requestDto.getCurrency());
         }
         offerParams.and("bestRateOnly", requestDto.isBestRateOnly());
         offerParams.and("lang", requestDto.getLang() != null ? requestDto.getLang() : "EN");
 
-        log.info("searching for hotel offers: {}", offerParams);
-        HotelOfferSearch[] hotelOffers = amadeusClient.shopping.hotelOffersSearch.get(offerParams);
-        log.info("{} found hotel offers", hotelOffers.length);
+        log.info("searching for hotel offers: {}", offerParams.get("hotelIds"));
+        try {
+            HotelOfferSearch[] hotelOffers = amadeusClient.shopping.hotelOffersSearch.get(offerParams);
+            log.info("{} found hotel offers", hotelOffers.length);
 
-        String json = gson.toJson(hotelOffers);
-        HotelOfferResponse[] hotelOfferResponses = gson.fromJson(json, HotelOfferResponse[].class);
+            String json = gson.toJson(hotelOffers);
+            HotelOfferResponse[] hotelOfferResponses = gson.fromJson(json, HotelOfferResponse[].class);
 
-        return Arrays.asList(hotelOfferResponses);
+            return Arrays.asList(hotelOfferResponses);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return new ArrayList<>();
     }
 
     public HotelOfferResponse getHotelOfferDetails(String hotelOfferId) throws ResponseException {

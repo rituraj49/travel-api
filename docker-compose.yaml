@@ -62,12 +62,12 @@ services:
 #      interval: 5s
 #      timeout: 5s
 #      retries: 20
-  hotel-spring:
-    container_name: hotel-service-backend
-    build:
-      context: .
-      dockerfile: Dockerfile
-#    image: rituraj49/hotel-service
+  spring-backend:
+    container_name: backend-service
+#    build:
+#      context: .
+#      dockerfile: Dockerfile
+    image: dev9431/backend-service
     restart: unless-stopped
     depends_on:
       - keycloak

@@ -36,6 +36,8 @@ public class UserProfile {
         private String city;
         private String state;
         private String country;
+
+        @Column(name = "zip_code")
         private String zipCode;
     }
 

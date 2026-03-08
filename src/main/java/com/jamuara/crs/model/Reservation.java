@@ -1,6 +1,7 @@
 package com.jamuara.crs.model;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import jakarta.persistence.CascadeType;
 import lombok.*;
@@ -74,6 +75,7 @@ public class Reservation {
 
     @ManyToOne(optional = true, fetch = FetchType.LAZY)
     @JoinColumn(name = "user_profile_id", nullable = true)
+    @JsonIgnore
     private UserProfile userProfile;
 
     @CreationTimestamp
