@@ -10,6 +10,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.jamuara.crs.currency.dto.Money;
+import com.jamuara.crs.currency.service.CurrencyService;
 import com.jamuara.crs.enums.Amenity;
 import com.jamuara.crs.hotel.dto.HotelSearchRequestDto;
 import com.jamuara.crs.hotel.mappers.HotelSearchResponseMapper;
@@ -34,6 +36,9 @@ public class HotelService implements IHotelService {
 
     @Autowired
     private Gson gson;
+
+    @Autowired
+    CurrencyService currencyService;
 
     public HotelService(Amadeus amadeusClient, HotelSearchResponseMapper searchResponseMapper) {
         this.amadeusClient = amadeusClient;
@@ -88,27 +93,32 @@ public class HotelService implements IHotelService {
             params.and("amenities", amenities.toArray());
         };
 
+        log.info("hotel offer params: {}", params.toString());
         Hotel[] hotels = amadeusClient.referenceData.locations.hotels.byCity.get(params);
 
         String[] hotelIds = Arrays.stream(hotels)
                 .map(Hotel::getHotelId)
-                .limit(21)
+                .limit(5)
                 .toArray(String[]::new);
 
         Params offerParams = Params.with("hotelIds", String.join(",",hotelIds));
         offerParams.and("adults", requestDto.getGuests());
         offerParams.and("checkInDate", requestDto.getCheckInDate());
         offerParams.and("checkOutDate", requestDto.getCheckOutDate());
-        offerParams.and("countryOfResidence", requestDto.getResidenceCountry());
-        offerParams.and("roomQuantity", requestDto.getRoomsQuantity());
-        if(requestDto.getPriceRange() != null) {
-            offerParams.and("priceRange", requestDto.getPriceRange());
+        offerParams.and("roomQuantity", requestDto.getRoomQuantity());
+        offerParams.and("bestRateOnly", requestDto.isBestRateOnly());
+//        offerParams.and("lang", requestDto.getLang() != null ? requestDto.getLang() : "EN");
+        if(requestDto.getCurrency() != null) {
             offerParams.and("currency", requestDto.getCurrency());
         }
-        offerParams.and("bestRateOnly", requestDto.isBestRateOnly());
-        offerParams.and("lang", requestDto.getLang() != null ? requestDto.getLang() : "EN");
+        if(requestDto.getResidenceCountry() != null) {
+            offerParams.and("countryOfResidence", requestDto.getResidenceCountry());
+        }
+        if(requestDto.getPriceRange() != null) {
+            offerParams.and("priceRange", requestDto.getPriceRange());
+        }
 
-        log.info("searching for hotel offers: {}", offerParams.get("hotelIds"));
+        log.info("searching for hotel offers: {}", offerParams.toString());
         try {
             HotelOfferSearch[] hotelOffers = amadeusClient.shopping.hotelOffersSearch.get(offerParams);
             log.info("{} found hotel offers", hotelOffers.length);
@@ -116,9 +126,25 @@ public class HotelService implements IHotelService {
             String json = gson.toJson(hotelOffers);
             HotelOfferResponse[] hotelOfferResponses = gson.fromJson(json, HotelOfferResponse[].class);
 
+            if(requestDto.getCurrency() != null) {
+                Arrays.stream(hotelOfferResponses)
+                    .flatMap(
+                    h -> h.getOffers().stream())
+                    .forEach(o -> {
+                        if(!requestDto.getCurrency().equals(o.getPrice().getCurrency())) {
+                            Money convertedMoney = currencyService.exchangeCurrency(
+                                o.getPrice().getCurrency(), requestDto.getCurrency(), o.getPrice().getTotal());
+
+                            // TODO: create a custom dto with original price and converted price fields
+                            o.getPrice().setCurrency(convertedMoney.getCurrency());
+                            o.getPrice().setTotal(convertedMoney.getAmount());
+                        }
+                });
+            }
             return Arrays.asList(hotelOfferResponses);
         } catch (Exception e) {
             e.printStackTrace();
+            log.error("something went wrong: {}", e.getMessage());
         }
         return new ArrayList<>();
     }

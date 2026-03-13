@@ -1,6 +1,5 @@
 package com.jamuara.crs.hotel.dto;
 
-import com.jamuara.crs.enums.Amenity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
 
@@ -49,7 +48,7 @@ public class HotelSearchRequestDto {
     @Schema(description = "Number of rooms",
             example = "1",
             requiredMode = Schema.RequiredMode.REQUIRED)
-    private int roomsQuantity;
+    private int roomQuantity;
 
     @Schema(description = "Price range (e.g. 100-300)",
             example = "100-300")
