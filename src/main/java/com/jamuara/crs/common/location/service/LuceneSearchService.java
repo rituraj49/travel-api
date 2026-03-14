@@ -13,13 +13,13 @@ import org.apache.lucene.analysis.Analyzer;
 import org.apache.lucene.analysis.miscellaneous.PerFieldAnalyzerWrapper;
 import org.apache.lucene.analysis.standard.StandardAnalyzer;
 import org.apache.lucene.document.Document;
-import org.apache.lucene.index.DirectoryReader;
-import org.apache.lucene.index.Term;
+import org.apache.lucene.index.*;
 import org.apache.lucene.queryparser.classic.MultiFieldQueryParser;
 import org.apache.lucene.queryparser.classic.ParseException;
 import org.apache.lucene.queryparser.classic.QueryParser;
 import org.apache.lucene.queryparser.classic.QueryParserBase;
 import org.apache.lucene.search.*;
+import org.apache.lucene.util.BytesRef;
 import org.springframework.context.annotation.Primary;
 import org.springframework.stereotype.Service;
 
@@ -41,17 +41,20 @@ public class LuceneSearchService implements ISearchService {
         this.luceneIndexInitializer = luceneIndexInitializer;
     }
 
+
     @Override
     public List<LocationResponse> keywordSearch(String keyword) {
         List<Location> results = new ArrayList<>();
 
+//        SearcherManager
         try (DirectoryReader reader = DirectoryReader.open(luceneIndexInitializer.getInMemoryIndex())) {
+//        try (SearcherManager manager = new SearcherManager(index)) {
             IndexSearcher searcher = new IndexSearcher(reader);
-            String[] edgeFields = {"name", "city"};
+            String[] edgeFields = {"name_search", "city_search"};
             Map<String, Float> boosts = new HashMap<>();
             boosts.put("city", 5.0f);
-            boosts.put("name", 2.0f);
             boosts.put("iata", 1.0f);
+            boosts.put("name", 2.0f);
 
             List<Query> exactQueries = List.of(
                     new TermQuery(new Term("iata", keyword.toLowerCase())),
@@ -67,32 +70,54 @@ public class LuceneSearchService implements ISearchService {
                             "icao", new IndexingKeywordAnalyzer(),
                             "city_code", new IndexingKeywordAnalyzer(),
                             "name", new SearchAnalyzer(),
-                            "name_autocomplete", new EdgeNGramAnalyzer(),
+//                            "name_autocomplete", new EdgeNGramAnalyzer(),
+                            "name_autocomplete", new SearchAnalyzer(),
                             "city", new SearchAnalyzer(),
-                            "city_autocomplete", new EdgeNGramAnalyzer()
+//                            "city_autocomplete", new EdgeNGramAnalyzer()
+                            "city_autocomplete", new SearchAnalyzer()
                     )
             );
-            MultiFieldQueryParser mfqParser = new MultiFieldQueryParser(edgeFields, perFieldAnalyzer);
+//            MultiFieldQueryParser mfqParser = new MultiFieldQueryParser(edgeFields, perFieldAnalyzer);
+//            MultiFieldQueryParser mfqParser = new MultiFieldQueryParser(edgeFields, perFieldAnalyzer, boosts);
+//            Query edgeQuery = mfqParser.parse(QueryParserBase.escape(keyword.toLowerCase()));
+//            mfqParser.setDefaultOperator(QueryParser.Operator.AND);
 
-            mfqParser.setDefaultOperator(QueryParser.Operator.AND);
+            QueryParser qParser = new MultiFieldQueryParser(edgeFields, new SearchAnalyzer());
+            qParser.setDefaultOperator(QueryParser.Operator.AND);
 
-            Query edgeQuery = mfqParser.parse(QueryParserBase.escape(keyword.toLowerCase()));
+            Query textQuery = qParser.parse(QueryParserBase.escape(keyword.toLowerCase()));
 
-            finalQuery.add(new BoostQuery(edgeQuery, 1.0f), BooleanClause.Occur.SHOULD);
+            finalQuery.add(new BoostQuery(textQuery, 50f), BooleanClause.Occur.SHOULD);
 
-            Query cityAutocompleteQuery = new PrefixQuery(new Term("city_autocomplete", keyword.toLowerCase()));
-            Query nameAutocompleteQuery = new PrefixQuery(new Term("name_autocomplete", keyword.toLowerCase()));
+            if(keyword.length() >= 3) {
+                Query cityAutocompleteQuery = new PrefixQuery(new Term("city_autocomplete", keyword.toLowerCase()));
+                Query nameAutocompleteQuery = new PrefixQuery(new Term("name_autocomplete", keyword.toLowerCase()));
 
-            finalQuery.add(new BoostQuery(cityAutocompleteQuery, 1.0f), BooleanClause.Occur.SHOULD);
-            finalQuery.add(new BoostQuery(nameAutocompleteQuery, 1.0f), BooleanClause.Occur.SHOULD);
+                finalQuery.add(new BoostQuery(cityAutocompleteQuery, 200f), BooleanClause.Occur.SHOULD);
+                finalQuery.add(new BoostQuery(nameAutocompleteQuery, 150f), BooleanClause.Occur.SHOULD);
+            }
 
-            DisjunctionMaxQuery disjunctionMaxQuery = new DisjunctionMaxQuery(exactQueries, 0.0f);
-            exactQueries.forEach(q -> finalQuery.add(new BoostQuery(disjunctionMaxQuery, 100.0f), BooleanClause.Occur.SHOULD));
+            finalQuery.add(new BoostQuery(new TermQuery(
+                    new Term("iata", keyword.toUpperCase())), 2000f), BooleanClause.Occur.SHOULD);
+
+            finalQuery.add(new BoostQuery(
+                    new TermQuery(new Term("city_code", keyword.toUpperCase())), 1000f), BooleanClause.Occur.SHOULD);
+
+            log.info("final query for search: {}", finalQuery.build());
+
 
 //            TopDocs initialHits = searcher.search(query, 10);
             TopDocs initialHits = searcher.search(finalQuery.build(), 10);
             for (ScoreDoc scoreDoc : initialHits.scoreDocs) {
+//                explanation for each result
+//                Explanation explanation = searcher.explain(finalQuery.build(), scoreDoc.doc);
                 Document doc = searcher.storedFields().document(scoreDoc.doc);
+
+//                System.out.println("///////////////");
+//                for(IndexableField f: doc.getFields()) {
+//                    System.out.println(f.name() + " = " + f.stringValue());
+//                }
+//                System.out.println("--------------");
 
                 results.add(new Location(
                         LocationType.valueOf(doc.get("subType")),
@@ -106,6 +131,16 @@ public class LuceneSearchService implements ISearchService {
                         doc.get("city")
                 ));
             }
+
+//            Terms terms = MultiTerms.getTerms(reader, "city_code");
+//            TermsEnum termsEnum = terms.iterator();
+//
+//            int counter = 0;
+//            BytesRef term;
+//            while ((term = termsEnum.next()) != null && counter < 50) {
+//                System.out.println("term: " + term.utf8ToString());
+//                counter++;
+//            }
         } catch (IOException | ParseException e) {
             throw new RuntimeException(e);
         }
@@ -114,6 +149,7 @@ public class LuceneSearchService implements ISearchService {
 //		return HelperUtil.getGroupedData(results);
         List<LocationResponse> locationResponseList = Helper.getGroupedLocationData(results);
         return locationResponseList;
+//        return results;
 //        return new LocationResponseWrapper(locationResponseList);
     }
 }

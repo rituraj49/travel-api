@@ -47,7 +47,11 @@ public class Helper {
     }
 
     public static List<LocationResponse> getGroupedLocationData(List<Location> data) {
-        Map<String, List<Location>> groupedData = data.stream().collect(Collectors.groupingBy(Location::getCityCode));
+        Map<String, List<Location>> groupedData = data.stream().collect(Collectors.groupingBy(
+            Location::getCityCode,
+            LinkedHashMap::new,
+            Collectors.toList()
+        ));
 
         List<LocationResponse> result = new ArrayList<>();
 
