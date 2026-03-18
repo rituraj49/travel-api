@@ -9,6 +9,7 @@ import com.jamuara.crs.flight.dto.FlightBookingRequest;
 import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FetchFlightBookingResponse;
 import com.jamuara.crs.flight.dto.tbo.book.FlightBookingTicketingRequest;
+import com.jamuara.crs.hotel.dto.HotelBookingRequestDto;
 import com.jamuara.crs.hotel.service.HotelService;
 import com.jamuara.crs.model.Payment;
 import com.jamuara.crs.model.Reservation;
@@ -68,7 +69,7 @@ public class BookingAsyncService {
 
             triggerFlightBooking(bookingIntent, p);
         } else if(p.getBookingType() == BookingType.HOTEL) {
-            Map<String, Object> bookingIntent = wrapper != null ? (Map<String, Object>) wrapper.get() : null;
+            HotelBookingRequestDto bookingIntent = wrapper != null ? (HotelBookingRequestDto) wrapper.get() : null;
             log.info("cached booking intent found: {}", wrapper.get().toString());
             triggerHotelBooking(bookingIntent);
         }
@@ -145,7 +146,7 @@ public class BookingAsyncService {
         }
     }
 
-    public void triggerHotelBooking(Map<String, Object> hotelBookingRequest) {
+    public void triggerHotelBooking(HotelBookingRequestDto hotelBookingRequest) {
         try {
             hotelService.bookHotel(hotelBookingRequest);
         } catch(Exception e) {

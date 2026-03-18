@@ -78,6 +78,10 @@ public class Reservation {
     @JsonIgnore
     private UserProfile userProfile;
 
+    @ManyToOne(optional = true, fetch = FetchType.LAZY)
+    @JsonIgnore
+    private TravelPackage travelPackage;
+
     @CreationTimestamp
     @Column(nullable = false, updatable = false)
     private LocalDateTime createdAt;

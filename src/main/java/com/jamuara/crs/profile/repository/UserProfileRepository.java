@@ -25,9 +25,10 @@ public interface UserProfileRepository extends JpaRepository<UserProfile, Long> 
 //            LEFT JOIN FETCH u.reservations
 //            WHERE u.kcUserId=:kcUserId
 //            """)
-    @EntityGraph(attributePaths = {
-            "reservations"
-    })
+//    @EntityGraph(attributePaths = {
+//            "reservations",
+//            "hotelReservations"
+//    })
     @Query("select u from UserProfile u where u.kcUserId = :kcUserId")
     Optional<UserProfile> findByKcUserIdWithAllRelations(String kcUserId);
 }

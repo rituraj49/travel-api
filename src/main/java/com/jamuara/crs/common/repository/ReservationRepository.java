@@ -25,6 +25,16 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
 //            """)
     Optional<List<Reservation>> findByPaymentId(Long id);
 
+    @Query("""
+            SELECT DISTINCT r
+            FROM Reservation r
+            LEFT JOIN FETCH r.travelers
+            WHERE r.userProfile.id=:id
+            """)
+    Optional<List<Reservation>> findByUserProfileId(Long id);
+
+    List<Reservation> findByKcUserId(String id);
+
     Optional<Reservation> findReservationByBookingId(String id);
 
     @Query("""
@@ -39,8 +49,6 @@ public interface ReservationRepository extends JpaRepository<Reservation,Long> {
     Optional<Reservation> findReservationByPnr(String pnr);
 
     Page<Reservation> findReservationByBookingStatus(Reservation.BookingStatus status, Pageable pageable);
-
-
 
     Page<Reservation> findByCreatedAtBetweenAndBookingStatus(
             LocalDateTime from,

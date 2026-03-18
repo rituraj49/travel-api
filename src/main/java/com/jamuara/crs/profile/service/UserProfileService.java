@@ -53,6 +53,7 @@ public class UserProfileService {
         Map<String, List<String>> attrs = userRep.getAttributes();
 
         UserProfileDto userProfileDto = new UserProfileDto();
+        userProfileDto.setId(userProfile.getId());
         userProfileDto.setUsername(userRep.getUsername());
         userProfileDto.setFirstName(userRep.getFirstName());
         userProfileDto.setLastName(userRep.getLastName());
@@ -78,6 +79,7 @@ public class UserProfileService {
         userProfileDto.setAddress(addressDto);
 
         userProfileDto.setReservations(userProfile.getReservations());
+        userProfileDto.setHotelReservations(userProfile.getHotelReservations());
 
         return userProfileDto;
     }
@@ -158,6 +160,7 @@ public class UserProfileService {
                 .orElseThrow(() -> new NotFoundException("no user found in database for the kc user id"));
         userProfile.getReservations().forEach(r -> r.getTravelers().size());
         userProfile.getReservations().forEach(r -> r.getFlightLegs().size());
+        userProfile.getHotelReservations().forEach(hr -> hr.getGuests().size());
 
         return userProfile;
     }

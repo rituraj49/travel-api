@@ -10,15 +10,24 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.Gson;
 import com.google.gson.JsonObject;
+import com.jamuara.crs.common.Helper;
+import com.jamuara.crs.common.repository.HotelReservationRepository;
 import com.jamuara.crs.currency.dto.Money;
 import com.jamuara.crs.currency.service.CurrencyService;
 import com.jamuara.crs.enums.Amenity;
+import com.jamuara.crs.hotel.dto.HotelBookingRequestDto;
 import com.jamuara.crs.hotel.dto.HotelSearchRequestDto;
+import com.jamuara.crs.hotel.mappers.HotelReservationMapper;
 import com.jamuara.crs.hotel.mappers.HotelSearchResponseMapper;
 import com.jamuara.crs.hotel.model.HotelOfferResponse;
 import com.jamuara.crs.hotel.model.HotelSearchResponse;
+import com.jamuara.crs.model.HotelReservation;
+import com.jamuara.crs.model.UserProfile;
+import com.jamuara.crs.profile.service.UserProfileService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -34,15 +43,24 @@ public class HotelService implements IHotelService {
 
     private HotelSearchResponseMapper searchResponseMapper;
 
+    private HotelReservationMapper hotelReservationMapper;
+
+    @Autowired
+    private UserProfileService userProfileService;
+
+    @Autowired
+    private HotelReservationRepository hotelReservationRepository;
+
     @Autowired
     private Gson gson;
 
     @Autowired
     CurrencyService currencyService;
 
-    public HotelService(Amadeus amadeusClient, HotelSearchResponseMapper searchResponseMapper) {
+    public HotelService(Amadeus amadeusClient, HotelSearchResponseMapper searchResponseMapper, HotelReservationMapper hotelReservationMapper) {
         this.amadeusClient = amadeusClient;
         this.searchResponseMapper = searchResponseMapper;
+        this.hotelReservationMapper = hotelReservationMapper;
     }
 
     @Override
@@ -159,15 +177,46 @@ public class HotelService implements IHotelService {
     }
 
     @Override
-    public JsonNode bookHotel(Map<String, Object> body) throws Exception {
+    public HotelReservation bookHotel(HotelBookingRequestDto dto) throws Exception {
 //        HotelOrder response = amadeusClient.booking.hotelOrders.post(body);
 //        return response.getResponse().getBody();
-        JsonObject jsonObject = gson.toJsonTree(body).getAsJsonObject();
+        JsonObject jsonObject = gson.toJsonTree(dto).getAsJsonObject();
         log.info("hotel booking request body : {}", jsonObject);
         HotelOrder hotelOrder = amadeusClient.booking.hotelOrders.post(jsonObject);
 //        return hotelOrder;
+        HotelReservation hotelReservation = saveHotelReservation(hotelOrder, dto);
+        System.out.println("hotel reserv: " + hotelReservation.toString());
         String gsonJson = gson.toJson(hotelOrder);
         ObjectMapper objectMapper = new ObjectMapper();
-        return objectMapper.readTree(gsonJson);
+//        return objectMapper.readTree(gsonJson);
+        return hotelReservation;
+    }
+
+    public HotelReservation saveHotelReservation(HotelOrder order, HotelBookingRequestDto request) {
+        System.out.println("hotel order converting: "  + order.toString());
+        HotelReservation hotelReservation = new HotelReservation();
+        try {
+            hotelReservation = hotelReservationMapper.toEntity(order);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        String kcUserId = null;
+        UserProfile userProfile = null;
+        if(Helper.isUserAuthenticated()) {
+            Jwt jwt = (Jwt) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+            if(jwt != null) kcUserId = jwt.getClaim("sub");
+            if(kcUserId != null) userProfile = userProfileService.findUserByKcUserId(kcUserId);
+        }
+
+        hotelReservation.setUserProfile(userProfile);
+        hotelReservation.setKcUserId(kcUserId);
+
+        Gson gson = new Gson();
+        hotelReservation.setBookingRequest(gson.toJson(request));
+        hotelReservation.setBookingResponse(gson.toJson(order));
+
+
+        return hotelReservationRepository.save(hotelReservation);
     }
 }

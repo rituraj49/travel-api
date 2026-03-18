@@ -4,11 +4,13 @@ import com.amadeus.exceptions.ResponseException;
 import com.amadeus.resources.HotelOfferSearch;
 import com.amadeus.resources.HotelOrder;
 import com.fasterxml.jackson.databind.JsonNode;
+import com.jamuara.crs.hotel.dto.HotelBookingRequestDto;
 import com.jamuara.crs.hotel.dto.HotelSearchRequestDto;
 import com.jamuara.crs.hotel.model.HotelOfferResponse;
 import com.jamuara.crs.hotel.model.HotelSearchResponse;
 import com.jamuara.crs.hotel.service.HotelService;
 import com.jamuara.crs.hotel.service.IHotelService;
+import com.jamuara.crs.model.HotelReservation;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.media.Content;
@@ -162,9 +164,9 @@ public class HotelController {
     }
 
     @PostMapping("/book")
-    public ResponseEntity<?> bookHotel(@RequestBody Map<String, Object> body) {
+    public ResponseEntity<?> bookHotel(@RequestBody HotelBookingRequestDto body) {
         try {
-            JsonNode response = hotelService.bookHotel(body);
+            HotelReservation response = hotelService.bookHotel(body);
             return ResponseEntity.ok()
                     .contentType(MediaType.APPLICATION_JSON)
                     .body(response);
