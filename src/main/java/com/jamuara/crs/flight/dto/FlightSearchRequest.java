@@ -11,7 +11,7 @@ public class FlightSearchRequest {
     private String destinationLocationCode;
     private String departureDate;
 
-    @JsonIgnore
+//    @JsonIgnore
     private String returnDate;
 
     private int adults;

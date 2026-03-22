@@ -1,9 +1,13 @@
 package com.jamuara.crs.model;
 
+import com.jamuara.crs.flight.dto.FlightBookingRequest;
+import com.jamuara.crs.flight.dto.FlightBookingResponse;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.JdbcTypeCode;
+import org.hibernate.type.SqlTypes;
 import org.springframework.context.annotation.Profile;
 
 import java.time.LocalDateTime;
@@ -22,13 +26,17 @@ public class UserLogs {
 
     private String orderId;
 
+    private String username;
+
     private LocalDateTime logTimestamp = LocalDateTime.now();
 
-    @Column(length = 7000)
-    private String requestPayload;
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private FlightBookingRequest requestPayload;
 
-    @Column(length = 7000)
-    private String responsePayload;
+    @Column(columnDefinition = "jsonb")
+    @JdbcTypeCode(SqlTypes.JSON)
+    private FlightBookingResponse responsePayload;
 
     private Integer numberOfTravellers;
 
@@ -39,11 +47,12 @@ public class UserLogs {
 
     private String toLocation;
 
-    public UserLogs(String orderId, LocalDateTime logTimestamp, String requestPayload,
-                      String responsePayload, Integer numberOfTravellers,
+    public UserLogs(String orderId, LocalDateTime logTimestamp, String username, FlightBookingRequest requestPayload,
+                    FlightBookingResponse responsePayload, Integer numberOfTravellers,
                       String totalAmount, String fromLocation, String toLocation,String currencyCode) {
         this.orderId = orderId;
         this.logTimestamp = logTimestamp;
+        this.username = username;
         this.requestPayload = requestPayload;
         this.responsePayload = responsePayload;
         this.numberOfTravellers = numberOfTravellers;

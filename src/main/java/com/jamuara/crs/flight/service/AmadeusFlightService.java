@@ -8,6 +8,7 @@ import com.amadeus.resources.FlightOfferSearch;
 import com.amadeus.resources.FlightOrder;
 import com.amadeus.resources.FlightPrice;
 import com.amadeus.resources.Resource;
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -65,10 +66,11 @@ public class AmadeusFlightService implements IFlightService {
     }
 
 //    @Cacheable("flightOffers")
-    public List<FlightAvailabilityResponse> searchFlights(FlightSearchRequest request) throws ResponseException {
+    public List<FlightAvailabilityResponse>  searchFlights(FlightSearchRequest request) throws ResponseException {
         log.info("cache missed, sending flight search request to amadeus");
         log.info("flight offers request parameters: {}", request.toString());
         ObjectMapper mapper = new ObjectMapper();
+        mapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
         Map<String, String> paramsMap = mapper.convertValue(request, new TypeReference<Map<String, String>>() {});
 
         Params params = null;

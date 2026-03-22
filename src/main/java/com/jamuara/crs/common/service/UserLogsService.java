@@ -27,10 +27,10 @@ public class UserLogsService {
     @Autowired
     private ObjectMapper objectMapper;
 
-    public void saveUserLog(String orderId, LocalDateTime logTimestamp, String requestPayload, String responsePayload,
+    public void saveUserLog(String orderId, LocalDateTime logTimestamp, String username, FlightBookingRequest requestPayload, FlightBookingResponse responsePayload,
                             Integer numberOfTravellers, String totalAmount,
                             String fromLocation, String toLocation, String currencyCode) {
-        UserLogs log1 = new UserLogs(orderId, logTimestamp, requestPayload, responsePayload,
+        UserLogs log1 = new UserLogs(orderId, logTimestamp, username, requestPayload, responsePayload,
                 numberOfTravellers, totalAmount, fromLocation, toLocation, currencyCode);
 
 //        System.out.println(log1);
@@ -39,9 +39,8 @@ public class UserLogsService {
     }
 
     public void createUserLogs(FlightBookingRequest orderRequest, FlightBookingResponse createdOrder) {
-        try {
-            String requestJson = objectMapper.writeValueAsString(orderRequest);
-            String responseJson = objectMapper.writeValueAsString(createdOrder);
+//            String requestJson = objectMapper.writeValueAsString(orderRequest);
+//            String responseJson = objectMapper.writeValueAsString(createdOrder);
 
             Integer numberOfTravellers = orderRequest.getTravelers() != null ? orderRequest.getTravelers().size() : 0;
 
@@ -65,18 +64,14 @@ public class UserLogsService {
             saveUserLog(
                     createdOrder.getOrderId(),
                     LocalDateTime.now(),
-                    requestJson+username,
-                    responseJson,
+                    username,
+                    orderRequest,
+                    createdOrder,
                     numberOfTravellers,
                     totalAmount,
                     from,
                     to,
                     currencyCode
             );
-
-        } catch (JsonProcessingException e) {
-            log.error("Error converting request/response to JSON: {}", e.getMessage());
-            e.printStackTrace();
-        }
     }
 }

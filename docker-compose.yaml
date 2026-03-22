@@ -6,7 +6,7 @@ services:
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: java
-      POSTGRES_DB: mydb
+      POSTGRES_DB: lucenedb
     ports:
       - 5435:5432
     volumes:
@@ -64,17 +64,17 @@ services:
 #      retries: 20
   spring-backend:
     container_name: backend-service
-#    build:
-#      context: .
-#      dockerfile: Dockerfile
-    image: dev9431/backend-service
+    build:
+      context: .
+      dockerfile: Dockerfile
+#    image: dev9431/backend-service
     restart: unless-stopped
-    depends_on:
-      - keycloak
+#    depends_on:
+#      - keycloak
     environment:
       - AMADEUS_KEY=
       - AMADEUS_SECRET=
-      - SPRING_DATABASE_URL=jdbc:postgresql://postgres:5432/mydb
+      - SPRING_DATABASE_URL=jdbc:postgresql://postgres:5432/lucenedb
       - SPRING_DATABASE_USERNAME=postgres
       - SPRING_DATABASE_PASSWORD=java
     ports:

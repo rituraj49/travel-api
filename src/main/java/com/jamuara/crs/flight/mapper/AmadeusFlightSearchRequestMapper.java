@@ -25,7 +25,7 @@ public class AmadeusFlightSearchRequestMapper {
 //        flightFilters.put("returnToDepartureAirport", !flightOfferSearchRequestDto.isOneWay());
 
         searchParams.put("maxFlightOffers", flightOfferSearchRequestDto.getMaxCount());
-//        searchParams.put("addOneWayOffers", flightOfferSearchRequestDto.isOneWay());/0
+//        searchParams.put("addOneWayOffers", flightOfferSearchRequestDto.isOneWay());
         searchParams.put("flightFilters", flightFilters);
 
         flightOfferMap.put("currencyCode", flightOfferSearchRequestDto.getCurrencyCode());
