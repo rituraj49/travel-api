@@ -100,7 +100,8 @@ public class LocationSearchController {
     ) {
         try {
             log.info("Received keyword for search: {}", keyword);
-			List<LocationResponse> result = esService.searchByKeyword(keyword, page, size);
+//			List<LocationResponse> result = esService.searchByKeyword(keyword, page, size);
+			List<LocationResponse> result = esService.jamuaraElasticSearch(keyword, "airports", page, size);
 //            LocationResponseWrapper result = esService.searchByKeyword(keyword, page, size);
 
             return ResponseEntity.status(HttpStatus.OK).body(result);

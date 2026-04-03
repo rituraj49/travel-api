@@ -12,7 +12,10 @@ import com.jamuara.crs.common.Helper;
 import com.jamuara.crs.common.location.dto.CityGroup;
 import com.jamuara.crs.common.location.dto.Location;
 import com.jamuara.crs.common.location.dto.LocationResponse;
+import com.jamuara.elasticlib.service.BulkItemMapper;
+import com.jamuara.elasticlib.service.ElasticSearchService;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -24,6 +27,9 @@ import java.util.stream.Collectors;
 public class ESService {
 
     private final ElasticsearchClient esClient;
+
+    @Autowired
+    private com.jamuara.elasticlib.service.ElasticSearchService jamuaraElasticSearchService;
 
     public ESService(ElasticsearchClient esClient) {
         this.esClient = esClient;
@@ -93,6 +99,59 @@ public class ESService {
             log.error(e.getMessage());
             throw new IllegalStateException("failed to create index", e);
         }
+    }
+
+    public void jamuaraBulkUpload(List<Location> locations, String indexName) throws IOException {
+        jamuaraElasticSearchService.bulkUploadData(locations, indexName,
+                new BulkItemMapper<Location>() {
+            @Override
+            public String getId(Location location) {
+                return location.getIata();
+            }
+
+            @Override
+            public Map<String, Object> map(Location location) {
+                return toLocationDocument(location);
+            }
+        },
+1000);
+    }
+
+    private void jamuaraIndexCityGroups(List<Location> locations) throws IOException {
+        Map<String, List<Location>> cityGroups = locations.stream().collect(Collectors.groupingBy(Location::getCityCode));
+
+        List<CityGroup> cityGroupList = cityGroups.entrySet().stream().map(c -> {
+            CityGroup cityGroup = new CityGroup();
+            cityGroup.setCityCode(c.getKey());
+            List<LocationResponse.SimpleAirport> simpleAirportList = c.getValue().stream()
+                    .map(a -> new LocationResponse.SimpleAirport(
+                            a.getSubType(),
+                            a.getIata(),
+                            a.getName(),
+                            a.getCity(),
+                            a.getCityCode(),
+                            a.getCountryCode()
+                    )).toList();
+            cityGroup.setAirportGroup(simpleAirportList);
+            return cityGroup;
+        }).toList();
+
+        jamuaraElasticSearchService.bulkUploadData(cityGroupList, "city_groups",
+                new BulkItemMapper<CityGroup>() {
+                    @Override
+                    public String getId(CityGroup cityGroup) {
+                        return cityGroup.getCityCode();
+                    }
+
+                    @Override
+                    public Map<String, Object> map(CityGroup cityGroup) {
+                        Map<String, Object> cgMap = new HashMap<>();
+
+                        cgMap.put("city_code", cityGroup.getCityCode());
+                        cgMap.put("airports", cityGroup.getAirportGroup());
+                        return cgMap;
+                    }
+                }, cityGroups.size());
     }
 
     public void bulkUpload(List<Location> locations, String indexName) throws IOException {
@@ -254,5 +313,50 @@ public class ESService {
 //        LocationResponseWrapper wrapper = new LocationResponseWrapper();
 //        wrapper.setLocationResponses(locationResponseList);
 //        return wrapper;
+    }
+
+    public List<LocationResponse> jamuaraElasticSearch(String keyword, String indexName, int page, int size) throws IOException {
+        List<Location> airports = jamuaraElasticSearchService.search(
+                indexName,
+                s -> {
+                    ElasticSearchService.applyPagination(s, page, size);
+
+                    s.query(q -> q
+                            .bool(b -> b
+                                    .should(sh -> sh.term(t -> t.field("iata.raw").value(keyword).boost(5f)))
+                                    .should(sh -> sh.term(t -> t.field("city_code.raw").value(keyword).boost(3f)))
+                                    .should(sh -> sh.match(m -> m.field("name").query(keyword).boost(2f)))
+                                    .should(sh -> sh.match(m -> m.field("city").query(keyword).boost(1f)))
+                                    .minimumShouldMatch("1")
+                            )
+                    );
+                    s.sort(so -> so.score(o -> o.order(SortOrder.Desc)));
+                },
+                Location.class
+        );
+
+        Set<String> cityCodes = airports.stream()
+                .map(Location::getCityCode)
+                .collect(Collectors.toSet());
+
+        List<CityGroup> cityGroups = jamuaraElasticSearchService.search(
+                "city_groups",
+                s -> s.query(q -> q
+                        .terms(t -> t
+                                .field("city_code.keyword")
+                                .terms(tq -> tq.value(
+                                        cityCodes.stream()
+                                                .map(FieldValue::of)
+                                                .toList()
+                                ))
+                        )
+                ),
+                CityGroup.class
+        );
+
+        List<LocationResponse> response =
+                Helper.getGroupedCityData(airports, cityGroups);
+
+        return response;
     }
 }
